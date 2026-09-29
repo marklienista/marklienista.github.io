@@ -2,44 +2,84 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#155e59"><meta name="description" content="Um lugar simples para escrever, guardar e imaginar. ApertaLetra experimental, gratuito e sem cadastro.">
+<meta name="theme-color" content="#5754a4"><meta name="description" content="Um lugar simples para escrever, guardar e imaginar. ApertaLetra experimental, gratuito e sem cadastro.">
 <meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
 <title>ApertaLetra • Escreva suas ideias</title>
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./style.css">
-<script src="./js/model.js" defer></script><script src="./js/store.js" defer></script><script src="./js/app.js" defer></script>
+<script src="./js/model.js" defer></script><script src="./js/store.js" defer></script><script src="./js/app.js" defer></script><script src="./js/beginner.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#editor">Ir para a escrita</a>
 <header class="app-header">
- <a class="brand" href="./" aria-label="ApertaLetra início"><span class="brand-mark" aria-hidden="true">Aa</span><span>Aperta<span class="brand-accent">Letra</span></span></a>
- <span class="beta">EXPERIMENTAL <span>• gratuito</span></span>
- <div class="header-actions"><button id="libraryBtn">Meus textos <span aria-hidden="true">▤</span></button><button id="helpBtn" class="quiet" aria-label="Ajuda e privacidade">Ajuda</button></div>
+ <div class="brand" aria-label="ApertaLetra"><span class="brand-mark" aria-hidden="true">A<span>a</span></span><div><h1>Aperta<span>Letra</span></h1><p>Escreva. Experimente. É seu.</p></div></div>
+ <span class="beta">Versão de teste · grátis</span>
+ <button id="helpBtn" class="help-button" aria-label="Ajuda e privacidade"><span aria-hidden="true">?</span> Ajuda</button>
 </header>
 <main>
- <section class="intro"><div><p class="eyebrow">UM LUGAR PARA SUAS IDEIAS</p><h1>O que vamos escrever hoje?</h1><p>Uma história, um bilhete, uma ideia. O texto é seu.</p></div><button id="newBtn" class="secondary">＋ Novo texto</button></section>
- <p class="local-note"><strong>Protótipo em testes:</strong> use textos de exemplo e baixe uma cópia. O salvamento e a recuperação ainda estão em validação.</p>
- <section class="workspace" aria-label="Área de escrita">
- <div class="document-bar"><label class="title-label" for="docTitle">Título do texto<input id="docTitle" maxlength="120" autocomplete="off" placeholder="Dê um título à sua ideia"></label><div class="document-actions"><button id="openBtn" class="quiet">Abrir arquivo</button><button id="downloadBtn" class="primary">Baixar texto <span aria-hidden="true">↓</span></button><button id="printBtn">Imprimir</button></div></div>
- <div class="toolbar" role="group" aria-label="Ferramentas de escrita">
-  <div class="toolgroup"><button id="undoBtn" title="Desfazer (Ctrl+Z)" aria-label="Desfazer">↶</button><button id="redoBtn" title="Refazer (Ctrl+Shift+Z)" aria-label="Refazer">↷</button></div>
-  <div class="toolgroup"><button data-command="bold" aria-label="Negrito" aria-pressed="false"><b>N</b></button><button data-command="italic" aria-label="Itálico" aria-pressed="false"><i>I</i></button><button data-command="underline" aria-label="Sublinhado" aria-pressed="false"><u>S</u></button></div>
-  <div class="toolgroup"><label>Letra<select id="fontSelect" aria-label="Tipo de letra do texto"><option value="Arial">Simples</option><option value="Georgia">De livro</option><option value="Verdana">Bem aberta</option></select></label><label>Tamanho<select id="sizeSelect" aria-label="Tamanho da letra do texto"><option value="20">20</option><option value="24" selected>24</option><option value="28">28</option><option value="32">32</option></select></label></div>
-  <div class="toolgroup colors" role="group" aria-label="Cor da seleção"><button data-color="#183734" style="--swatch:#183734" aria-label="Cor escura" title="Cor escura"></button><button data-color="#145b9b" style="--swatch:#145b9b" aria-label="Cor azul" title="Cor azul"></button><button data-color="#a12f45" style="--swatch:#a12f45" aria-label="Cor vermelha" title="Cor vermelha"></button><button data-color="#7049a2" style="--swatch:#7049a2" aria-label="Cor roxa" title="Cor roxa"></button></div>
-  <div class="toolgroup"><button data-command="justifyLeft" aria-label="Alinhar à esquerda" title="Alinhar à esquerda">☰</button><button data-command="justifyCenter" aria-label="Centralizar" title="Centralizar">≡</button></div>
- </div>
- <div class="paper-wrap"><article class="paper"><h2 id="printTitle" class="print-only"></h2><div id="editor" contenteditable="true" role="textbox" aria-label="Seu texto" aria-multiline="true" spellcheck="false" data-placeholder="Era uma vez uma ideia…" tabindex="0"></div></article></div>
- <div class="status-bar"><span id="saveStatus" role="status" aria-live="polite">Preparando a escrita…</span><span id="wordCount">0 palavras</span><button id="focusBtn" class="quiet">Modo foco</button></div>
+ <nav class="action-shelf intro" aria-label="O que fazer com seu texto">
+<button id="newBtn" class="action-tile "><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5h18l8 8v29H12z" fill="#fff"/><path d="M30 5v9h8"/><path d="M20 28h12m-6-6v12" stroke="#6560bb"/></svg><span>Novo texto</span></button>
+<button id="libraryBtn" class="action-tile "><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 14h14l5 5h19l-5 23H7z" fill="#f5ce67"/><path d="M9 14V8h15l5 6h10v5" fill="#fff0b6"/><path d="M14 27h18m-18 6h13"/></svg><span>Meus textos</span></button>
+<button id="openBtn" class="action-tile "><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16h14l4 4h19l-5 22H7z" fill="#c4dcfa"/><path d="M27 5v20m-7-7 7 7 7-7" stroke="#376b9f"/></svg><span>Abrir arquivo</span></button>
+<button id="downloadBtn" class="action-tile "><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 29v12h29V29" fill="#cdf0df"/><path d="M24 5v26m-8-8 8 8 8-8" stroke="#226e50"/><path d="M19 36h11"/></svg><span>Baixar cópia</span></button>
+<button id="printBtn" class="action-tile "><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 5h23v13H13z" fill="white"/><path d="M9 17h31a4 4 0 0 1 4 4v14H5V21a4 4 0 0 1 4-4z" fill="#e2d6f9"/><path d="M13 28h23v15H13z" fill="white"/><path d="M18 33h13m-13 5h10"/><circle cx="37" cy="23" r="1.5" fill="#5754a4" stroke="none"/></svg><span>Imprimir</span></button><div class="shelf-note"><strong>Uma ideia já é um começo.</strong><span>O resto você inventa.</span></div></nav>
+ <section class="workspace" aria-label="Sua oficina de escrita">
+  <div class="writing-side">
+   <div class="paper-actions"><div class="history-actions"><button id="undoBtn" class="action-tile "><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 10 5 21l11 11M6 21h22c10 0 14 7 13 16" stroke="#47745d"/></svg><span>Desfazer</span></button><button id="redoBtn" class="action-tile "><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m32 10 11 11-11 11m10-11H20c-10 0-14 7-13 16" stroke="#47745d"/></svg><span>Refazer</span></button></div><button id="selectAllBtn" class="select-all" aria-label="Selecionar todo o texto"><span aria-hidden="true">[ Aa ]</span> Escolher tudo</button></div>
+   <div class="paper-wrap"><article class="paper">
+    <label class="title-label" for="docTitle">Dê um nome ao seu texto <span>• pode ser depois</span></label>
+    <input id="docTitle" maxlength="120" autocomplete="off" placeholder="Meu texto" aria-label="Título do texto">
+    <h2 id="printTitle" class="print-only"></h2>
+    <div id="editor" contenteditable="true" role="textbox" aria-label="Seu texto" aria-multiline="true" spellcheck="false" data-placeholder="Clique aqui e comece a escrever…" tabindex="0"></div>
+   </article></div>
+   <div class="status-bar"><span id="saveStatus" role="status" aria-live="polite">Preparando a escrita…</span><span id="wordCount">0 palavras</span><button id="focusBtn" class="quiet">Modo foco</button></div>
+   <p class="local-note">Guardado só neste navegador. <strong>Baixar cópia</strong> leva o texto com você.</p>
+  </div>
+  <aside class="toolbar" aria-label="Ferramentas de escrita">
+   <div class="tool-heading"><span aria-hidden="true">Aa</span><div><h2>Experimente!</h2><p>As letras podem mudar.</p></div></div>
+   <section class="tool-section"><h3>Jeito da letra <span>• texto todo</span></h3>
+    <div class="font-cards" role="group" aria-label="Tipo de letra do texto">
+     <button data-font="Arial" aria-pressed="true" aria-label="Letra simples"><span class="font-sample" style="font-family:Arial">Aa</span><span>Simples</span></button>
+     <button data-font="Georgia" aria-pressed="false" aria-label="Letra de livro"><span class="font-sample" style="font-family:Georgia">Aa</span><span>De livro</span></button>
+     <button data-font="Verdana" aria-pressed="false" aria-label="Letra bem aberta"><span class="font-sample" style="font-family:Verdana">Aa</span><span>Aberta</span></button>
+    </div>
+   </section>
+   <section class="tool-section"><h3>Tamanho <span>• texto todo</span></h3><div class="size-tools">
+    <button id="smallerBtn" aria-label="Diminuir a letra"><span class="size-small" aria-hidden="true">A−</span><span>Menor</span></button>
+    <output id="sizeValue" aria-live="polite" aria-label="Tamanho atual da letra">24</output>
+    <button id="largerBtn" aria-label="Aumentar a letra"><span class="size-large" aria-hidden="true">A+</span><span>Maior</span></button>
+   </div></section>
+   <div class="selection-note" id="selectionHint">Para cor e efeito, selecione palavras ou toque em <strong>Escolher tudo</strong>.</div>
+   <section class="tool-section"><h3>Um efeito</h3><div class="effect-tools" role="group" aria-label="Efeitos nas letras">
+    <button data-command="bold" aria-label="Negrito" title="Letra forte (negrito)" aria-pressed="false"><b aria-hidden="true">N</b><span>Forte</span></button>
+    <button data-command="italic" aria-label="Itálico" title="Letra inclinada (itálico)" aria-pressed="false"><i aria-hidden="true">I</i><span>Inclinada</span></button>
+    <button data-command="underline" aria-label="Sublinhado" title="Letra sublinhada" aria-pressed="false"><u aria-hidden="true">S</u><span>Sublinhada</span></button>
+   </div></section>
+   <section class="tool-section"><h3>Uma cor</h3><div class="colors" role="group" aria-label="Cor da seleção">
+<button data-color="#183734" style="--swatch:#183734" aria-label="Cor escura" title="Cor escura" aria-pressed="false"><span aria-hidden="true"></span></button>
+<button data-color="#145b9b" style="--swatch:#145b9b" aria-label="Cor azul" title="Cor azul" aria-pressed="false"><span aria-hidden="true"></span></button>
+<button data-color="#287c43" style="--swatch:#287c43" aria-label="Cor verde" title="Cor verde" aria-pressed="false"><span aria-hidden="true"></span></button>
+<button data-color="#7049a2" style="--swatch:#7049a2" aria-label="Cor roxa" title="Cor roxa" aria-pressed="false"><span aria-hidden="true"></span></button>
+<button data-color="#a12f45" style="--swatch:#a12f45" aria-label="Cor vermelha" title="Cor vermelha" aria-pressed="false"><span aria-hidden="true"></span></button>
+<button data-color="#b34916" style="--swatch:#b34916" aria-label="Cor laranja" title="Cor laranja" aria-pressed="false"><span aria-hidden="true"></span></button>
+<button data-color="#a52f75" style="--swatch:#a52f75" aria-label="Cor rosa" title="Cor rosa" aria-pressed="false"><span aria-hidden="true"></span></button>
+<button data-color="#79502c" style="--swatch:#79502c" aria-label="Cor marrom" title="Cor marrom" aria-pressed="false"><span aria-hidden="true"></span></button>
+</div></section>
+   <section class="tool-section"><h3>Onde fica?</h3><div class="align-tools" role="group" aria-label="Posição do texto">
+<button data-command="justifyLeft" aria-label="Alinhar à esquerda" aria-pressed="false"><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10h36M6 20h25M6 30h36M6 40h22"/></svg><span>Esquerda</span></button><button data-command="justifyCenter" aria-label="Centralizar" aria-pressed="false"><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10h36M13 20h22M6 30h36M13 40h22"/></svg><span>Centro</span></button><button data-command="justifyRight" aria-label="Alinhar à direita" aria-pressed="false"><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10h36M17 20h25M6 30h36M20 40h22"/></svg><span>Direita</span></button></div></section>
+  </aside>
  </section>
- <p class="local-note"><span aria-hidden="true">◉</span> Seus textos ficam <strong>neste navegador</strong>, não na nuvem. Baixe uma cópia para levar com você.</p>
- <footer><span>ApertaLetra <span id="appVersion">0.1.1</span> • criado para experimentar e escrever.</span><span>Sem cadastro. Sem cobrança.</span></footer>
+ <footer><span>ApertaLetra <span id="appVersion">0.2.0</span></span><span>Sem cadastro. Sem cobrança. A escrita é sua.</span></footer>
 </main>
+<!-- Kept as the canonical settings controls for file-format compatibility. -->
+<select id="fontSelect" aria-label="Tipo de letra do texto" hidden><option value="Arial">Simples</option><option value="Georgia">De livro</option><option value="Verdana">Bem aberta</option></select>
+<select id="sizeSelect" aria-label="Tamanho da letra do texto" hidden><option value="20">20</option><option value="24" selected>24</option><option value="28">28</option><option value="32">32</option></select>
 <div id="toast" role="status" aria-live="polite" hidden></div>
 <input id="fileInput" type="file" accept=".apertaletra,.txt,application/json,text/plain" hidden>
 <dialog id="libraryDialog" aria-labelledby="libraryTitle"><div class="dialog-head"><div><p class="eyebrow">NESTE NAVEGADOR</p><h2 id="libraryTitle">Meus textos</h2></div><button data-close aria-label="Fechar meus textos">✕</button></div><p>Em um computador compartilhado, outras pessoas deste navegador também podem ver estes textos.</p><div id="documentList" class="document-list"></div></dialog>
 <dialog id="downloadDialog" aria-labelledby="downloadTitle"><div class="dialog-head"><h2 id="downloadTitle">Leve seu texto com você</h2><button data-close aria-label="Fechar opções de download">✕</button></div><p>Baixar cria uma cópia fora do navegador. Guarde-a em uma pasta ou pendrive.</p><button id="editableBtn" class="download-choice"><strong>Arquivo ApertaLetra</strong><span>Para abrir e continuar escrevendo, com a formatação.</span></button><button id="txtBtn" class="download-choice"><strong>Texto simples (.txt)</strong><span>Para abrir em outros programas, sem cores ou formatação.</span></button><p class="muted">Para gerar PDF, use Imprimir e escolha “Salvar como PDF”, quando disponível no seu navegador.</p></dialog>
-<dialog id="helpDialog" aria-labelledby="helpTitle"><div class="dialog-head"><h2 id="helpTitle">Escrever sem complicar</h2><button data-close aria-label="Fechar ajuda">✕</button></div><h3>1. Escreva e experimente</h3><p>Selecione um trecho para usar negrito, itálico, sublinhado ou cor. Letra e tamanho mudam o texto inteiro. Não há correção automática: sua escrita é sua.</p><h3>2. Guarde uma cópia</h3><p>O salvamento automático fica neste navegador e pode ser apagado ao limpar seus dados. Ele não é uma cópia de segurança. “Baixar texto” guarda um arquivo editável; “Abrir arquivo” permite continuar.</p><h3>3. Cuide da privacidade</h3><p>Não escreva senhas, endereço ou informações sensíveis. Sem contas individuais, outras pessoas que usam este navegador podem ver os textos. Baixe sua cópia antes de excluir uma produção da biblioteca.</p><h3>Versão experimental</h3><p>Escrever, guardar localmente, baixar e imprimir são gratuitos nesta etapa. Recursos futuros de nuvem ou organização poderão ter outros planos; nenhum texto existente será retido para exigir pagamento.</p><p>O aplicativo não transmite o conteúdo das produções nem possui anúncios ou análise de uso remota. A hospedagem pode registrar acessos técnicos. A biblioteca local não é sincronizada entre computadores.</p><p id="offlineStatus" class="muted">Uso sem internet: disponível em página já aberta. Reabrir offline depende do cache instalado pelo navegador.</p><p class="muted">Imprimir abre o diálogo do navegador. Isso não confirma que papel foi impresso.</p></dialog>
+<dialog id="helpDialog" aria-labelledby="helpTitle"><div class="dialog-head"><h2 id="helpTitle">Escrever sem complicar</h2><button data-close aria-label="Fechar ajuda">✕</button></div><h3>1. Escreva e experimente</h3><p>Selecione um trecho para usar cor ou efeito. Para mudar tudo de uma vez, toque em “Escolher tudo”. Forte é negrito; inclinada é itálico. Os cartões de letra e os botões Maior e Menor mudam o texto inteiro. Não há correção automática: sua escrita é sua.</p><h3>2. Guarde uma cópia</h3><p>O salvamento automático fica neste navegador e pode ser apagado ao limpar seus dados. Ele não é uma cópia de segurança. “Baixar cópia” guarda um arquivo editável; “Abrir arquivo” permite continuar.</p><h3>3. Cuide da privacidade</h3><p>Não escreva senhas, endereço ou informações sensíveis. Sem contas individuais, outras pessoas que usam este navegador podem ver os textos. Baixe sua cópia antes de excluir uma produção da biblioteca.</p><h3>Versão experimental</h3><p>Esta versão continua em testes. Baixe uma cópia das produções importantes. O teste inicial de uso foi confirmado pelo criador; outros navegadores e situações de recuperação ainda precisam de verificação.</p><p>Escrever, guardar localmente, baixar e imprimir são gratuitos nesta etapa. Recursos futuros de nuvem ou organização poderão ter outros planos; nenhum texto existente será retido para exigir pagamento.</p><p>O aplicativo não transmite o conteúdo das produções nem possui anúncios ou análise de uso remota. A hospedagem pode registrar acessos técnicos. A biblioteca local não é sincronizada entre computadores.</p><p id="offlineStatus" class="muted">Uso sem internet: disponível em página já aberta. Reabrir offline depende do cache instalado pelo navegador.</p><p class="muted">Imprimir abre o diálogo do navegador. Isso não confirma que papel foi impresso.</p></dialog>
 <noscript><p class="error-banner">Ative o JavaScript para usar o editor. Seus arquivos não serão alterados.</p></noscript>
 </body></html>

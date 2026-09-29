@@ -1,6 +1,6 @@
 'use strict';
-const CACHE='apertaletra-shell-0.1.1';
-const FILES=['./','./index.html','./style.css','./js/model.js','./js/store.js','./js/app.js','./manifest.webmanifest','./icon.svg'];
+const CACHE='apertaletra-shell-0.2.0';
+const FILES=['./','./index.html','./style.css','./js/model.js','./js/store.js','./js/app.js','./js/beginner.js','./manifest.webmanifest','./icon.svg'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)));});
 // No skipWaiting: do not replace an active editor midway through writing.
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('apertaletra-shell-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
