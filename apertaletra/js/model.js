@@ -2,7 +2,22 @@
 'use strict';
 (() => {
  const VERSION=1, MAX_FILE_BYTES=1024*1024, MAX_TEXT=250000;
- const FONTS=['Arial','Georgia','Verdana'], SIZES=[20,24,28,32];
+ const FONT_STACKS={
+  Arial:'Arial, Helvetica, sans-serif',
+  Georgia:'Georgia, "Times New Roman", serif',
+  Manuscrita:'"Segoe Print", "Bradley Hand", "Comic Sans MS", "Comic Neue", cursive',
+  'Courier New':'"Courier New", Courier, monospace',
+  Verdana:'Verdana, sans-serif'
+ };
+ const FONTS=Object.keys(FONT_STACKS), SIZES=[16,18,20,24,28,32,48];
+ const STEP_SIZES=[16,18,24,32,48];
+ const HTML_SIZES={1:10,2:13,3:16,4:18,5:24,6:32,7:48};
+ function fontKey(value){
+  const normalized=String(value||'').replace(/["']/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+  return FONTS.find(f=>normalized===f.toLowerCase() || normalized===FONT_STACKS[f].replace(/["']/g,'').toLowerCase())||null;
+ }
+ function fontStack(value){return FONT_STACKS[fontKey(value)||'Arial'];}
+ function pixelSize(value){const v=String(value||'').trim();return /^\d+(?:\.\d+)?px$/.test(v)&&Number.parseFloat(v)>=10&&Number.parseFloat(v)<=96?v:'';}
  const ALLOWED=new Set(['P','DIV','BR','B','STRONG','I','EM','U','SPAN','FONT','UL','OL','LI']);
  const DROP=new Set(['SCRIPT','STYLE','IFRAME','OBJECT','EMBED','SVG','MATH','IMG','VIDEO','AUDIO','LINK','META','INPUT','FORM','BUTTON']);
  const color=v=> /^(#[0-9a-f]{3,8}|rgba?\(\s*[\d.,%\s]+\))$/i.test(v||'') ? v : '';
@@ -16,6 +31,11 @@
    if(!ALLOWED.has(node.tagName)){for(const child of node.childNodes)walk(child,parent);return;}
    const element=document.createElement(node.tagName==='FONT'?'span':node.tagName.toLowerCase());
    const c=color(node.getAttribute('color')||node.style.color); if(c)element.style.color=c;
+   const face=fontKey(node.style.fontFamily||node.getAttribute('face'));if(face)element.style.fontFamily=fontStack(face);
+   const size=pixelSize(node.style.fontSize)||(node.tagName==='FONT'&&HTML_SIZES[node.getAttribute('size')]?HTML_SIZES[node.getAttribute('size')]+'px':'');if(size)element.style.fontSize=size;
+   if(['bold','700','800','900'].includes(node.style.fontWeight))element.style.fontWeight='bold';
+   if(node.style.fontStyle==='italic')element.style.fontStyle='italic';
+   if(node.style.textDecorationLine==='underline')element.style.textDecoration='underline';
    if(['left','center','right','justify'].includes(node.style.textAlign))element.style.textAlign=node.style.textAlign;
    for(const child of node.childNodes)walk(child,element);
    parent.appendChild(element);
@@ -42,5 +62,5 @@
  }
  function exportFile(doc){return JSON.stringify({app:'apertaletra',version:VERSION,document:validateDocument(doc)},null,2);}
  function filename(title){return (title.trim()||'Meu texto').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'-').slice(0,100);}
- globalThis.AL={VERSION,MAX_FILE_BYTES,MAX_TEXT,FONTS,SIZES,cleanHTML,plainHTML,textFromHTML,settings,id,fresh,validateDocument,importFile,exportFile,filename};
+ globalThis.AL={VERSION,MAX_FILE_BYTES,MAX_TEXT,FONTS,SIZES,STEP_SIZES,HTML_SIZES,fontKey,fontStack,pixelSize,cleanHTML,plainHTML,textFromHTML,settings,id,fresh,validateDocument,importFile,exportFile,filename};
 })();

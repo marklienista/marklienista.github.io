@@ -4,15 +4,15 @@
  const CURRENT='apertaletra:current', RECOVERY='apertaletra:recovery:', recoveryKey=RECOVERY+AL.id();
  let doc=AL.fresh(),dirty=false,generation=0,saveTask=null,saveTimer=null,range=null,history=[],historyAt=-1,toastTimer=null,restoring=false;
  function toast(message){clearTimeout(toastTimer);$('toast').textContent=message;$('toast').hidden=false;toastTimer=setTimeout(()=>$('toast').hidden=true,7000);}
- function status(text,state='pending'){$('saveStatus').textContent=text;$('saveStatus').dataset.state=state;}
+ function status(text,state='pending'){$('saveStatus').textContent=text;$('saveStatus').dataset.state=state;const indicator=$('saveIndicator');if(indicator){indicator.dataset.state=state;indicator.title=text;}}
  function setCurrent(id){try{localStorage.setItem(CURRENT,id);}catch{/* IndexedDB can still work when localStorage is unavailable. */}}
  function text(){return AL.textFromHTML(editor.innerHTML);}
- function capture(){return {...doc,title:title.value.slice(0,120),html:AL.cleanHTML(editor.innerHTML),settings:{font:$('fontSelect').value,size:Number($('sizeSelect').value)}};}
+ function capture(){return {...doc,title:title.value.slice(0,120),html:AL.cleanHTML(editor.innerHTML),settings:{...doc.settings}};}
  function emergency(){try{localStorage.setItem(recoveryKey,JSON.stringify({...capture(),emergencyAt:Date.now()}));}catch{/* Remain dirty until the IndexedDB transaction commits. */}}
  function clearEmergency(){try{localStorage.removeItem(recoveryKey);}catch{}}
  function updateCount(){const value=text().trim();$('wordCount').textContent=`${value?value.split(/\s+/u).length:0} palavras`;}
- function applySettings(){editor.style.fontFamily=doc.settings.font;editor.style.fontSize=doc.settings.size+'px';$('fontSelect').value=doc.settings.font;$('sizeSelect').value=doc.settings.size;}
- function snapshot(){return JSON.stringify({title:title.value,html:editor.innerHTML,settings:{font:$('fontSelect').value,size:Number($('sizeSelect').value)}});}
+ function applySettings(){editor.style.fontFamily=AL.fontStack(doc.settings.font);editor.style.fontSize=doc.settings.size+'px';$('fontSelect').value=doc.settings.font;$('sizeSelect').value=doc.settings.size;}
+ function snapshot(){return JSON.stringify({title:title.value,html:editor.innerHTML,settings:{...doc.settings}});}
  function historyPush(){const current=snapshot();if(history[historyAt]===current)return;history=history.slice(0,historyAt+1);history.push(current);let total=history.reduce((n,s)=>n+s.length,0);while(history.length>2&&(history.length>100||total>5000000))total-=history.shift().length;historyAt=history.length-1;historyButtons();}
  function historyButtons(){$('undoBtn').disabled=historyAt<=0;$('redoBtn').disabled=historyAt>=history.length-1;}
  function historyMove(step){const target=historyAt+step;if(target<0||target>=history.length)return;historyAt=target;const saved=JSON.parse(history[historyAt]);restoring=true;title.value=saved.title;editor.innerHTML=AL.cleanHTML(saved.html);doc.settings=AL.settings(saved.settings);applySettings();restoring=false;caretEnd();markDirty(false);historyButtons();}
@@ -37,18 +37,42 @@
   })();return saveTask;
  }
  function rememberRange(){const sel=window.getSelection();if(sel.rangeCount&&editor.contains(sel.anchorNode)&&editor.contains(sel.focusNode))range=sel.getRangeAt(0).cloneRange();}
- function restoreRange(){editor.focus();const sel=window.getSelection();if(range&&editor.contains(range.commonAncestorContainer)){sel.removeAllRanges();sel.addRange(range);}else caretEnd();}
+ function restoreRange(){
+  editor.focus();const sel=window.getSelection();
+  if(range&&editor.contains(range.commonAncestorContainer)){
+   const live=sel.rangeCount?sel.getRangeAt(0):null;
+   // Replacing an identical collapsed range discards the browser's pending styles.
+   if(!live||live.startContainer!==range.startContainer||live.startOffset!==range.startOffset||live.endContainer!==range.endContainer||live.endOffset!==range.endOffset){sel.removeAllRanges();sel.addRange(range);}
+  }else caretEnd();
+ }
  function caretEnd(){editor.focus();const r=document.createRange();r.selectNodeContents(editor);r.collapse(false);const sel=window.getSelection();sel.removeAllRanges();sel.addRange(r);range=r.cloneRange();}
+ function normalizeTypography(){
+  for(const font of editor.querySelectorAll('font')){
+   const size=AL.HTML_SIZES[font.getAttribute('size')];if(size)font.style.fontSize=size+'px';
+   const face=AL.fontKey(font.getAttribute('face'));if(face)font.style.fontFamily=AL.fontStack(face);
+  }
+ }
  function format(command,value=null){
   restoreRange();
   // Isolated legacy browser adapter, intentionally replaceable. execCommand is
   // deprecated; formatting is covered by DOM tests in this prototype. No HTML input.
   // Replace this adapter with a bundled editor engine before broad compatibility claims.
-  try{document.execCommand(command,false,value);rememberRange();markDirty();updateToolbar();}catch{toast('Este navegador não aplicou a formatação. Seu texto foi mantido.');}
+  try{document.execCommand('styleWithCSS',false,false);document.execCommand(command,false,value);normalizeTypography();rememberRange();markDirty();updateToolbar();document.dispatchEvent(new Event('al:format'));}catch{toast('Este navegador não aplicou a formatação. Seu texto foi mantido.');}
  }
  function updateToolbar(){for(const btn of document.querySelectorAll('[data-command]')){if(['bold','italic','underline'].includes(btn.dataset.command)){try{btn.setAttribute('aria-pressed',String(document.queryCommandState(btn.dataset.command)));}catch{}}}}
- function showDocument(next){restoring=true;doc={...next,settings:AL.settings(next.settings)};title.value=doc.title;editor.innerHTML=AL.cleanHTML(doc.html);applySettings();dirty=false;range=null;history=[];historyAt=-1;historyPush();restoring=false;updateCount();status(doc.revision?'Guardado neste navegador':'Pronto para escrever',doc.revision?'ok':'pending');setCurrent(doc.id);}
- async function newDocument(){if(!await persist()){toast('Antes de começar outro texto, resolva o salvamento. Seu texto continua aberto.');return;}clearEmergency();showDocument(AL.fresh());editor.focus();}
+ function showDocument(next){restoring=true;doc={...next,settings:AL.settings(next.settings)};title.value=doc.title;editor.innerHTML=AL.cleanHTML(doc.html);applySettings();dirty=false;range=null;history=[];historyAt=-1;historyPush();restoring=false;updateCount();status(doc.revision?'Guardado neste navegador':'Pronto para escrever',doc.revision?'ok':'pending');setCurrent(doc.id);document.dispatchEvent(new Event('al:document'));}
+ async function newDocument(){if(!await persist()){toast('Antes de começar outro texto, resolva o salvamento. Seu texto continua aberto.');return;}clearEmergency();showDocument(AL.fresh());resetInsertion();}
+ function resetInsertion(){
+  caretEnd();
+  if(editor.textContent)return;
+  try{
+   document.execCommand('fontName',false,AL.fontStack(doc.settings.font));
+   document.execCommand('fontSize',false,Object.keys(AL.HTML_SIZES).find(k=>AL.HTML_SIZES[k]===doc.settings.size)||'5');
+   document.execCommand('foreColor',false,getComputedStyle(editor).color);
+   for(const command of ['bold','italic','underline'])if(document.queryCommandState(command))document.execCommand(command,false,null);
+  }catch{}
+  rememberRange();document.dispatchEvent(new Event('al:format'));
+ }
  function download(content,name,type){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([content],{type}));a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);}
  function exportCurrent(kind){try{const current=kind==='txt'?{title:title.value,plain:editor.innerText}:capture();download(kind==='txt'?current.plain:AL.exportFile(current),AL.filename(current.title)+(kind==='txt'?'.txt':'.apertaletra'),kind==='txt'?'text/plain;charset=utf-8':'application/json');$('downloadDialog').close();toast('Download solicitado. Confira a pasta de downloads para guardar sua cópia.');}catch(error){toast(error.message);}}
  async function importSelected(file){
@@ -86,19 +110,24 @@
   r.deleteContents();const fragment=document.createDocumentFragment();pasted.replace(/\r\n?/g,'\n').split('\n').forEach((line,i)=>{if(i)fragment.append(document.createElement('br'));fragment.append(document.createTextNode(line));});const last=fragment.lastChild;r.insertNode(fragment);if(last){r.setStartAfter(last);r.collapse(true);selection.removeAllRanges();selection.addRange(r);}rememberRange();markDirty();
  });
  editor.addEventListener('drop',event=>{event.preventDefault();toast('Use Abrir arquivo para trazer um texto. Imagens não fazem parte desta versão.');});
- editor.addEventListener('input',()=>{try{markDirty();}catch(error){status('Texto muito grande. Baixe ou reduza antes de sair.','error');toast(error.message);}});
+ editor.addEventListener('input',()=>{try{normalizeTypography();markDirty();}catch(error){status('Texto muito grande. Baixe ou reduza antes de sair.','error');toast(error.message);}});
  editor.addEventListener('keyup',()=>{rememberRange();updateToolbar();});editor.addEventListener('mouseup',()=>{rememberRange();updateToolbar();});editor.addEventListener('blur',rememberRange);
  title.addEventListener('input',()=>markDirty());
  document.querySelectorAll('[data-command],[data-color]').forEach(btn=>{btn.addEventListener('pointerdown',event=>event.preventDefault());btn.addEventListener('click',()=>format(btn.dataset.command||'foreColor',btn.dataset.color));});
- for(const id of ['fontSelect','sizeSelect'])$(id).addEventListener('change',()=>{doc.settings={font:$('fontSelect').value,size:Number($('sizeSelect').value)};applySettings();markDirty();});
+ $('fontSelect').addEventListener('change',()=>format('fontName',AL.fontStack($('fontSelect').value)));
+ $('sizeSelect').addEventListener('change',()=>{
+  const size=Number($('sizeSelect').value), native=Object.keys(AL.HTML_SIZES).find(k=>AL.HTML_SIZES[k]===size);
+  if(native)format('fontSize',native);
+ });
  $('undoBtn').onclick=()=>historyMove(-1);$('redoBtn').onclick=()=>historyMove(1);$('newBtn').onclick=newDocument;$('libraryBtn').onclick=library;$('helpBtn').onclick=()=>$('helpDialog').showModal();
  $('downloadBtn').onclick=()=>$('downloadDialog').showModal();$('editableBtn').onclick=()=>exportCurrent('editable');$('txtBtn').onclick=()=>exportCurrent('txt');
  $('openBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=event=>importSelected(event.target.files[0]);
  $('printBtn').onclick=()=>{persist();$('printTitle').textContent=title.value;window.print();};window.addEventListener('beforeprint',()=>$('printTitle').textContent=title.value);
- $('focusBtn').onclick=()=>{document.body.classList.toggle('focus-mode');$('focusBtn').textContent=document.body.classList.contains('focus-mode')?'Sair do modo foco':'Modo foco';};
+ function focusMode(on){document.body.classList.toggle('focus-mode',on);$('focusBtn').setAttribute('aria-pressed',String(on));$('focusBtn').setAttribute('aria-label',on?'Sair do modo foco':'Modo foco');$('focusBtn').querySelector('.control-label').textContent=on?'Voltar':'Foco';}
+ $('focusBtn').onclick=()=>focusMode(!document.body.classList.contains('focus-mode'));
  document.querySelectorAll('[data-close]').forEach(btn=>btn.onclick=()=>btn.closest('dialog').close());
  document.addEventListener('keydown',event=>{
-  if(event.key==='Escape'&&document.body.classList.contains('focus-mode')){document.body.classList.remove('focus-mode');$('focusBtn').textContent='Modo foco';}
+  if(event.key==='Escape'&&document.body.classList.contains('focus-mode')){focusMode(false);}
   if(!(event.ctrlKey||event.metaKey))return;const key=event.key.toLowerCase();const isEditor=document.activeElement===editor||editor.contains(document.activeElement);
   if(key==='s'){event.preventDefault();$('downloadDialog').showModal();}
   if((key==='z'||key==='y')&&!document.querySelector('dialog[open]')){event.preventDefault();historyMove(key==='y'||event.shiftKey?1:-1);}
