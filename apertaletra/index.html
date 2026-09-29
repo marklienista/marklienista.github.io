@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#155e59"><meta name="description" content="Um lugar simples para escrever, guardar e imaginar. ApertaLetra experimental, gratuito e sem cadastro.">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>ApertaLetra • Escreva suas ideias</title>
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./style.css">
+<script src="./js/model.js" defer></script><script src="./js/store.js" defer></script><script src="./js/app.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#editor">Ir para a escrita</a>
+<header class="app-header">
+ <a class="brand" href="./" aria-label="ApertaLetra início"><span class="brand-mark" aria-hidden="true">Aa</span><span>Aperta<span class="brand-accent">Letra</span></span></a>
+ <span class="beta">EXPERIMENTAL <span>• gratuito</span></span>
+ <div class="header-actions"><button id="libraryBtn">Meus textos <span aria-hidden="true">▤</span></button><button id="helpBtn" class="quiet" aria-label="Ajuda e privacidade">Ajuda</button></div>
+</header>
+<main>
+ <section class="intro"><div><p class="eyebrow">UM LUGAR PARA SUAS IDEIAS</p><h1>O que vamos escrever hoje?</h1><p>Uma história, um bilhete, uma ideia. O texto é seu.</p></div><button id="newBtn" class="secondary">＋ Novo texto</button></section>
+ <p class="local-note"><strong>Protótipo em testes:</strong> use textos de exemplo e baixe uma cópia. O salvamento e a recuperação ainda estão em validação.</p>
+ <section class="workspace" aria-label="Área de escrita">
+ <div class="document-bar"><label class="title-label" for="docTitle">Título do texto<input id="docTitle" maxlength="120" autocomplete="off" placeholder="Dê um título à sua ideia"></label><div class="document-actions"><button id="openBtn" class="quiet">Abrir arquivo</button><button id="downloadBtn" class="primary">Baixar texto <span aria-hidden="true">↓</span></button><button id="printBtn">Imprimir</button></div></div>
+ <div class="toolbar" role="group" aria-label="Ferramentas de escrita">
+  <div class="toolgroup"><button id="undoBtn" title="Desfazer (Ctrl+Z)" aria-label="Desfazer">↶</button><button id="redoBtn" title="Refazer (Ctrl+Shift+Z)" aria-label="Refazer">↷</button></div>
+  <div class="toolgroup"><button data-command="bold" aria-label="Negrito" aria-pressed="false"><b>N</b></button><button data-command="italic" aria-label="Itálico" aria-pressed="false"><i>I</i></button><button data-command="underline" aria-label="Sublinhado" aria-pressed="false"><u>S</u></button></div>
+  <div class="toolgroup"><label>Letra<select id="fontSelect" aria-label="Tipo de letra do texto"><option value="Arial">Simples</option><option value="Georgia">De livro</option><option value="Verdana">Bem aberta</option></select></label><label>Tamanho<select id="sizeSelect" aria-label="Tamanho da letra do texto"><option value="20">20</option><option value="24" selected>24</option><option value="28">28</option><option value="32">32</option></select></label></div>
+  <div class="toolgroup colors" role="group" aria-label="Cor da seleção"><button data-color="#183734" style="--swatch:#183734" aria-label="Cor escura" title="Cor escura"></button><button data-color="#145b9b" style="--swatch:#145b9b" aria-label="Cor azul" title="Cor azul"></button><button data-color="#a12f45" style="--swatch:#a12f45" aria-label="Cor vermelha" title="Cor vermelha"></button><button data-color="#7049a2" style="--swatch:#7049a2" aria-label="Cor roxa" title="Cor roxa"></button></div>
+  <div class="toolgroup"><button data-command="justifyLeft" aria-label="Alinhar à esquerda" title="Alinhar à esquerda">☰</button><button data-command="justifyCenter" aria-label="Centralizar" title="Centralizar">≡</button></div>
+ </div>
+ <div class="paper-wrap"><article class="paper"><h2 id="printTitle" class="print-only"></h2><div id="editor" contenteditable="true" role="textbox" aria-label="Seu texto" aria-multiline="true" spellcheck="false" data-placeholder="Era uma vez uma ideia…" tabindex="0"></div></article></div>
+ <div class="status-bar"><span id="saveStatus" role="status" aria-live="polite">Preparando a escrita…</span><span id="wordCount">0 palavras</span><button id="focusBtn" class="quiet">Modo foco</button></div>
+ </section>
+ <p class="local-note"><span aria-hidden="true">◉</span> Seus textos ficam <strong>neste navegador</strong>, não na nuvem. Baixe uma cópia para levar com você.</p>
+ <footer><span>ApertaLetra <span id="appVersion">0.1.1</span> • criado para experimentar e escrever.</span><span>Sem cadastro. Sem cobrança.</span></footer>
+</main>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+<input id="fileInput" type="file" accept=".apertaletra,.txt,application/json,text/plain" hidden>
+<dialog id="libraryDialog" aria-labelledby="libraryTitle"><div class="dialog-head"><div><p class="eyebrow">NESTE NAVEGADOR</p><h2 id="libraryTitle">Meus textos</h2></div><button data-close aria-label="Fechar meus textos">✕</button></div><p>Em um computador compartilhado, outras pessoas deste navegador também podem ver estes textos.</p><div id="documentList" class="document-list"></div></dialog>
+<dialog id="downloadDialog" aria-labelledby="downloadTitle"><div class="dialog-head"><h2 id="downloadTitle">Leve seu texto com você</h2><button data-close aria-label="Fechar opções de download">✕</button></div><p>Baixar cria uma cópia fora do navegador. Guarde-a em uma pasta ou pendrive.</p><button id="editableBtn" class="download-choice"><strong>Arquivo ApertaLetra</strong><span>Para abrir e continuar escrevendo, com a formatação.</span></button><button id="txtBtn" class="download-choice"><strong>Texto simples (.txt)</strong><span>Para abrir em outros programas, sem cores ou formatação.</span></button><p class="muted">Para gerar PDF, use Imprimir e escolha “Salvar como PDF”, quando disponível no seu navegador.</p></dialog>
+<dialog id="helpDialog" aria-labelledby="helpTitle"><div class="dialog-head"><h2 id="helpTitle">Escrever sem complicar</h2><button data-close aria-label="Fechar ajuda">✕</button></div><h3>1. Escreva e experimente</h3><p>Selecione um trecho para usar negrito, itálico, sublinhado ou cor. Letra e tamanho mudam o texto inteiro. Não há correção automática: sua escrita é sua.</p><h3>2. Guarde uma cópia</h3><p>O salvamento automático fica neste navegador e pode ser apagado ao limpar seus dados. Ele não é uma cópia de segurança. “Baixar texto” guarda um arquivo editável; “Abrir arquivo” permite continuar.</p><h3>3. Cuide da privacidade</h3><p>Não escreva senhas, endereço ou informações sensíveis. Sem contas individuais, outras pessoas que usam este navegador podem ver os textos. Baixe sua cópia antes de excluir uma produção da biblioteca.</p><h3>Versão experimental</h3><p>Escrever, guardar localmente, baixar e imprimir são gratuitos nesta etapa. Recursos futuros de nuvem ou organização poderão ter outros planos; nenhum texto existente será retido para exigir pagamento.</p><p>O aplicativo não transmite o conteúdo das produções nem possui anúncios ou análise de uso remota. A hospedagem pode registrar acessos técnicos. A biblioteca local não é sincronizada entre computadores.</p><p id="offlineStatus" class="muted">Uso sem internet: disponível em página já aberta. Reabrir offline depende do cache instalado pelo navegador.</p><p class="muted">Imprimir abre o diálogo do navegador. Isso não confirma que papel foi impresso.</p></dialog>
+<noscript><p class="error-banner">Ative o JavaScript para usar o editor. Seus arquivos não serão alterados.</p></noscript>
+</body></html>
