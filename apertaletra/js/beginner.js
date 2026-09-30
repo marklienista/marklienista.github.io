@@ -1,7 +1,7 @@
 /* Presentation preferences and visual controls. Local only; does not change document defaults. */
 'use strict';
 (() => {
- const $=id=>document.getElementById(id),editor=$('editor'),font=$('fontSelect'),size=$('sizeSelect');
+ const $=id=>document.getElementById(id),active=()=>globalThis.ALEditor.active(),font=$('fontSelect'),size=$('sizeSelect');
  const KEY='apertaletra:presentation:v1';
  let mode='symbols';try{const saved=localStorage.getItem(KEY);if(['symbols','both','text'].includes(saved))mode=saved;}catch{}
  function setMode(value){
@@ -21,8 +21,9 @@
   $(id).addEventListener('pointerdown',e=>e.preventDefault());
   $(id).addEventListener('click',()=>{const current=Number(size.value)||24,list=step>0?AL.STEP_SIZES:[...AL.STEP_SIZES].reverse(),next=list.find(n=>step>0?n>current:n<current);if(next)apply(size,next);});
  }
- $('selectAllBtn').addEventListener('click',()=>{editor.focus();const r=document.createRange();r.selectNodeContents(editor);const s=getSelection();s.removeAllRanges();s.addRange(r);editor.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));sync();});
+ $('selectAllBtn').addEventListener('click',()=>{const editor=active();editor.focus();const r=document.createRange();r.selectNodeContents(editor);const s=getSelection();s.removeAllRanges();s.addRange(r);editor.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));sync();});
  function sync(){
+  const editor=active();
   const s=getSelection(),inside=s.rangeCount&&editor.contains(s.anchorNode)&&editor.contains(s.focusNode);
   let currentFont=AL.fontKey(editor.style.fontFamily)||'Arial',currentSize=parseFloat(editor.style.fontSize)||24;
   if(inside){
@@ -42,7 +43,7 @@
  }
  document.addEventListener('selectionchange',sync);document.addEventListener('al:format',sync);
  document.addEventListener('al:document',()=>queueMicrotask(sync));
- new MutationObserver(sync).observe(editor,{attributes:true,attributeFilter:['style']});
+ document.querySelectorAll('.writing-field').forEach(e=>new MutationObserver(sync).observe(e,{attributes:true,attributeFilter:['style']}));
  document.querySelectorAll('[data-command],[data-color]').forEach(b=>b.addEventListener('click',sync));
- editor.addEventListener('input',sync);sync();
+ document.querySelectorAll('.writing-field').forEach(e=>e.addEventListener('input',sync));sync();
 })();

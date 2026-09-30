@@ -15,3 +15,40 @@ body.focus-mode .app-header,body.focus-mode .action-shelf,body.focus-mode .toolb
 @media(max-width:740px){body{padding:9px}.brand h1{font-size:20px}.brand-mark{width:35px;height:35px;font-size:25px}.app-header{gap:8px}.utility-controls{gap:5px}.utility-controls .visual-control{padding:4px 8px}.action-shelf{gap:5px;padding:7px;flex-wrap:wrap}.action-shelf .visual-control{min-width:43px;flex:1;min-height:54px;padding:5px 3px}.action-shelf svg{width:32px;height:32px}.shelf-divider{display:none}.action-shelf .control-label{font-size:10px}.workspace{grid-template-columns:minmax(0,1fr);gap:10px}.paper{min-height:360px;padding:18px 19px 22px 34px}.paper:before{left:16px}#docTitle{font-size:23px;margin-bottom:15px}#editor{min-height:238px}.toolbar{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tool-section+.tool-section{margin:0;padding:0;border:0}.tool-section{min-width:0}.font-cards{gap:5px}.font-cards .visual-control{min-height:52px}.font-sample{font-size:29px}.size-tools{height:100%}.size-tools .visual-control{min-height:70px}.effect-tools .visual-control{min-height:53px}.effect-sample{font-size:30px}.align-tools .visual-control{min-height:48px}.colors{grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}.colors button{height:38px;min-height:38px}.color-section{grid-column:2;grid-row:2/4}.selection-tools{margin:0;grid-column:1/-1}.status-bar{gap:7px}.status-bar .version-note{font-size:9px}.toolbar .control-label{font-size:10px}body[data-mode=both] .colors{grid-template-columns:repeat(3,minmax(0,1fr))}body[data-mode=both] .colors button{min-height:50px;height:50px}body[data-mode=text] .colors{grid-template-columns:repeat(2,minmax(0,1fr))}body[data-mode=text] .action-shelf .visual-control,body[data-mode=both] .action-shelf .visual-control{flex:1 1 21%;max-width:none}.mode-options{grid-template-columns:1fr}.mode-options button{flex-direction:row;min-height:90px;text-align:left}.mode-preview{min-height:60px;min-width:98px}body[data-mode=both] .font-cards .visual-control{min-height:67px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 @media print{@page{size:A4;margin:20mm}html,body{background:#fff!important;color:#000;margin:0;padding:0}.app-header,.action-shelf,.toolbar,#docTitle,.status-bar,.skip,#toast,dialog,.error-banner{display:none!important}main,.workspace,.writing-side,.paper{display:block!important;max-width:none;width:auto;margin:0;padding:0;border:0;box-shadow:none;background:transparent!important}.paper{min-height:0!important;overflow:visible}.paper:before{display:none}.print-only{display:block!important;margin:0 0 12pt;font-size:20pt;overflow-wrap:anywhere}.print-only:empty{display:none!important}#editor{display:block!important;min-height:0!important;outline:0!important;line-height:1.55!important;overflow:visible}.paper,#editor{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+/* Genre shells: structure outside editing hosts; no instructional copy on the page. */
+[hidden]{display:none!important}
+.genre-options{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px}
+.genre-card{min-height:176px;background:#fbfaff;padding:22px 12px}
+.genre-card>svg{height:90px;width:90px}
+.genre-card .control-label{font-size:18px}
+.recipe-name-marker{display:flex;align-items:center;gap:10px;margin-bottom:8px;color:#67538a}
+.recipe-name-marker svg{width:32px;height:32px}
+.recipe-name-marker .control-label{font-size:14px}
+.recipe-sheet{display:grid;gap:24px}
+.recipe-section{padding:12px 14px 15px;border:2px solid #e5e0f0;border-radius:12px;min-width:0;background:#fff}
+.recipe-section.active-section{border-color:#b8a7d8}
+.recipe-caption{display:flex;align-items:center;gap:10px;margin:0 0 10px;color:#645184;user-select:none}
+.recipe-caption svg{width:36px;height:36px}
+.recipe-caption .control-label{font-size:16px;text-align:left}
+.recipe-field{min-height:120px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;caret-color:#514099;outline-offset:4px}
+.recipe-field :is(p,div){margin:0 0 .3em}
+.recipe-field :is(ul,ol){margin:0;padding-left:1.45em}
+.recipe-field li{padding-left:.15em}
+.recipe-field::selection,.recipe-field *::selection{background:#ded4ff;color:#241d3c}
+body[data-mode=symbols] :is(.recipe-caption,.recipe-name-marker) .control-label,body[data-mode=symbols] .chooser-label{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important}
+body[data-mode=text] :is(.recipe-caption,.recipe-name-marker)>svg{display:none}
+body[data-mode=text] .genre-card{min-height:100px}
+#freeCopyBtn{margin-right:8px;margin-bottom:8px}
+@media(max-width:740px){.recipe-section{padding:10px}.recipe-field{min-height:96px}.recipe-sheet{gap:16px}.genre-options{gap:10px}.genre-card{min-height:140px;padding:16px 6px}.genre-card>svg{width:70px;height:70px}.genre-card .control-label{font-size:15px}.paper[data-kind=recipe]{padding:16px 14px 18px 27px}}
+@media print{
+ .paper[data-kind=recipe] #editor,#recipeNameMarker{display:none!important}
+ .recipe-sheet{display:block;gap:0}
+ .recipe-section{display:block;border:0;padding:0;margin:0 0 20pt;background:none;break-inside:auto}
+ .recipe-caption{display:block;margin:0 0 6pt;break-after:avoid;color:#000}
+ .recipe-caption svg{display:none!important}
+ body[data-mode=symbols] .recipe-caption .control-label,.recipe-caption .control-label{position:static!important;clip-path:none!important;overflow:visible!important;white-space:normal!important;width:auto!important;height:auto!important;font-size:14pt;font-weight:700}
+ .recipe-field{min-height:0!important;outline:0!important;line-height:1.55;overflow:visible}
+ .recipe-field li{break-inside:avoid}
+ .recipe-field{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
