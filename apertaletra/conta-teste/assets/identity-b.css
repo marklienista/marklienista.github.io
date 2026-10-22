@@ -1,0 +1,14 @@
+/* CFT-003 B aceita. Recortes só nos planos, não nos alvos, textos ou foco.
+   Aplicação local ao adulto do ApertaLetra. Não governa a paleta da escrita. */
+#adultRoot{--ms-paper:#faf9f5;--ms-white:#fffdf9;--ms-ink:#232922;--ms-muted:#586151;--ms-line:#d8dcd1;--ms-yellow:#f2c641;--ms-terra:#ad4b3b;--ms-leaf:#20685d;--ms-cut:polygon(0 7%,95% 0,100% 91%,3% 100%);--ms-tab:polygon(3% 0,100% 6%,97% 100%,0 92%)}
+#adultRoot .ms-credit{font-size:12px;line-height:1.5}#adultRoot .ms-credit span,#adultRoot .ms-name{background:linear-gradient(transparent 73%,var(--ms-yellow) 73%);font-weight:700}
+#adultRoot .ms-tab{position:relative;isolation:isolate;display:inline-block;padding:8px 14px;font-size:12px;font-weight:700;line-height:1.4;color:var(--ms-ink)}
+#adultRoot .ms-tab::before{content:'';position:absolute;inset:0;z-index:-1;background:var(--ms-yellow);clip-path:var(--ms-tab);pointer-events:none}
+#adultRoot .ms-frame{position:relative;isolation:isolate;width:100%;max-width:270px;padding:20px 22px 14px 20px;margin:0 auto 18px}
+#adultRoot .ms-frame::before{content:'';position:absolute;left:0;right:21%;top:0;bottom:20%;background:var(--ms-terra);clip-path:polygon(4% 0,100% 5%,93% 91%,0 100%);z-index:-2;pointer-events:none}
+#adultRoot .ms-frame::after{content:'';position:absolute;left:59%;right:0;top:13%;bottom:0;background:var(--ms-leaf);clip-path:polygon(7% 0,100% 6%,94% 96%,0 100%);z-index:-1;pointer-events:none}
+#adultRoot .ms-frame img{display:block;width:100%;height:auto;aspect-ratio:1.1;object-fit:cover;border:6px solid var(--ms-paper);border-radius:0;box-shadow:none}
+#adultRoot .ms-routes{display:grid;gap:9px}#adultRoot .ms-route{position:relative;isolation:isolate;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 17px;min-height:48px;background:none;border:0;color:var(--ms-ink);font-size:13px;font-weight:700;text-decoration:none}
+#adultRoot .ms-route::before{content:'';position:absolute;inset:0;z-index:-1;background:#f2ebe1;clip-path:var(--ms-cut);pointer-events:none}#adultRoot .ms-route:nth-child(2)::before{background:#eaf1e9;clip-path:polygon(2% 0,100% 4%,95% 100%,0 96%)}#adultRoot .ms-route:nth-child(3)::before{background:#f5f0e4}#adultRoot .ms-route:hover{text-decoration:underline;text-underline-offset:4px}
+#adultRoot a:focus-visible,#adultRoot button:focus-visible,#adultRoot input:focus-visible,#adultRoot summary:focus-visible{outline:3px solid #174c9d;outline-offset:4px}
+@media(prefers-reduced-motion:reduce){#adultRoot *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
