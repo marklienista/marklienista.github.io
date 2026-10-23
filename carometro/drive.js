@@ -38,7 +38,7 @@ export class Drive {
         error_callback:error=>reject(Error(error?.message||'A janela do Google foi fechada ou bloqueada.'))
       });
       // O Google somente solicita novo consentimento quando necessário.
-      client.requestAccessToken({prompt:''});
+      client.requestAccessToken({prompt:'select_account'});
     });
     this.token=result.access_token;this.until=Date.now()+Number(result.expires_in||3500)*1000;
     try{const info=await this.request('GET','/about?fields=user(emailAddress)');this.email=info.user?.emailAddress||''}catch{this.email=''}
