@@ -1,5 +1,5 @@
 'use strict';
-const CACHE='apertaletra-al008-shell-0.6.0-alpha.1';
+const CACHE='apertaletra-al008-shell-0.6.0-alpha.1-auth-feedback-1';
 const FILES=['./','./index.html','./style.css','./js/model.js','./js/store.js','./js/app.js','./js/beginner.js','./adult.css','./classroom.css','./js/class-api.js','./assets/identity-b.css','./assets/marcelo.webp','./js/config.js','./js/cloud.js','./js/online-store.js','./js/portal.js','./manifest.webmanifest','./icon.svg'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)));});
 // No skipWaiting: do not replace an active editor midway through writing.
