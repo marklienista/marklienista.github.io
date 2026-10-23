@@ -5,7 +5,7 @@ export class Session{
   constructor(){
     this.space=demoSpace();this.drive=null;this.link=null;this.photos=new Map();this.pending=new Map();
     this.logoUrl=null;this.pendingLogo=null;this.dirty=false;
-    this.config={clientId:CLOUD_CONFIG.googleOAuthClientId,pickerKey:CLOUD_CONFIG.googlePickerApiKey};
+    this.config={clientId:CLOUD_CONFIG.googleOAuthClientId,projectNumber:CLOUD_CONFIG.googleCloudProjectNumber,pickerKey:CLOUD_CONFIG.googlePickerApiKey};
     this.localSpaces=new Map([[this.space.id,this.space]]);
     this.classId=this.space.classes[0]?.id||null;
     this.year=2026;this.selected=new Set(this.space.students.map(s=>s.id));this.onUpdate=()=>{};
