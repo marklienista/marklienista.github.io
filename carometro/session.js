@@ -1,10 +1,11 @@
 import {demoSpace,emptySpace,validateSpace,setPhoto} from './model.js';
 import {DriveFiles} from './drive-files.js';
+import {CLOUD_CONFIG} from './config.js';
 export class Session{
   constructor(){
     this.space=demoSpace();this.drive=null;this.link=null;this.photos=new Map();this.pending=new Map();
     this.logoUrl=null;this.pendingLogo=null;this.dirty=false;
-    this.config={clientId:localStorage.getItem('carometro.public.clientId')||'',pickerKey:localStorage.getItem('carometro.public.pickerKey')||''};
+    this.config={clientId:CLOUD_CONFIG.googleOAuthClientId,pickerKey:CLOUD_CONFIG.googlePickerApiKey};
     this.localSpaces=new Map([[this.space.id,this.space]]);
     this.classId=this.space.classes[0]?.id||null;
     this.year=2026;this.selected=new Set(this.space.students.map(s=>s.id));this.onUpdate=()=>{};
@@ -38,13 +39,11 @@ export class Session{
     this.localSpaces.set(this.space.id,this.space);
     this.link=null;this.classId=null;this.year=current;this.selected.clear();this.dirty=true;this.onUpdate();
   }
-  saveConfig(clientId,pickerKey){
-    this.config={clientId:String(clientId||'').trim(),pickerKey:String(pickerKey||'').trim()};
-    localStorage.setItem('carometro.public.clientId',this.config.clientId);
-    localStorage.setItem('carometro.public.pickerKey',this.config.pickerKey);
-  }
   async connect(){
-    this.drive=new DriveFiles(this.config.clientId);
+    if (this.drive?.ready()) return this.drive.email;
+    if (!this.drive || this.drive.clientId!==this.config.clientId) {
+      this.drive=new DriveFiles(this.config.clientId);
+    }
     await this.drive.authorize();
     return this.drive.email;
   }
