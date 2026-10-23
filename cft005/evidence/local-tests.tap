@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: retorno exige origem prevista, sem credenciais ou fragmento
+ok 1 - retorno exige origem prevista, sem credenciais ou fragmento
+  ---
+  duration_ms: 1.9556
+  type: 'test'
+  ...
+# Subtest: identidade exige cliente e usuario explicitos
+ok 2 - identidade exige cliente e usuario explicitos
+  ---
+  duration_ms: 0.891
+  type: 'test'
+  ...
+# Subtest: PKCE usa entropia nova e SHA-256 do verifier exato
+ok 3 - PKCE usa entropia nova e SHA-256 do verifier exato
+  ---
+  duration_ms: 10.3124
+  type: 'test'
+  ...
+# Subtest: autorizacao conserva callback, state, nonce e S256 sem enviar verifier
+ok 4 - autorizacao conserva callback, state, nonce e S256 sem enviar verifier
+  ---
+  duration_ms: 2.4517
+  type: 'test'
+  ...
+# Subtest: autorizacao rejeita configuracao incompleta e destinos inseguros
+ok 5 - autorizacao rejeita configuracao incompleta e destinos inseguros
+  ---
+  duration_ms: 2.9894
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 181.873

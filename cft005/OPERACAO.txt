@@ -1,0 +1,128 @@
+CFT-005 / ARC-002 — ponto de parada em 23/10/2026 (BRT)
+
+RESULTADO: PARCIAL; prova integrada real BLOQUEADA por segurança.
+
+Estado retomado
+Branch cft005-minha-conta-preparacao, base 647cc55.
+Supabase jxyylpdgwvswaapeefsy, anteriormente meempresta, agora conta_base,
+ACTIVE_HEALTHY. A experiência pública continua Conta / Minha conta.
+Não há nova arquitetura, migração ou mudança de nome nesta execução.
+
+Comprovação local
+Executar: node --test cft005/oauth-client.test.mjs
+A suíte original passou antes das alterações. O log antigo dizia 12 assertions,
+mas não era uma contagem calculada pelo executor; não usar essa mensagem como
+quantidade de testes. A suíte atual tem cinco testes nomeados, com zero falhas.
+Inclui origens de retorno, comparação cliente/usuário, PKCE S256 calculado,
+configuração ausente, state, nonce opcional e destinos inseguros.
+Corrigido: assertClientClaim({}, undefined, undefined) aceitava a ausência dos
+dois identificadores; agora recusa configuração ausente/vazia.
+authorizeUrl exige HTTPS no emissor, callback HTTPS ou loopback HTTP, state e
+challenge válidos e conserva nonce quando fornecido. O chamador deve gerar
+state/nonce aleatórios; checar formato não comprova entropia.
+safeReturn verifica origem; não valida callback exato ou state de uma transação.
+assertClientClaim não verifica assinatura, iss, aud, exp ou nonce de JWT.
+Essas verificações ainda dependem da integração existente de A/B.
+
+Preparação existente preservada
+O documento canônico registra pacote de 21 arquivos de A/B e consentimento,
+CFT-005_ARC-002_preparacao_local.zip, libfile_7a312df357d881918f8b6b9b29c1a722.
+Ele não está na branch sincronizada nem foi recuperado pelos conectores desta
+execução; a busca local por nome e a busca CFT-005 no Drive não o localizaram.
+Não foi reconstruído. Seus 12/12 e 18/18 históricos não foram reexecutados.
+Falta incorporar esses mesmos fontes, integrar o SDK fixado e testar a UI em
+navegador. Não declarar a interface central implementada nesta rodada.
+
+Inspeção remota de leitura
+OAuth: discovery específico retorna 404 feature_disabled, OAuth server is disabled.
+Auth /health com chave PUBLICÁVEL retorna v2.197.0. Zero auth.oauth_clients.
+public.meempresta_states tem RLS e três políticas permissivas por auth.uid() =
+user_id, sem condição client_id. UPDATE tem USING e WITH CHECK.
+authenticated tem SELECT/INSERT/UPDATE; anon não tem concessões nessa tabela.
+As duas RPCs public são SECURITY INVOKER; anon sem EXECUTE e authenticated com
+EXECUTE. Não há views public. Não foram consultadas linhas de contas ou dados.
+Aviso preexistente do advisor: leaked password protection desabilitada;
+não foi alterado e não é a razão principal desta parada.
+
+Hospedagem
+Render srv-db3bav4s728c73bv4a90: meempresta-teste, static_site,
+repo marklienista/meempresta, branch me003-teste, publishPath ./public,
+autoDeploy no, suspended not_suspended.
+https://meempresta-teste.onrender.com/cft005/authorize.html retorna 404.
+GitHub Pages autoral usa build_type legacy, source main, path /.
+Branch cft005-minha-conta-preparacao não é a origem pública de Pages.
+Nenhum deploy foi solicitado. Configurações internas de Auth não foram
+reconfirmadas: o painel redirecionou ao login nesta máquina. Site URL, ausência
+de Redirect URLs, Auth Hooks e TTL de 3600s constam apenas da leitura de 21/10
+no documento; não confundir esses valores históricos com leitura atual.
+
+Bloqueio concreto
+supabase/auth#2877 continua aberto e descreve tokens de clientes OAuth aceitos
+em /user e /factors, inclusive gestão de credenciais em contas sem MFA.
+A proposta #2878 continua aberta e merged=false. A versão oficial v2.197.0
+publicada informa rotas com requireAuthentication, sem a barreira OAuth proposta;
+UserUpdate não recusa client_id e restringe alterações sensíveis por AAL apenas
+quando o usuário já tem MFA. A leitura de código + versão é evidência de risco,
+não uma exploração executada no projeto nem prova do binário hospedado completo.
+RLS protege dados PostgreSQL; não protege os endpoints de gestão de Auth.
+Só ocultar clientes na UI e desligar cadastro dinâmico não demonstra essa
+barreira. Alterar hooks globais sem baseline e compatibilidade também não é
+mitigação comprovada. Nenhuma conta real foi usada para testar o relato.
+Por isso não habilitar beta, criar clientes ou emitir tokens OAuth nesta rodada.
+
+Condições para retomar a prova
+1. Confirmar no ambiente hospedado uma correção da fronteira de gestão de Auth
+   ou demonstrar controle de servidor que limite emissão/consentimento OAuth
+   às identidades sintéticas, preservando todos os fluxos diretos existentes.
+   Não basta um bloqueio na interface. Validar sem alterar credenciais reais.
+2. Recuperar o pacote existente, sem reconstruí-lo, e conferir baseline atual
+   de Site URL, authorization path, cadastro dinâmico, hooks, chaves e TTL.
+3. Validar a proposta RLS já existente antes de aplicá-la: política RESTRICTIVE
+   para negar tokens com client_id em meempresta_states, mantendo as três
+   políticas por proprietário e o funcionamento das sessões diretas/RPCs.
+4. Usar apenas tabela e identidades sintéticas de prova. Isolamento por dono
+   E client_id, grants mínimos e verificação de sessão/revogação se necessário.
+5. Integrar a página central existente no serviço de teste, com headers limitados
+   a /cft005/* e SDK fixado local. Não publicar no site autoral público.
+6. Só depois habilitar OAuth com cadastro dinâmico false, authorization path
+   /cft005/authorize.html e A/B públicos, token_endpoint_auth_method none,
+   PKCE S256. Conferir aceitação dos callbacks exatos
+   http://127.0.0.1:4311/callback e http://127.0.0.2:4312/callback.
+7. Executar A→B sem repetir senha, mesmo sub, client_id distintos, assinatura/
+   iss/aud/exp/nonce, recusa entre clientes e usuários, leitura/escrita cruzada,
+   sessão expirada, cancelamento, retorno, refresh e logout/revogação.
+   Registrar separadamente logout local, central e validade residual do JWT.
+
+Reversão preparada, NÃO exercitada remotamente
+Nenhuma configuração, RLS, objeto, conta ou dado foi alterado remotamente.
+Portanto esta execução não precisa de rollback no Supabase/Render.
+Para o código isolado, reverter o commit apenas nesta branch. Não mexer em main.
+Antes de qualquer futura alteração remota, salvar baseline completo dos campos
+que serão alterados e confirmar o caminho de restauração no painel/API disponível.
+Se ensaio futuro falhar: parar emissão, revogar concessões e refresh/sessões de
+prova, desabilitar beta e restaurar SOMENTE campos alterados e arquivos de prova.
+Não rotacionar chaves, reduzir TTL global nem modificar credenciais existentes.
+Manter a barreira RLS dos dados atuais até expirar o último JWT emitido, mais a
+tolerância de relógio, ou provar invalidação por sessão. Só então retirar objetos
+exclusivos de prova se autorizado e seguro, sem CASCADE e sem apagar dados reais.
+Desligar OAuth ou fazer logout não garante invalidar access tokens já emitidos.
+
+Matriz real desta rodada
+A→B sem senha / identidade comum / emissão por cliente / RLS com tokens reais /
+recusa cruzada / expiração / cancelamento / retorno / refresh / logout:
+TODOS NÃO EXECUTADOS. Não há PASS de autenticação real.
+
+Fontes
+https://docs.google.com/document/d/14Tgta3SrAmtJgk8XaQcS-z6SeEnlzIyUGYHkhFQqCPY
+https://docs.google.com/document/d/1vctr9mkKTUa5ZHRcb_x4k3iXldXkmQWBSsOr2jT6ZAg
+https://github.com/supabase/auth/issues/2877
+https://github.com/supabase/auth/pull/2878
+https://github.com/supabase/auth/blob/v2.197.0/internal/api/api.go
+https://github.com/supabase/auth/blob/v2.197.0/internal/api/auth.go
+https://github.com/supabase/auth/blob/v2.197.0/internal/api/user.go
+https://supabase.com/docs/guides/auth/oauth-server/token-security
+https://supabase.com/docs/guides/auth/oauth-server/getting-started
+https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
+https://supabase.com/changelog.md
+
+Sem serviços contratados, alteração de plano, migração, Apertaquem ou publicação.

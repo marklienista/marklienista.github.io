@@ -1,0 +1,31 @@
+{
+  "record_date": "2026-10-23",
+  "timezone": "America/Sao_Paulo",
+  "status": "PARCIAL",
+  "integrated_authentication": "BLOQUEADA_SEGURANCA",
+  "branch": "cft005-minha-conta-preparacao",
+  "base_commit": "647cc55",
+  "runtime": "Node v24.19.0",
+  "local_tests": {"passed": 5, "failed": 0, "evidence": "local-tests.tap", "remote_requests": 0},
+  "project": {"ref": "jxyylpdgwvswaapeefsy", "name": "conta_base", "formerly": "meempresta", "status": "ACTIVE_HEALTHY"},
+  "http_observations": [
+    {"url": "https://jxyylpdgwvswaapeefsy.supabase.co/auth/v1/.well-known/oauth-authorization-server", "status": 404, "error_code": "feature_disabled", "message": "OAuth server is disabled"},
+    {"url": "https://jxyylpdgwvswaapeefsy.supabase.co/auth/v1/health", "status": 200, "api_key_type": "publishable", "version": "v2.197.0"},
+    {"url": "https://meempresta-teste.onrender.com/cft005/authorize.html", "status": 404}
+  ],
+  "database_catalog": {
+    "oauth_clients": 0,
+    "public_tables": [{"name": "meempresta_states", "rls": true, "policies": ["meempresta_select_own", "meempresta_insert_own", "meempresta_update_own"], "ownership_check": "auth.uid() = user_id", "client_id_filter": false, "update_using_and_with_check": true, "authenticated_grants": ["SELECT", "INSERT", "UPDATE"], "anon_grants": []}],
+    "public_views": 0,
+    "public_rpc": [{"name": "meempresta_read_or_create", "security_invoker": true, "anon_execute": false}, {"name": "meempresta_write", "security_invoker": true, "anon_execute": false}],
+    "application_rows_read": false,
+    "accounts_read": false
+  },
+  "hosting": {"render_service": "srv-db3bav4s728c73bv4a90", "render_branch": "me003-teste", "publish_path": "./public", "auto_deploy": "no", "suspended": "not_suspended", "github_pages": {"build_type": "legacy", "branch": "main", "path": "/"}},
+  "risk": {"issue": "https://github.com/supabase/auth/issues/2877", "issue_state": "open", "proposed_fix": "https://github.com/supabase/auth/pull/2878", "fix_state": "open", "merged": false, "official_source_tag": "v2.197.0", "live_exploit_attempted": false, "mitigation_proven": false},
+  "dashboard": {"authenticated_in_this_execution": false, "internal_auth_configuration_reconfirmed": false},
+  "existing_preparation": {"artifact": "libfile_7a312df357d881918f8b6b9b29c1a722", "retrieved": false, "rebuilt": false, "historical_tests_rerun": false},
+  "real_test_matrix": {"A_to_B_without_password": "NOT_RUN", "same_sub": "NOT_RUN", "distinct_client_ids": "NOT_RUN", "RLS_isolation": "NOT_RUN", "cross_client_rejection": "NOT_RUN", "expiry": "NOT_RUN", "cancel": "NOT_RUN", "callback": "NOT_RUN", "refresh": "NOT_RUN", "logout": "NOT_RUN"},
+  "remote_mutations": {"supabase": false, "render": false, "public_site": false, "credentials": false, "data": false},
+  "rollback": {"remote_needed": false, "remote_exercised": false, "procedure": "../OPERACAO.txt"}
+}
