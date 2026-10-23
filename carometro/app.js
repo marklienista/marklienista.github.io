@@ -1,4 +1,5 @@
 import {Session} from './session.js';
+import {prepareGoogleIdentity} from './drive.js';
 import {addClass,renameClass,addStudent,editStudent,moveStudent,markStudentInactive,setPhoto,classStudents,studentClass,planPromotion,applyPromotion,mapPilotRows,comparePilot,applyPilot,parseDelimited,exportCsv,normalize} from './model.js';
 import {readPilotFile} from './xlsx.js';
 import {pickManifest} from './picker.js';
@@ -346,6 +347,11 @@ function start(){
   }
   bindNavigation();initForms();initCapture();initPromotion();initPilot();initPrint();initSharing();initGoogle();
   render();
+  if(S.config.clientId){
+    // Só carregamos o SDK se a integração estiver ativada nesta instalação.
+    // A autorização propriamente dita acontece apenas após o clique do usuário.
+    prepareGoogleIdentity().catch(()=>{});
+  }
   if(new URL(location.href).searchParams.has('space')){
     report('Você recebeu um convite. Conecte ao Google Drive para abrir o carômetro compartilhado.','warning');
   }
