@@ -1,4 +1,5 @@
 name: AL009 live API verification
+# Repeat after the scoped PT409 backend correction; fresh disposable identities.
 on:
   push:
     branches: [al009-api-verificacao]
