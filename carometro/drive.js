@@ -1,20 +1,44 @@
 /* Adapter Google Drive v3: tokens OAuth transitórios, sem backend para fotos. */
 export const SCOPE='https://www.googleapis.com/auth/drive.file';
+let identityPreparation;
+export function prepareGoogleIdentity(){
+  if(globalThis.google?.accounts?.oauth2)return Promise.resolve();
+  if(!identityPreparation)identityPreparation=new Promise((resolve,reject)=>{
+    const script=document.createElement('script');
+    script.src='https://accounts.google.com/gsi/client';
+    script.async=true;
+    script.onload=()=>{
+      if(globalThis.google?.accounts?.oauth2)resolve();
+      else reject(Error('A biblioteca de login do Google não está disponível.'));
+    };
+    script.onerror=()=>reject(Error('Não foi possível abrir a conexão com o Google.'));
+    document.head.append(script);
+  });
+  return identityPreparation;
+}
+
 export class Drive {
   constructor(clientId){this.clientId=String(clientId||'');this.token=null;this.until=0;this.email=''}
   ready(){return !!this.token&&Date.now()<this.until-30000}
   async authorize(){
     if(!/^[\d]+-[a-zA-Z0-9_.-]+\.apps\.googleusercontent\.com$/.test(this.clientId))throw Error('Informe um Client ID OAuth Web do Google Cloud.');
-    if(!globalThis.google?.accounts?.oauth2)await new Promise((yes,no)=>{
-      const script=document.createElement('script');script.src='https://accounts.google.com/gsi/client';script.onload=yes;script.onerror=()=>no(Error('Google indisponível.'));document.head.append(script);
-    });
+    if(!globalThis.google?.accounts?.oauth2)await prepareGoogleIdentity();
     const result=await new Promise((resolve,reject)=>{
-      const client=google.accounts.oauth2.initTokenClient({client_id:this.clientId,scope:SCOPE,callback:response=>{
-        if(response?.error)return reject(Error(response.error_description||response.error));
-        if(!response?.access_token)return reject(Error('Autorização cancelada.'));
-        resolve(response);
-      }});
-      client.requestAccessToken({prompt:'consent'});
+      const client=google.accounts.oauth2.initTokenClient({
+        client_id:this.clientId,
+        scope:SCOPE,
+        callback:response=>{
+          if(response?.error)return reject(Error(response.error_description||response.error));
+          if(!response?.access_token)return reject(Error('Autorização cancelada.'));
+          if(!String(response.scope||'').split(/\s+/).includes(SCOPE)) {
+            return reject(Error('A autorização para os arquivos do Carômetro não foi concedida.'));
+          }
+          resolve(response);
+        },
+        error_callback:error=>reject(Error(error?.message||'A janela do Google foi fechada ou bloqueada.'))
+      });
+      // O Google somente solicita novo consentimento quando necessário.
+      client.requestAccessToken({prompt:''});
     });
     this.token=result.access_token;this.until=Date.now()+Number(result.expires_in||3500)*1000;
     try{const info=await this.request('GET','/about?fields=user(emailAddress)');this.email=info.user?.emailAddress||''}catch{this.email=''}
