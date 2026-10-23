@@ -126,3 +126,16 @@ https://supabase.com/docs/guides/auth/password-security#password-strength-and-le
 https://supabase.com/changelog.md
 
 Sem serviços contratados, alteração de plano, migração, Apertaquem ou publicação.
+
+ADENDO — 23/10/2026, 14h07 BRT: acesso administrativo restabelecido
+Após o usuário informar a conexão, a ferramenta conectada respondeu e a entrada
+normal pela sessão GitHub existente autenticou o painel. Nenhuma senha ou código
+foi solicitado ou extraído. Conferência atual: OAuth desligado; zero OAuth Apps;
+Site URL https://meempresta-teste.onrender.com/; nenhuma Redirect URL; Auth Hooks
+vazio; access token 3600s; detecção de reuso ligada, intervalo 10s. Controles
+avançados de sessão continuam indisponíveis no Free, valores exibidos em zero.
+Authorization Path e cadastro dinâmico não foram expostos no estado desligado;
+o recurso não foi ligado para inspecioná-los. Nenhum formulário foi alterado ou
+salvo. Esta leitura substitui a pendência de acesso ao painel descrita acima;
+não resolve o risco de gestão de Auth nem muda a matriz de testes reais.
+Evidência: evidence/admin-read-2026-10-23.json.

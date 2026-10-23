@@ -1,0 +1,40 @@
+{
+  "observed_at": "2026-10-23T14:07:00-03:00",
+  "timezone": "America/Sao_Paulo",
+  "project_ref": "jxyylpdgwvswaapeefsy",
+  "project_name": "conta_base",
+  "access": {
+    "connector": "working",
+    "dashboard": "authenticated_via_existing_github_session",
+    "credentials_requested": false
+  },
+  "observations": {
+    "oauth_server_enabled": false,
+    "oauth_apps": 0,
+    "new_oauth_app_button_enabled": false,
+    "site_url": "https://meempresta-teste.onrender.com/",
+    "redirect_urls": [],
+    "auth_hooks": [],
+    "access_token_expiry_seconds": 3600,
+    "refresh_token_reuse_detection": true,
+    "refresh_token_reuse_interval_seconds": 10,
+    "enforce_single_session": false,
+    "timebox_hours": 0,
+    "inactivity_timeout_hours": 0,
+    "advanced_session_controls": "disabled_on_free_plan",
+    "authorization_path": "not_visible_while_oauth_disabled",
+    "dynamic_client_registration": "not_visible_while_oauth_disabled"
+  },
+  "configuration_mutations": false,
+  "oauth_tokens_issued": false,
+  "risk_resolved": false,
+  "result": "PARCIAL_REAL_AUTH_BLOCKED",
+  "note": "Supersedes only the earlier dashboard-access blocker, not the security blocker or real-test matrix.",
+  "sources": [
+    "https://supabase.com/dashboard/project/jxyylpdgwvswaapeefsy/auth/oauth-server",
+    "https://supabase.com/dashboard/project/jxyylpdgwvswaapeefsy/auth/oauth-apps",
+    "https://supabase.com/dashboard/project/jxyylpdgwvswaapeefsy/auth/url-configuration",
+    "https://supabase.com/dashboard/project/jxyylpdgwvswaapeefsy/auth/hooks",
+    "https://supabase.com/dashboard/project/jxyylpdgwvswaapeefsy/auth/sessions"
+  ]
+}
