@@ -35,6 +35,7 @@ function render(){
   $('addStudentBtn').disabled=!c||!S.editable();
   $('promoteBtn').disabled=!classesForYear().length||!S.editable();
   $('newClassBtn').disabled=!S.editable();
+  $('captureModeBtn').disabled=!c||!S.editable();
   if(c)renderStudentCards(S.space,c.id,S.photos,S.selected,$('searchStudents').value,$('onlyMissing').checked,{
     onSelect:(id,checked)=>{if(checked)S.selected.add(id);else S.selected.delete(id);render()},
     onPhoto:(id,file)=>run(async()=>{await S.photo(id,file);report('Fotografia de teste preparada na memória. Use Salvar no Drive para mantê-la.','warning')}),
@@ -87,6 +88,7 @@ function initForms(){
   $('searchStudents').oninput=render;
   $('onlyMissing').onchange=render;
   $('newClassBtn').onclick=()=>openClass(false);
+  $('captureModeBtn').onclick=()=>openCapture();
   $('renameClassBtn').onclick=()=>openClass(true);
   $('addStudentBtn').onclick=()=>openStudent(null);
   $('classForm').onsubmit=e=>run(async()=>{
@@ -121,6 +123,26 @@ function initForms(){
     const changed=structuredClone(S.space);changed.school.name=name;S.update(changed);
     if($('logoFile').files?.[0])await S.logo($('logoFile').files[0]);
     $('logoFile').value='';closeModal('settingsDialog');report('Configurações aplicadas. Salve no Drive se desejar manter.');
+  });
+}
+
+let currentCaptureId=null;
+function nextCapture(){
+  const p=S.classId?classStudents(S.space,S.classId).find(p=>!p.photoId&&!S.photos.has(p.id)):null;
+  currentCaptureId=p?.id||null;
+  $('capturePrompt').textContent=p?'Próximo: '+p.name:'Não há estudantes sem fotografia nesta turma.';
+  $('captureFile').disabled=!p;$('captureSkipBtn').disabled=!p;
+}
+function openCapture(){if(!S.classId)return;nextCapture();presentModal('captureDialog')}
+function initCapture(){
+  $('captureSkipBtn').onclick=()=>{
+    const p=classStudents(S.space,S.classId).filter(p=>!p.photoId&&!S.photos.has(p.id));
+    const index=p.findIndex(x=>x.id===currentCaptureId),nxt=p[(index+1)%p.length];
+    if(nxt){currentCaptureId=nxt.id;$('capturePrompt').textContent='Próximo: '+nxt.name}
+  };
+  $('captureFile').onchange=()=>run(async()=>{
+    const file=$('captureFile').files?.[0],id=currentCaptureId;if(!file||!id)return;
+    await S.photo(id,file);$('captureFile').value='';nextCapture();
   });
 }
 function initPromotion(){
@@ -307,7 +329,7 @@ window.addEventListener('beforeunload',e=>{
 function start(){
   const client=new URL(location.href).searchParams.get('client');
   if(client&&!S.config.clientId){S.saveConfig(client,S.config.pickerKey)}
-  bindNavigation();initForms();initPromotion();initPilot();initPrint();initSharing();initGoogle();
+  bindNavigation();initForms();initCapture();initPromotion();initPilot();initPrint();initSharing();initGoogle();
   render();
   if(new URL(location.href).searchParams.has('space')){
     report('Você recebeu um link. Configure o Google Cloud e conecte o Drive para autorizar o arquivo compartilhado.','warning');
