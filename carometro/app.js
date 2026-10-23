@@ -19,9 +19,9 @@ function selectedCurrentStudents(){
 function report(text,kind){notify(text,kind)}
 function render(){
   $('spaceTitle').textContent=S.space.school.name||'Carômetro sem nome';
-  const mode=S.isCloud()?(S.isLinked()?'Google Drive · '+(S.drive.email||'conta autorizada'):'Google conectado · ainda não salvo'):'Demonstração temporária · Google Drive desconectado';
+  const mode=S.isCloud()?(S.isLinked()?'Google Drive · '+(S.drive.email||'conta autorizada'):'Google conectado · ainda não salvo'):(S.config.clientId?'Demonstração temporária · Google Drive desconectado':'Demonstração temporária · integração Google em preparação');
   $('modeText').textContent=mode+(S.dirty?' · alterações não salvas':'');
-  $('connectBtn').textContent=S.isCloud()?'Trocar / reconectar Drive':'Conectar Google Drive';
+  $('connectBtn').textContent=S.isCloud()?'Desconectar Google Drive':'Conectar ao Google Drive';
   $('saveBtn').disabled=!S.isCloud()||!S.editable()||(!S.dirty&&S.isLinked());
   $('saveBtn').textContent=S.isLinked()?'Salvar no Drive':'Criar no Drive';
   fillSelect($('yearSelect'),years().map(y=>({value:y,label:String(y)})),S.year);
@@ -59,8 +59,6 @@ function bindNavigation(){
   $('helpBtn').onclick=()=>presentModal('helpDialog');
   $('settingsBtn').onclick=()=>{
     $('settingSchool').value=S.space.school.name;
-    $('googleClientId').value=S.config.clientId;
-    $('googlePickerKey').value=S.config.pickerKey;
     presentModal('settingsDialog');
   };
 }
@@ -117,7 +115,7 @@ function initForms(){
     S.startSpace($('newSpaceName').value);closeModal('newSpaceDialog');report('Espaço criado. Crie uma turma e depois conecte o Drive para salvar.');
   });
   $('settingsForm').onsubmit=e=>run(async()=>{
-    e.preventDefault();S.saveConfig($('googleClientId').value,$('googlePickerKey').value);
+    e.preventDefault();
     const name=$('settingSchool').value.trim();
     if(!name)throw Error('Informe o nome da escola.');
     const changed=structuredClone(S.space);changed.school.name=name;S.update(changed);
@@ -200,7 +198,6 @@ function initSharing(){
   $('copyLinkBtn').onclick=()=>run(async()=>{
     if(!S.link?.manifestId)throw Error('Salve no Drive antes de gerar o link.');
     const u=new URL(location.href);u.search='';u.searchParams.set('space',S.link.manifestId);
-    if(S.config.clientId)u.searchParams.set('client',S.config.clientId);
     try{await navigator.clipboard.writeText(u.href);report('Link copiado. Compartilhe somente com pessoas autorizadas no Google Drive.')}
     catch{prompt('Copie o link:',u.href)}
   });
@@ -293,7 +290,21 @@ function initPilot(){
 }
 function initGoogle(){
   $('connectBtn').onclick=()=>run(async()=>{
-    if(!S.config.clientId){$('settingsBtn').click();report('Configure primeiro o Client ID OAuth Web do Google Cloud.','warning');return}
+    if(S.isCloud()){
+      if(S.dirty&&!confirm('Existem alterações não salvas. Desconectar mesmo assim?'))return;
+      const previousDrive=S.drive;
+      previousDrive.disconnect();
+      S.localSpaces.clear();
+      S.startSpace('Escola Exemplo');
+      S.drive=null;S.dirty=false;render();
+      const button=$('openExistingBtn');if(button)button.remove();
+      report('Conta Google desconectada deste navegador. Para entrar com outra conta, use Conectar ao Google Drive.');
+      return;
+    }
+    if(!S.config.clientId){
+      presentModal('driveUnavailableDialog');
+      return;
+    }
     const email=await S.connect();render();
     report('Google Drive autorizado'+(email?' para '+email:'')+'. Tokens não são salvos.','info');
     const id=new URL(location.href).searchParams.get('space');
@@ -327,12 +338,16 @@ window.addEventListener('beforeunload',e=>{
   if(S.dirty&&S.isLinked()){e.preventDefault();e.returnValue=''}
 });
 function start(){
-  const client=new URL(location.href).searchParams.get('client');
-  if(client&&!S.config.clientId){S.saveConfig(client,S.config.pickerKey)}
+  // O Client ID é definido para todo o aplicativo, não por parâmetros de convite.
+  const address=new URL(location.href);
+  if(address.searchParams.has('client')){
+    address.searchParams.delete('client');
+    history.replaceState(null,'',address.href);
+  }
   bindNavigation();initForms();initCapture();initPromotion();initPilot();initPrint();initSharing();initGoogle();
   render();
   if(new URL(location.href).searchParams.has('space')){
-    report('Você recebeu um link. Configure o Google Cloud e conecte o Drive para autorizar o arquivo compartilhado.','warning');
+    report('Você recebeu um convite. Conecte ao Google Drive para abrir o carômetro compartilhado.','warning');
   }
 }
 start();
