@@ -102,7 +102,7 @@
    return (await this.save(copy)).doc;
   }
  }
- function stateLabel(state){return ({synced:'Sincronizado na conta',local:'Rascunho apenas neste navegador — não sincronizado',conflict:'Conflito: versão da nuvem preservada; seu rascunho está neste navegador',cached:'Cópia local da última sincronização — nuvem não consultada',demo:'Experimento fictício — somente neste navegador',unavailable:'Texto indisponível na nuvem; cópia local preservada'})[state]||'Ainda não sincronizado';}
+ function stateLabel(state){return ({synced:'Sincronizado na conta',local:'Rascunho apenas neste navegador — não sincronizado',conflict:'Conflito: versão da nuvem preservada; seu rascunho está neste navegador',cached:'Cópia local da última sincronização — nuvem não consultada',demo:'Salvo neste navegador — baixe uma cópia para levar',unavailable:'Texto indisponível na nuvem; cópia local preservada'})[state]||'Ainda não sincronizado';}
  globalThis.ALOnline={DraftDB,OnlineStore,stateLabel};
  if(typeof module!=='undefined')module.exports=globalThis.ALOnline;
 })();

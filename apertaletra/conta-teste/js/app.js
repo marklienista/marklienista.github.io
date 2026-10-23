@@ -1,14 +1,14 @@
 'use strict';
 (() => {
  const $=id=>document.getElementById(id), freeEditor=$('editor'), title=$('docTitle');
- let store=null, epoch=0;
+ let store=null, epoch=0, context={};
  const editors=[freeEditor,$('ingredientsEditor'),$('preparationEditor')];
  let editor=freeEditor,switching=false;
  let CURRENT='', RECOVERY='', recoveryKey='';
  let doc=AL.fresh(),dirty=false,generation=0,saveTask=null,saveTimer=null,range=null,history=[],historyAt=-1,toastTimer=null,restoring=false;
  function toast(message){clearTimeout(toastTimer);$('toast').textContent=message;$('toast').hidden=false;toastTimer=setTimeout(()=>$('toast').hidden=true,7000);}
  function status(text,state='pending'){$('saveStatus').textContent=text;$('saveStatus').dataset.state=state;const indicator=$('saveIndicator');if(indicator){indicator.dataset.state=state;indicator.title=text;}}
- function syncStatus(value){const label=ALOnline.stateLabel(value);status(label,value==='synced'?'ok':value==='conflict'||value==='unavailable'?'error':'pending');}
+ function syncStatus(value){const label=context.mode==='model'?'Rascunho da proposta neste navegador':context.mode==='student'&&value==='synced'?'Salvo para o professor':ALOnline.stateLabel(value);status(label,value==='synced'?'ok':value==='conflict'||value==='unavailable'?'error':'pending');}
  function setCurrent(id){try{localStorage.setItem(CURRENT,id);}catch{/* IndexedDB can still work when localStorage is unavailable. */}}
  function isRecipe(){return AL.kind(doc)==='recipe';}
  function text(){return isRecipe()?editors.slice(1).map(e=>AL.textFromHTML(e.innerHTML)).join('\n'):AL.textFromHTML(freeEditor.innerHTML);}
@@ -23,7 +23,13 @@
  }
  // Presentation controls consult the active writing block; they never own the document.
  globalThis.ALEditor={active:()=>editor};
- function setEditing(enabled){editors.forEach(e=>e.contentEditable=String(enabled));title.disabled=!enabled;}
+ function setEditing(enabled){
+ const locks=context.locked||[],ids={editor:'body',ingredientsEditor:'ingredients',preparationEditor:'preparation'};
+ editors.forEach(e=>{const off=!enabled||context.readOnly||locks.includes(ids[e.id]);e.contentEditable=String(!off);e.setAttribute('aria-readonly',String(!!off));e.closest('.recipe-section')?.classList.toggle('provided-section',locks.includes(ids[e.id]));});
+ title.disabled=!enabled||!!context.readOnly||locks.includes('title');
+ }
+ function setPolicy(next){context={...context,...next};setEditing(!switching);}
+
  function renderDocument(value,activeId){
   title.value=value.title;
   freeEditor.hidden=isRecipe();$('recipeSheet').hidden=!isRecipe();
@@ -46,7 +52,7 @@
  function historyPush(){const current=snapshot();if(history[historyAt]===current)return;history=history.slice(0,historyAt+1);history.push(current);let total=history.reduce((n,s)=>n+s.length,0);while(history.length>2&&(history.length>100||total>5000000))total-=history.shift().length;historyAt=history.length-1;historyButtons();}
  function historyButtons(){$('undoBtn').disabled=historyAt<=0;$('redoBtn').disabled=historyAt>=history.length-1;}
  function historyMove(step){
-  const target=historyAt+step;if(target<0||target>=history.length||switching)return;
+  const target=historyAt+step;if(target<0||target>=history.length||switching||context.readOnly)return;
   historyAt=target;const saved=JSON.parse(history[historyAt]);restoring=true;
   doc={...doc,...saved.value};renderDocument(saved.value,saved.activeId);restoring=false;
   range=null;caretEnd();markDirty(false);historyButtons();document.dispatchEvent(new Event('al:document'));
@@ -91,7 +97,7 @@
  }
  function crossBlockSelection(){const s=getSelection();return !!(isRecipe()&&s.rangeCount&&!s.isCollapsed&&!(editor.contains(s.anchorNode)&&editor.contains(s.focusNode)));}
  function format(command,value=null){
-  if(switching)return;
+  if(switching||context.readOnly||editor.contentEditable==='false')return;
   if(crossBlockSelection()){toast('Escolha um trecho dentro de um bloco.');return;}
   restoreRange();
   // Isolated legacy browser adapter, intentionally replaceable. execCommand is
@@ -114,6 +120,7 @@
   }finally{switching=false;setEditing(true);}
  }
  async function newDocument(type='free'){
+  if(context.bound)return false;
   if(await switchDocument(()=>AL.fresh(type))){
    $('newDialog').close();resetInsertion();
    // Keep even an empty recipe draft, including its structure, across a later load.
@@ -121,7 +128,7 @@
   }
  }
  async function freeCopy(){
-  if(!isRecipe())return;
+  if(!isRecipe()||context.bound)return;
   if(await switchDocument(()=>AL.asFree(capture()))){
    $('settingsDialog').close();resetInsertion();markDirty();
    toast('Cópia em escrita livre criada. A receita original continua em Meus textos.');
@@ -141,7 +148,7 @@
  function download(content,name,type){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([content],{type}));a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);}
  function exportCurrent(kind){try{const current=kind==='txt'?{title:title.value}:capture(),plain=kind==='txt'?(isRecipe()?[title.value,'Ingredientes',$('ingredientsEditor').innerText,'Modo de preparo',$('preparationEditor').innerText].join('\n\n'):freeEditor.innerText):'';download(kind==='txt'?plain:AL.exportFile(current),AL.filename(current.title)+(kind==='txt'?'.txt':'.apertaletra'),kind==='txt'?'text/plain;charset=utf-8':'application/json');$('downloadDialog').close();toast('Download solicitado. Confira a pasta de downloads para guardar sua cópia.');}catch(error){toast(error.message);}}
  async function importSelected(file){
-  if(!file)return;
+  if(!file||context.bound)return;
   try{
    if(file.size>AL.MAX_FILE_BYTES)throw new Error('Abra um arquivo de até 1 MB.');
    const imported=AL.importFile(file.name,await file.text());
@@ -156,7 +163,7 @@
  field.addEventListener('beforeinput',event=>{if(crossBlockSelection())event.preventDefault();});
  // Plain-text paste avoids remote images, hidden markup and injected handlers.
  field.addEventListener('paste',event=>{
-  event.preventDefault();activate(field);const pasted=event.clipboardData?.getData('text/plain')||'';if(!pasted)return;
+  event.preventDefault();if(context.readOnly||field.contentEditable==='false')return;activate(field);const pasted=event.clipboardData?.getData('text/plain')||'';if(!pasted)return;
   if(text().length+pasted.length>AL.MAX_TEXT){toast('Este trecho ultrapassa o limite de tamanho desta versão.');return;}
   const selection=window.getSelection();if(!selection.rangeCount)return;const r=selection.getRangeAt(0);if(!editor.contains(r.commonAncestorContainer))return;
   r.deleteContents();const fragment=document.createDocumentFragment();pasted.replace(/\r\n?/g,'\n').split('\n').forEach((line,i)=>{if(i)fragment.append(document.createElement('br'));fragment.append(document.createTextNode(line));});const last=fragment.lastChild;r.insertNode(fragment);if(last){r.setStartAfter(last);r.collapse(true);selection.removeAllRanges();selection.addRange(r);}rememberRange();markDirty();
@@ -196,16 +203,17 @@
   for(const key of keys){try{const entry=JSON.parse(localStorage.getItem(key));const value=AL.validateDocument(entry);const old=await store.get(entry.id);if(!old||JSON.stringify(AL.validateDocument(old))!==JSON.stringify(value)){const result=await store.save({...AL.fresh(),...value,title:(value.title||'Meu texto').slice(0,105)+' (recuperado)'});recovered=result.doc;}localStorage.removeItem(key);}catch{/* Keep unrecognized recovery records. Never silently delete a failed recovery. */}}
   return recovered;
  }
- async function mount(nextStore,selected=null){
+ async function mount(nextStore,selected=null,policy={}){
+  context=policy;
   epoch++;clearTimeout(saveTimer);store=nextStore;dirty=false;saveTask=null;switching=true;setEditing(false);
   CURRENT='apertaletra:online-current:'+store.scope;
   RECOVERY='apertaletra:online-emergency:'+store.scope+':';recoveryKey=RECOVERY+AL.id();
   const mountedEpoch=epoch;
   try{
-   await store.open();const recovered=await recover();let currentId=null;try{currentId=localStorage.getItem(CURRENT);}catch{}
+   await store.open();const recovered=context.bound?null:await recover();let currentId=null;try{currentId=localStorage.getItem(CURRENT);}catch{}
    const current=selected||recovered||(currentId?await store.get(currentId):null);
    if(mountedEpoch!==epoch)return;
-   showDocument(current||AL.fresh());if(recovered)toast('Rascunho recuperado. Confira o estado de sincronização.');
+   showDocument(current||AL.fresh());setEditing(true);if(recovered)toast('Rascunho recuperado. Confira o estado de sincronização.');
   }catch{
    if(mountedEpoch!==epoch)return;
    showDocument(AL.fresh());status('Recuperação local indisponível. Baixe uma cópia antes de sair.','error');
@@ -213,11 +221,11 @@
  }
  function unmount(){
   epoch++;clearTimeout(saveTimer);store=null;dirty=false;saveTask=null;range=null;history=[];historyAt=-1;
-  title.value='';editors.forEach(e=>e.replaceChildren());doc=AL.fresh();CURRENT='';RECOVERY='';recoveryKey='';
+  context={};title.value='';editors.forEach(e=>e.replaceChildren());doc=AL.fresh();CURRENT='';RECOVERY='';recoveryKey='';
   document.querySelectorAll('#editorRoot dialog[open]').forEach(d=>d.close());focusMode(false);setEditing(false);
   $('toast').textContent='';$('toast').hidden=true;historyButtons();
  }
- Object.assign(globalThis.ALEditor,{mount,unmount,persist,capture,download:exportCurrent,newDocument,
+ Object.assign(globalThis.ALEditor,{mount,unmount,persist,capture,setPolicy,isDirty:()=>dirty,download:exportCurrent,newDocument,
   async retry(){if(!store)return;await persist();const active=store,e=epoch;await active.sync(doc.id);const latest=await active.get(doc.id);if(e===epoch&&latest&&!dirty)showDocument(latest);},
   hasLocalWork:()=>dirty||['local','conflict','cached','unavailable'].includes(doc.syncState)
  });

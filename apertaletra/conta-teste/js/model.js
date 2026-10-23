@@ -47,7 +47,7 @@
  function plainHTML(text){const el=document.createElement('div');el.textContent=text;return el.innerHTML.replace(/\r\n?/g,'\n').replace(/\n/g,'<br>');}
  function textFromHTML(html){const el=document.createElement('div');el.innerHTML=cleanHTML(html);for(const br of el.querySelectorAll('br'))br.replaceWith('\n');for(const block of el.querySelectorAll('div,p,li'))block.append('\n');return el.textContent.replace(/\n{3,}/g,'\n\n').trimEnd();}
  function settings(value={}){return {font:FONTS.includes(value?.font)?value.font:'Arial',size:SIZES.includes(Number(value?.size))?Number(value.size):24};}
- function id(){return typeof crypto.randomUUID==='function'?crypto.randomUUID():Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);}
+ function id(){if(typeof crypto.randomUUID==='function')return crypto.randomUUID();const b=crypto.getRandomValues(new Uint8Array(16));b[6]=(b[6]&15)|64;b[8]=(b[8]&63)|128;const h=[...b].map(n=>n.toString(16).padStart(2,'0')).join('');return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20);}
  const GENRES=Object.freeze({recipe:Object.freeze({version:1,label:'Receita',fields:Object.freeze([{id:'ingredients',label:'Ingredientes'},{id:'preparation',label:'Modo de preparo'}])})});
  function kind(doc){return doc?.kind||'free';}
  function fresh(type='free'){const now=new Date().toISOString();return {id:id(),title:'',html:'',settings:settings(),createdAt:now,updatedAt:now,revision:0,...(type==='recipe'?{kind:'recipe',layoutVersion:1,blocks:GENRES.recipe.fields.map(f=>({id:f.id,html:''}))}:{})};}

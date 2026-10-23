@@ -1,7 +1,7 @@
 'use strict';
 // Only the Supabase publishable key belongs in this client. Never insert service-role secrets.
 globalThis.AL_CONFIG=Object.freeze({
- version:'0.5.0-alpha.2',
+ version:'0.6.0-alpha.1',
  cloudEnabled:true,
  supabaseUrl:'https://eyfmhnlzduoobdmwexmc.supabase.co',
  publishableKey:'sb_publishable_as-eMTlem4cWd29PVNFAhg_uVLIqZKu',
