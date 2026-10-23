@@ -204,7 +204,7 @@ function initSharing(){
   });
   $('pickerBtn').onclick=()=>run(async()=>{
     if(!S.isCloud())throw Error('Conecte o Drive.');
-    const id=await pickManifest(S.drive.token,S.config.pickerKey);
+    const id=await pickManifest(S.drive.token,S.config.pickerKey,S.config.projectNumber);
     if(!id)return;
     if(S.dirty&&!confirm('Descartar alterações ainda não salvas neste carômetro?'))return;
     const r=await S.load(id);
@@ -314,7 +314,12 @@ function initGoogle(){
       try{const r=await S.load(id);report(r.failed?'Convite aberto, mas imagens requerem autorização por arquivo.':'Carômetro compartilhado aberto.')}
       catch(e){report('O acesso ao arquivo compartilhado não foi comprovado. Use o Google Picker ou confirme a permissão: '+e.message,'warning')}
     } else {
-      const existing=await S.drive.spaces();
+      let existing=[];
+      try{existing=await S.drive.spaces();}
+      catch(error){
+        report('Conta Google conectada. A listagem de carômetros ainda não pôde ser acessada: '+error.message,'warning');
+        return;
+      }
       if(existing.length){
         const button=document.createElement('button');button.className='light';button.id='openExistingBtn';button.textContent='Abrir carômetro do Drive';button.type='button';
         const old=$('openExistingBtn');if(old)old.remove();
