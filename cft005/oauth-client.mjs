@@ -13,7 +13,7 @@ export function assertClientClaim(claims, expectedClientId, expectedUserId) {
 }
 export function base64url(bytes) {
   let binary = ''; for (const b of bytes) binary += String.fromCharCode(b);
-  return btoa(binary).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');
+  return btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
 export async function pkce() {
   const verifier = base64url(crypto.getRandomValues(new Uint8Array(32)));
