@@ -9,6 +9,32 @@
   constructor(message,code='network',status=0){super(message);this.name='CloudError';this.code=code;this.status=status;}
  }
  const parse=async r=>{try{return await r.json();}catch{return null;}};
+ // Authentication has no draft. A missing response does not prove that signup failed.
+ function requestMessage(path,code,status=0){
+  const auth=path.startsWith('/auth/v1/'),signup=path.startsWith('/auth/v1/signup');
+  if(auth){
+   const known={
+    invalid_credentials:'E-mail ou senha não conferem. Confira os dados e use Entrar.',
+    email_not_confirmed:'Confirme seu e-mail antes de entrar. Confira também a pasta de spam.',
+    email_address_not_authorized:'O envio de confirmação ainda não está configurado para este endereço. É necessário ajustar o serviço de cadastro.',
+    email_address_invalid:'Confira se o endereço de e-mail foi digitado corretamente.',
+    weak_password:'A senha não atende aos requisitos de segurança. Escolha uma senha mais forte.',
+    over_email_send_rate_limit:'O serviço atingiu o limite de e-mails de confirmação. Confira se uma mensagem já chegou antes de tentar novamente mais tarde.',
+    over_request_rate_limit:'Houve muitas tentativas em pouco tempo. Aguarde antes de tentar novamente.',
+    signup_disabled:'A criação de contas está indisponível no serviço. Não é um problema com sua senha.',
+    user_already_exists:'Confira seu e-mail e use Entrar com a conta que você já cadastrou.'
+   };
+   if(known[code])return known[code];
+   if(code==='network'||code==='request_timeout'||code==='invalid_response'){
+    const reason=code==='request_timeout'?'O serviço demorou para responder. ':'';
+    return reason+(signup?'Não foi possível confirmar a resposta do cadastro. Confira seu e-mail: se a confirmação chegou, conclua e use Entrar. Não repita o cadastro antes de conferir.':'Não foi possível comunicar com o serviço de acesso. Confira a conexão e tente Entrar novamente.');
+   }
+   if(status===429)return 'O serviço recebeu muitas tentativas. Aguarde antes de tentar novamente.';
+   return signup?'Não foi possível concluir a solicitação de cadastro. Confira seu e-mail antes de tentar novamente.':'Não foi possível concluir o acesso. Confira a mensagem e tente novamente.';
+  }
+  if(code==='network'||code==='request_timeout')return 'Sem confirmação da nuvem. O rascunho fica apenas neste navegador.';
+  return status===401?'Entre novamente para sincronizar.':status===403?'A conta não tem acesso a este texto.':'Não foi possível concluir a solicitação.';
+ }
  class Cloud {
   constructor(config,fetcher=globalThis.fetch.bind(globalThis)){
    this.config=config;this.fetcher=fetcher;this.session=null;this.user=null;this.epoch=0;this.refreshing=null;
@@ -24,14 +50,15 @@
   }
   requireEnabled(){if(!this.enabled)throw new CloudError(this.config.unavailableReason||'Nuvem não configurada.','not_configured');}
   async request(path,{method='GET',body,token,signal}={}){
-   this.requireEnabled();const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
+   this.requireEnabled();let timedOut=false;const controller=new AbortController(),timer=setTimeout(()=>{timedOut=true;controller.abort();},path.startsWith('/auth/v1/')?30000:12000);
    const onAbort=()=>controller.abort();signal?.addEventListener('abort',onAbort,{once:true});
    try{
     const response=await this.fetcher(this.url+path,{method,headers:{apikey:this.config.publishableKey,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:body===undefined?undefined:JSON.stringify(body),signal:controller.signal,cache:'no-store',credentials:'omit',referrerPolicy:'no-referrer'});
     const data=await parse(response);
-    if(!response.ok)throw new CloudError(response.status===401?'Entre novamente para sincronizar.':response.status===403?'A conta não tem acesso a este texto.':'Não foi possível concluir a solicitação.',data?.code||data?.error_code||'request_failed',response.status);
+    if(!response.ok){const code=data?.error_code||(typeof data?.code==='string'?data.code:'request_failed');throw new CloudError(requestMessage(path,code,response.status),code,response.status);}
+    if(data===null&&response.status!==204)throw new CloudError(requestMessage(path,'invalid_response'),'invalid_response',response.status);
     return data;
-   }catch(error){if(error instanceof CloudError)throw error;throw new CloudError('Sem confirmação da nuvem. O rascunho fica apenas neste navegador.','network');}
+   }catch(error){if(error instanceof CloudError)throw error;const code=timedOut?'request_timeout':'network';throw new CloudError(requestMessage(path,code),code);}
    finally{clearTimeout(timer);signal?.removeEventListener('abort',onAbort);}
   }
   remember(session){
