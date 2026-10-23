@@ -80,3 +80,19 @@ dialog form{display:flex;flex-direction:column;gap:14px}dialog label{margin:3px 
   .print-student small{font-size:8pt;display:block}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+
+
+/* Prévia com aparência do impresso, sem criar um PDF no servidor. */
+#printSheet.preview{display:block;background:#fff;border:1px solid var(--line);padding:24px;margin:18px 0;box-shadow:0 4px 24px #2533260d;scroll-margin-top:12px}
+#printSheet.preview .print-head{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:2px solid #3a443c;padding:0 0 14px;margin:0 0 17px}
+#printSheet.preview .print-head h1{font-size:24px;margin:0}
+#printSheet.preview .print-head p{font-size:13px;margin:6px 0}
+#printSheet.preview .print-head img{max-width:100px;max-height:75px;object-fit:contain}
+#printSheet.preview .print-grid{display:grid;grid-template-columns:repeat(var(--print-columns,4),minmax(0,1fr));gap:12px}
+#printSheet.preview .print-student{border:1px solid #dedede;text-align:center;min-width:0;padding:9px;break-inside:avoid}
+#printSheet.preview .print-student img,#printSheet.preview .no-photo{width:100%;height:105px;object-fit:cover;background:#f1f2ed}
+#printSheet.preview .no-photo{display:grid;place-items:center;color:#666;font-size:11px}
+#printSheet.preview .print-student strong{display:block;font-size:12px;margin-top:5px;overflow-wrap:anywhere}
+#printSheet.preview .print-student small{display:block;font-size:11px}
+@media(max-width:600px){#printSheet.preview{padding:12px}#printSheet.preview .print-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}#printSheet.preview .print-student img{height:110px}}
+@media print{#printSheet.preview{box-shadow:none;border:0;padding:0;margin:0}#printSheet.preview .print-grid{grid-template-columns:repeat(var(--print-columns,4),minmax(0,1fr))!important}#printSheet.preview .print-student img{height:36mm}}
