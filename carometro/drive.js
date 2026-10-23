@@ -13,7 +13,7 @@ export function prepareGoogleIdentity(){
     };
     script.onerror=()=>reject(Error('Não foi possível abrir a conexão com o Google.'));
     document.head.append(script);
-  });
+  }).catch(error=>{identityPreparation=null;throw error});
   return identityPreparation;
 }
 
@@ -24,7 +24,7 @@ export class Drive {
     if(!/^[\d]+-[a-zA-Z0-9_.-]+\.apps\.googleusercontent\.com$/.test(this.clientId))throw Error('Informe um Client ID OAuth Web do Google Cloud.');
     if(!globalThis.google?.accounts?.oauth2)await prepareGoogleIdentity();
     const result=await new Promise((resolve,reject)=>{
-      const client=google.accounts.oauth2.initTokenClient({
+      const client=globalThis.google.accounts.oauth2.initTokenClient({
         client_id:this.clientId,
         scope:SCOPE,
         callback:response=>{
