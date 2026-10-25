@@ -39,3 +39,18 @@ export function authorizeUrl({issuer, clientId, redirectUri, state, challenge, n
   if (nonce !== undefined) url.searchParams.set('nonce', nonce);
   return url.href;
 }
+
+/**
+ * Validates an exact callback URL, not only its origin.
+ * Use this for OAuth redirect_uri and post-authentication navigation.
+ * State verification is a separate mandatory transaction check.
+ */
+export function safeCallback(value, allowedCallbacks) {
+  if (!Array.isArray(allowedCallbacks) || !allowedCallbacks.length) throw new Error('missing_callback_allowlist');
+  let u;
+  try { u = new URL(value); } catch { throw new Error('invalid_callback'); }
+  if (!['https:', 'http:'].includes(u.protocol) || u.username || u.password || u.hash) throw new Error('invalid_callback');
+  if (u.protocol === 'http:' && !['localhost','127.0.0.1','127.0.0.2','[::1]'].includes(u.hostname)) throw new Error('invalid_callback');
+  if (!allowedCallbacks.includes(u.href)) throw new Error('callback_not_allowed');
+  return u.href;
+}
