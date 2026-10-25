@@ -52,3 +52,15 @@ body[data-mode=text] .genre-card{min-height:100px}
  .recipe-field li{break-inside:avoid}
  .recipe-field{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+
+/* Additional writing genres share the existing protected blocks, not independent forms. */
+.genre-options{grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.genre-card{min-width:0;min-height:135px;padding:14px 6px}
+.genre-glyph{font-family:Georgia,serif;font-size:57px;line-height:1.2;color:#6655aa}
+.field-glyph{display:inline-flex;align-items:center;justify-content:center;min-width:36px;font:28px/1 Georgia,serif;color:#584b80}
+body[data-mode=text] .genre-glyph,body[data-mode=text] .field-glyph{display:none}
+.paper[data-kind]:not([data-kind=free]) #editor{display:none!important}
+#structuredSheet .recipe-field{min-height:74px}
+#structuredSheet [data-field=items],#structuredSheet [data-field=verses],#structuredSheet [data-field=message]{min-height:165px}
+@media(max-width:740px){.genre-options{grid-template-columns:repeat(2,minmax(0,1fr))}.genre-card{min-height:112px}.genre-glyph{font-size:40px}}
+@media print{.paper[data-kind]:not([data-kind=free]) #editor{display:none!important}#structuredSheet{display:block}#structuredSheet[hidden]{display:none!important}}

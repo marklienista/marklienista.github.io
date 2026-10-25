@@ -2,7 +2,8 @@
 (() => {
  const $=id=>document.getElementById(id), freeEditor=$('editor'), title=$('docTitle');
  let store=null, epoch=0, context={};
- const editors=[freeEditor,$('ingredientsEditor'),$('preparationEditor')];
+ const recipeEditors=[$('ingredientsEditor'),$('preparationEditor')];
+ let editors=[freeEditor,...recipeEditors];
  let editor=freeEditor,switching=false;
  let CURRENT='', RECOVERY='', recoveryKey='';
  let doc=AL.fresh(),dirty=false,generation=0,saveTask=null,saveTimer=null,range=null,history=[],historyAt=-1,toastTimer=null,restoring=false;
@@ -11,10 +12,13 @@
  function syncStatus(value){const label=context.mode==='model'?'Rascunho da proposta neste navegador':context.mode==='student'&&value==='synced'?'Salvo para o professor':ALOnline.stateLabel(value);status(label,value==='synced'?'ok':value==='conflict'||value==='unavailable'?'error':'pending');}
  function setCurrent(id){try{localStorage.setItem(CURRENT,id);}catch{/* IndexedDB can still work when localStorage is unavailable. */}}
  function isRecipe(){return AL.kind(doc)==='recipe';}
- function text(){return isRecipe()?editors.slice(1).map(e=>AL.textFromHTML(e.innerHTML)).join('\n'):AL.textFromHTML(freeEditor.innerHTML);}
+ function isStructured(){return AL.kind(doc)!=='free';}
+ function activeFields(){return AL.GENRES[AL.kind(doc)]?.fields||[];}
+ function writingEditors(){return isStructured()?activeFields().map(f=>$(f.id+'Editor')): [freeEditor];}
+ function text(){return writingEditors().map(e=>AL.textFromHTML(e.innerHTML)).join('\n');}
  function capture(){
   const raw={...doc,title:title.value.slice(0,120),html:freeEditor.innerHTML,settings:{...doc.settings}};
-  if(isRecipe())raw.blocks=AL.GENRES.recipe.fields.map(f=>({id:f.id,html:$(f.id+'Editor').innerHTML}));
+  if(isStructured())raw.blocks=activeFields().map(f=>({id:f.id,html:$(f.id+'Editor').innerHTML}));
   return {...doc,...AL.validateDocument(raw)};
  }
  function activate(field){
@@ -24,25 +28,43 @@
  // Presentation controls consult the active writing block; they never own the document.
  globalThis.ALEditor={active:()=>editor};
  function setEditing(enabled){
- const locks=context.locked||[],ids={editor:'body',ingredientsEditor:'ingredients',preparationEditor:'preparation'};
- editors.forEach(e=>{const off=!enabled||context.readOnly||locks.includes(ids[e.id]);e.contentEditable=String(!off);e.setAttribute('aria-readonly',String(!!off));e.closest('.recipe-section')?.classList.toggle('provided-section',locks.includes(ids[e.id]));});
+ const locks=context.locked||[];
+ editors.forEach(e=>{const field=e.dataset.field||(e===freeEditor?'body':null);const off=!enabled||context.readOnly||locks.includes(field);e.contentEditable=String(!off);e.setAttribute('aria-readonly',String(!!off));e.closest('.recipe-section')?.classList.toggle('provided-section',locks.includes(field));});
  title.disabled=!enabled||!!context.readOnly||locks.includes('title');
  }
  function setPolicy(next){context={...context,...next};setEditing(!switching);}
 
  function renderDocument(value,activeId){
+  const type=AL.kind(value),spec=AL.GENRES[type];
   title.value=value.title;
-  freeEditor.hidden=isRecipe();$('recipeSheet').hidden=!isRecipe();
-  document.querySelector('.paper').dataset.kind=isRecipe()?'recipe':'free';
-  freeEditor.innerHTML=isRecipe()?'':value.html;
-  for(const field of AL.GENRES.recipe.fields)$(field.id+'Editor').innerHTML=isRecipe()?(value.blocks.find(b=>b.id===field.id).html||(field.id==='ingredients'?'<ul><li><br></li></ul>':'<ol><li><br></li></ol>')):'';
-  $('freeCopyBtn').hidden=!isRecipe();$('recipeNameMarker').hidden=!isRecipe();
-  title.setAttribute('aria-label',isRecipe()?'Nome da receita':'Título do texto');
-  title.title=isRecipe()?'Nome da receita':'';
-  const select=$('selectAllBtn'),label=isRecipe()?'Selecionar todo o bloco':'Selecionar todo o texto';
-  select.setAttribute('aria-label',label);select.title=label;select.querySelector('.control-label').textContent=isRecipe()?'Escolher bloco':'Escolher tudo';
-  activate(isRecipe()?(editors.slice(1).find(e=>e.id===activeId)||editors[1]):freeEditor);
-  applySettings();
+  freeEditor.hidden=!!spec;$('recipeSheet').hidden=type!=='recipe';$('structuredSheet').hidden=!spec||type==='recipe';
+  document.querySelector('.paper').dataset.kind=type;
+  freeEditor.innerHTML=spec?'':value.html;
+  const parent=$('structuredSheet');parent.replaceChildren();
+  const dynamic=[];
+  if(spec&&type!=='recipe')for(const field of spec.fields){
+   const section=document.createElement('section');section.className='recipe-section';
+   const heading=document.createElement('h2');heading.className='recipe-caption';heading.id=field.id+'Heading';heading.setAttribute('aria-label',field.label);
+   const icon=document.createElement('span');icon.className='field-glyph';icon.setAttribute('aria-hidden','true');icon.textContent=field.symbol||'✎';
+   const label=document.createElement('span');label.className='control-label';label.textContent=field.label;
+   heading.append(icon,label);section.setAttribute('aria-labelledby',heading.id);
+   const input=document.createElement('div');input.id=field.id+'Editor';input.className='writing-field recipe-field';input.dataset.field=field.id;
+   input.contentEditable='false';input.setAttribute('role','textbox');input.setAttribute('aria-label',field.label);input.setAttribute('aria-multiline','true');input.setAttribute('spellcheck','false');input.setAttribute('autocorrect','off');input.setAttribute('autocapitalize','off');input.tabIndex=0;
+   section.append(heading,input);parent.append(section);dynamic.push(input);bindEditor(input);
+  }
+  editors=[freeEditor,...recipeEditors,...dynamic];
+  if(spec)for(const field of spec.fields)$(field.id+'Editor').innerHTML=value.blocks.find(b=>b.id===field.id)?.html||field.empty||'';
+  $('freeCopyBtn').hidden=!spec;$('recipeNameMarker').hidden=!spec;
+  const titleLabel=spec?.titleLabel||'Título do texto';
+  const marker=$('recipeNameMarker');let symbol=$('genreTitleSymbol');
+  if(!symbol){symbol=document.createElement('span');symbol.id='genreTitleSymbol';symbol.className='field-glyph';symbol.setAttribute('aria-hidden','true');marker.insertBefore(symbol,marker.querySelector('.control-label'));}
+  marker.querySelector('svg').hidden=type!=='recipe';symbol.hidden=type==='recipe';symbol.textContent=spec?.symbol||'';
+  marker.querySelector('.control-label').textContent=titleLabel;
+  title.setAttribute('aria-label',titleLabel);title.title=spec?titleLabel:'';
+  const select=$('selectAllBtn'),label=spec?'Selecionar todo o bloco':'Selecionar todo o texto';
+  select.setAttribute('aria-label',label);select.title=label;select.querySelector('.control-label').textContent=spec?'Escolher bloco':'Escolher tudo';
+  activate(spec?(writingEditors().find(e=>e.id===activeId)||writingEditors()[0]):freeEditor);
+  setEditing(!switching);applySettings();
  }
  function emergency(){if(!store||!recoveryKey)return;try{localStorage.setItem(recoveryKey,JSON.stringify({...capture(),emergencyAt:Date.now()}));}catch{/* Remain dirty until the IndexedDB transaction commits. */}}
  function clearEmergency(){try{if(recoveryKey)localStorage.removeItem(recoveryKey);}catch{}}
@@ -95,7 +117,7 @@
    const face=AL.fontKey(font.getAttribute('face'));if(face)font.style.fontFamily=AL.fontStack(face);
   }
  }
- function crossBlockSelection(){const s=getSelection();return !!(isRecipe()&&s.rangeCount&&!s.isCollapsed&&!(editor.contains(s.anchorNode)&&editor.contains(s.focusNode)));}
+ function crossBlockSelection(){const s=getSelection();return !!(isStructured()&&s.rangeCount&&!s.isCollapsed&&!(editor.contains(s.anchorNode)&&editor.contains(s.focusNode)));}
  function format(command,value=null){
   if(switching||context.readOnly||editor.contentEditable==='false')return;
   if(crossBlockSelection()){toast('Escolha um trecho dentro de um bloco.');return;}
@@ -123,15 +145,15 @@
   if(context.bound)return false;
   if(await switchDocument(()=>AL.fresh(type))){
    $('newDialog').close();resetInsertion();
-   // Keep even an empty recipe draft, including its structure, across a later load.
+   // Keep even an empty structured draft, including its fixed fields, across a later load.
    if(type!=='free')markDirty();
   }
  }
  async function freeCopy(){
-  if(!isRecipe()||context.bound)return;
+  if(!isStructured()||context.bound)return;
   if(await switchDocument(()=>AL.asFree(capture()))){
    $('settingsDialog').close();resetInsertion();markDirty();
-   toast('Cópia em escrita livre criada. A receita original continua em Meus textos.');
+   toast('Cópia em escrita livre criada. O texto original continua em Meus textos.');
   }
  }
  function resetInsertion(){
@@ -146,7 +168,7 @@
   rememberRange();document.dispatchEvent(new Event('al:format'));
  }
  function download(content,name,type){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([content],{type}));a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);}
- function exportCurrent(kind){try{const current=kind==='txt'?{title:title.value}:capture(),plain=kind==='txt'?(isRecipe()?[title.value,'Ingredientes',$('ingredientsEditor').innerText,'Modo de preparo',$('preparationEditor').innerText].join('\n\n'):freeEditor.innerText):'';download(kind==='txt'?plain:AL.exportFile(current),AL.filename(current.title)+(kind==='txt'?'.txt':'.apertaletra'),kind==='txt'?'text/plain;charset=utf-8':'application/json');$('downloadDialog').close();toast('Download solicitado. Confira a pasta de downloads para guardar sua cópia.');}catch(error){toast(error.message);}}
+ function exportCurrent(kind){try{const current=kind==='txt'?{title:title.value}:capture(),plain=kind==='txt'?(isStructured()?[title.value,...activeFields().flatMap(f=>[f.label,$(f.id+'Editor').innerText])].join('\n\n'):freeEditor.innerText):'';download(kind==='txt'?plain:AL.exportFile(current),AL.filename(current.title)+(kind==='txt'?'.txt':'.apertaletra'),kind==='txt'?'text/plain;charset=utf-8':'application/json');$('downloadDialog').close();toast('Download solicitado. Confira a pasta de downloads para guardar sua cópia.');}catch(error){toast(error.message);}}
  async function importSelected(file){
   if(!file||context.bound)return;
   try{
@@ -157,7 +179,7 @@
   }catch(error){toast(error.message||'Não foi possível abrir o arquivo. Seu texto foi mantido.');}
   finally{$('fileInput').value='';}
  }
- for(const field of editors){
+ function bindEditor(field){
  field.addEventListener('focus',()=>activate(field));
  field.addEventListener('pointerdown',()=>activate(field));
  field.addEventListener('beforeinput',event=>{if(crossBlockSelection())event.preventDefault();});
@@ -170,8 +192,9 @@
  });
  field.addEventListener('drop',event=>{event.preventDefault();toast('Use Abrir arquivo para trazer um texto. Imagens não fazem parte desta versão.');});
  field.addEventListener('input',()=>{activate(field);try{normalizeTypography();markDirty();}catch(error){status('Texto muito grande. Baixe ou reduza antes de sair.','error');toast(error.message);}});
- field.addEventListener('keyup',()=>{rememberRange();updateToolbar();});field.addEventListener('mouseup',()=>{rememberRange();updateToolbar();});field.addEventListener('blur',rememberRange);
+ field.addEventListener('keyup',()=>{rememberRange();updateToolbar();});field.addEventListener('mouseup',()=>{rememberRange();updateToolbar();}); field.addEventListener('blur',rememberRange);
  }
+ for(const field of editors)bindEditor(field);
  title.addEventListener('input',()=>{try{markDirty();}catch(error){status('Baixe uma cópia em texto simples antes de sair.','error');toast(error.message);}});
  document.querySelectorAll('[data-command],[data-color]').forEach(btn=>{btn.addEventListener('pointerdown',event=>event.preventDefault());btn.addEventListener('click',()=>format(btn.dataset.command||'foreColor',btn.dataset.color));});
  $('fontSelect').addEventListener('change',()=>format('fontName',AL.fontStack($('fontSelect').value)));
@@ -180,7 +203,9 @@
   if(native)format('fontSize',native);
  });
  $('undoBtn').onclick=()=>historyMove(-1);$('redoBtn').onclick=()=>historyMove(1);$('newBtn').onclick=()=>{if(!switching)$('newDialog').showModal();};
- $('newFreeBtn').onclick=()=>newDocument('free');$('newRecipeBtn').onclick=()=>newDocument('recipe');$('freeCopyBtn').onclick=freeCopy;
+ $('newFreeBtn').onclick=()=>newDocument('free');$('newRecipeBtn').onclick=()=>newDocument('recipe');
+ for(const [id,type] of [['newListBtn','list'],['newNoteBtn','note'],['newInvitationBtn','invitation'],['newPoemBtn','poem']])$(id).onclick=()=>newDocument(type);
+ $('freeCopyBtn').onclick=freeCopy;
  $('libraryBtn').onclick=()=>document.dispatchEvent(new Event('al:library'));$('helpBtn').onclick=()=>$('helpDialog').showModal();
  $('downloadBtn').onclick=()=>$('downloadDialog').showModal();$('editableBtn').onclick=()=>exportCurrent('editable');$('txtBtn').onclick=()=>exportCurrent('txt');
  $('openBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=event=>importSelected(event.target.files[0]);

@@ -46,7 +46,7 @@
    if(!AL.textFromHTML(html).trim())text.append(make('p','batch-empty','Sem texto neste campo.'));
    section.append(text);content.append(section);
   };
-  if(AL.kind(doc)==='recipe')doc.blocks.forEach((b,i)=>block(b.html,AL.GENRES.recipe.fields[i].label));
+  if(AL.GENRES[AL.kind(doc)])doc.blocks.forEach((b,i)=>block(b.html,AL.GENRES[AL.kind(doc)].fields[i].label));
   else block(doc.html);
   article.append(content);return article;
  }

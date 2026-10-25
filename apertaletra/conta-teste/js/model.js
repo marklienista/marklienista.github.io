@@ -48,9 +48,16 @@
  function textFromHTML(html){const el=document.createElement('div');el.innerHTML=cleanHTML(html);for(const br of el.querySelectorAll('br'))br.replaceWith('\n');for(const block of el.querySelectorAll('div,p,li'))block.append('\n');return el.textContent.replace(/\n{3,}/g,'\n\n').trimEnd();}
  function settings(value={}){return {font:FONTS.includes(value?.font)?value.font:'Arial',size:SIZES.includes(Number(value?.size))?Number(value.size):24};}
  function id(){if(typeof crypto.randomUUID==='function')return crypto.randomUUID();const b=crypto.getRandomValues(new Uint8Array(16));b[6]=(b[6]&15)|64;b[8]=(b[8]&63)|128;const h=[...b].map(n=>n.toString(16).padStart(2,'0')).join('');return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20);}
- const GENRES=Object.freeze({recipe:Object.freeze({version:1,label:'Receita',fields:Object.freeze([{id:'ingredients',label:'Ingredientes'},{id:'preparation',label:'Modo de preparo'}])})});
+ // Layouts have fixed field identifiers/order. The child can write freely inside each field.
+ const GENRES=Object.freeze({
+  recipe:{version:1,label:'Receita',titleLabel:'Nome da receita',symbol:'♨',fields:[{id:'ingredients',label:'Ingredientes',symbol:'▤',empty:'<ul><li><br></li></ul>'},{id:'preparation',label:'Modo de preparo',symbol:'①',empty:'<ol><li><br></li></ol>'}]},
+  list:{version:1,label:'Lista',titleLabel:'Nome da lista',symbol:'☷',fields:[{id:'items',label:'Itens',symbol:'☷',empty:'<ul><li><br></li></ul>'}]},
+  note:{version:1,label:'Bilhete',titleLabel:'Título do bilhete',symbol:'✉',fields:[{id:'recipient',label:'Para',symbol:'→'},{id:'message',label:'Mensagem',symbol:'✎'},{id:'signature',label:'De',symbol:'✍'}]},
+  invitation:{version:1,label:'Convite',titleLabel:'Título do convite',symbol:'✦',fields:[{id:'event',label:'Ocasião',symbol:'✦'},{id:'recipient',label:'Para quem',symbol:'→'},{id:'datetime',label:'Dia e hora',symbol:'◷'},{id:'place',label:'Local',symbol:'⌂'},{id:'sender',label:'Quem convida',symbol:'✍'}]},
+  poem:{version:1,label:'Poema',titleLabel:'Título do poema',symbol:'❞',fields:[{id:'verses',label:'Versos e estrofes',symbol:'❞'}]}
+ });
  function kind(doc){return doc?.kind||'free';}
- function fresh(type='free'){const now=new Date().toISOString();return {id:id(),title:'',html:'',settings:settings(),createdAt:now,updatedAt:now,revision:0,...(type==='recipe'?{kind:'recipe',layoutVersion:1,blocks:GENRES.recipe.fields.map(f=>({id:f.id,html:''}))}:{})};}
+ function fresh(type='free'){const now=new Date().toISOString();return {id:id(),title:'',html:'',settings:settings(),createdAt:now,updatedAt:now,revision:0,...(Object.hasOwn(GENRES,type)?{kind:type,layoutVersion:GENRES[type].version,blocks:GENRES[type].fields.map(f=>({id:f.id,html:''}))}:{})};}
  function validateDocument(raw){
   const invalid=()=>new Error('Arquivo inválido. O texto atual foi mantido.');
   if(!raw||typeof raw!=='object'||Array.isArray(raw)||typeof raw.title!=='string'||raw.title.length>120)throw invalid();
