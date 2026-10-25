@@ -98,3 +98,15 @@ dialog form{display:flex;flex-direction:column;gap:14px}dialog label{margin:3px 
 @media print{#printSheet.preview{box-shadow:none;border:0;padding:0;margin:0}#printSheet.preview .print-grid{grid-template-columns:repeat(var(--print-columns,4),minmax(0,1fr))!important}#printSheet.preview .print-student img{height:36mm}}
 
 #captureDialog input[type=file]{width:100%;margin-top:8px}
+
+/* CM-UI-001: salvar sempre com o mesmo nome e visível no celular. */
+.save-guide{margin:-4px 0 17px;padding:12px 16px;border-left:4px solid var(--leaf);background:#eaf1e9;font-size:14px;color:var(--deep);line-height:1.5}
+.save-guide[hidden]{display:none}
+.workspace-head #saveBtn:not(:disabled){box-shadow:0 0 0 2px #f2c641;min-height:48px}
+@media(max-width:640px){
+  .workspace-head .head-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;width:100%}
+  .workspace-head .head-actions button{width:100%;min-height:48px;min-width:0;white-space:normal}
+  .workspace-head #saveBtn{grid-column:1 / -1;grid-row:1;font-size:16px}
+  .workspace-head #connectBtn{grid-column:1;grid-row:2}
+  .workspace-head #newSpaceBtn{grid-column:2;grid-row:2}
+}
