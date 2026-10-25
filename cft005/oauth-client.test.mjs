@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {webcrypto} from 'node:crypto';
-import {safeReturn, assertClientClaim, base64url, pkce, authorizeUrl} from './oauth-client.mjs';
+import {safeReturn, safeCallback, assertClientClaim, base64url, pkce, authorizeUrl} from './oauth-client.mjs';
 
 globalThis.crypto ??= webcrypto;
 
@@ -64,3 +64,14 @@ test('autorizacao rejeita configuracao incompleta e destinos inseguros', () => {
 });
 
 // Contratos locais. Nao verificam assinatura JWT, callback completo, RLS ou SSO real.
+
+test('callback exato recusa outros caminhos e parametros', () => {
+ const allowed=['https://a.example/callback','http://127.0.0.1:4311/callback'];
+ assert.equal(safeCallback(allowed[0],allowed),allowed[0]);
+ assert.equal(safeCallback(allowed[1],allowed),allowed[1]);
+ assert.throws(()=>safeCallback('https://a.example/other',allowed));
+ assert.throws(()=>safeCallback('https://a.example/callback?x=1',allowed));
+ assert.throws(()=>safeCallback('https://a.example/callback#x',allowed));
+ assert.throws(()=>safeCallback('https://evil.example/callback',allowed));
+ assert.throws(()=>safeCallback(allowed[0],[]));
+});
