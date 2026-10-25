@@ -24,7 +24,16 @@ function render(){
   $('modeText').textContent=mode+(S.dirty?' · alterações não salvas':'');
   $('connectBtn').textContent=S.isCloud()?'Desconectar Google Drive':'Conectar ao Google Drive';
   $('saveBtn').disabled=!S.isCloud()||!S.editable()||(!S.dirty&&S.isLinked());
-  $('saveBtn').textContent=S.isLinked()?'Salvar no Drive':'Criar no Drive';
+  $('saveBtn').textContent='Salvar no Drive';
+  const guidance=$('saveGuide');
+  guidance.hidden=!S.isCloud();
+  if(S.isCloud()){
+    guidance.textContent=!S.isLinked()
+      ? 'Google Drive conectado. Para guardar as turmas e as fotos, toque em Salvar no Drive — isso cria o carômetro na sua conta.'
+      : S.dirty
+        ? 'Existem alterações ainda não salvas no Google Drive. Toque em Salvar no Drive.'
+        : 'O carômetro está salvo no Google Drive. Faça alterações para habilitar Salvar no Drive novamente.';
+  }
   fillSelect($('yearSelect'),years().map(y=>({value:y,label:String(y)})),S.year);
   if(!S.classId||!currentClass()||currentClass().year!==Number(S.year))S.classId=classesForYear()[0]?.id||null;
   renderClassBar(S.space,S.year,S.classId,id=>S.selectClass(id));
@@ -307,7 +316,8 @@ function initGoogle(){
       return;
     }
     const email=await S.connect();render();
-    report('Google Drive autorizado'+(email?' para '+email:'')+'. Tokens não são salvos.','info');
+    report('Google Drive conectado'+(email?' a '+email:'')+'. Para guardar seu primeiro carômetro, toque em Salvar no Drive.','info');
+    $('saveBtn').scrollIntoView({block:'center',behavior:'smooth'});
     const id=new URL(location.href).searchParams.get('space');
     if(id){
       if(S.dirty&&!confirm('Descartar alterações locais para abrir o convite?'))return;
