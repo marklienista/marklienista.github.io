@@ -14,7 +14,7 @@
 <div class="app-shell">
   <header class="topbar no-print">
     <div class="brand"><span class="brand-mark" aria-hidden="true">◩</span><span><strong>Carômetro</strong><small>por <b>Marcelo Santos</b></small></span></div>
-    <div class="top-actions"><span class="version">LABORATÓRIO 0.9 · NÃO LANÇADO</span><button type="button" id="helpBtn" class="quiet">Ajuda</button><button type="button" id="settingsBtn" class="quiet">Configurar</button></div>
+    <div class="top-actions"><span class="version">LABORATÓRIO 0.9.1 · NÃO LANÇADO</span><button type="button" id="helpBtn" class="quiet">Ajuda</button><button type="button" id="settingsBtn" class="quiet">Configurar</button></div>
   </header>
   <main id="conteudo" class="container">
     <div class="safety no-print" role="note"><strong>Ambiente de testes.</strong> Use apenas dados e imagens fictícios. Sem conexão ao Google Drive, as alterações ficam somente neste navegador de teste.</div>
@@ -24,8 +24,9 @@
     </section>
     <section class="workspace-head no-print" aria-labelledby="spaceTitle">
       <div><p class="eyebrow">ESPAÇO DE TRABALHO</p><h2 id="spaceTitle">Escola Exemplo</h2><p class="sub" id="modeText">Demonstração local · nenhuma informação no servidor</p></div>
-      <div class="head-actions"><button id="newSpaceBtn" class="light" type="button">+ Novo carômetro</button><button id="connectBtn" class="primary" type="button">Conectar Google Drive</button><button id="saveBtn" class="primary" type="button" disabled>Salvar no Drive</button></div>
+      <div class="head-actions"><button id="connectBtn" class="light" type="button">Conectar ao Google Drive</button><button id="saveBtn" class="primary" type="button" disabled>Salvar no Drive</button><button id="newSpaceBtn" class="light" type="button">+ Novo carômetro</button></div>
     </section>
+    <p id="saveGuide" class="save-guide no-print" hidden aria-live="polite"></p>
     <nav class="navtabs no-print" aria-label="Áreas do Carômetro">
       <button type="button" data-view="turmas" aria-current="page">Turmas e estudantes</button>
       <button type="button" data-view="listas">Lista piloto</button>
