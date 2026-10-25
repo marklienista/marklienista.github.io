@@ -1,0 +1,9 @@
+{
+  "provider": "custom:conta-central",
+  "supabaseUrl": "https://jxyylpdgwvswaapeefsy.supabase.co",
+  "publishableKey": "sb_publishable_SUBSTITUIR_PELA_CHAVE_PUBLICA",
+  "allowedCallbacks": [
+    "http://127.0.0.1:4311/callback.html",
+    "http://127.0.0.2:4312/callback.html"
+  ]
+}
