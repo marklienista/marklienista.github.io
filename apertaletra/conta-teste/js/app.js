@@ -39,6 +39,11 @@
   title.value=value.title;
   freeEditor.hidden=!!spec;$('recipeSheet').hidden=type!=='recipe';$('structuredSheet').hidden=!spec||type==='recipe';
   document.querySelector('.paper').dataset.kind=type;
+  document.body.dataset.genre=type;
+  const alignSection=document.querySelector('.align-tools')?.closest('.tool-section');
+  if(alignSection)alignSection.hidden=!!spec&&type!=='poem';
+  for(const control of document.querySelectorAll('[data-command^="justify"]'))control.hidden=type==='poem'&&!['justifyLeft','justifyCenter'].includes(control.dataset.command);
+
   freeEditor.innerHTML=spec?'':value.html;
   const parent=$('structuredSheet');parent.replaceChildren();
   const dynamic=[];
@@ -49,11 +54,15 @@
    const label=document.createElement('span');label.className='control-label';label.textContent=field.label;
    heading.append(icon,label);section.setAttribute('aria-labelledby',heading.id);
    const input=document.createElement('div');input.id=field.id+'Editor';input.className='writing-field recipe-field';input.dataset.field=field.id;
-   input.contentEditable='false';input.setAttribute('role','textbox');input.setAttribute('aria-label',field.label);input.setAttribute('aria-multiline','true');input.setAttribute('spellcheck','false');input.setAttribute('autocorrect','off');input.setAttribute('autocapitalize','off');input.tabIndex=0;
+   input.contentEditable='false';if(field.list)input.dataset.listType=field.list;input.setAttribute('role','textbox');input.setAttribute('aria-label',field.label);input.setAttribute('aria-multiline','true');input.setAttribute('spellcheck','false');input.setAttribute('autocorrect','off');input.setAttribute('autocapitalize','off');input.tabIndex=0;
    section.append(heading,input);parent.append(section);dynamic.push(input);bindEditor(input);
   }
   editors=[freeEditor,...recipeEditors,...dynamic];
-  if(spec)for(const field of spec.fields)$(field.id+'Editor').innerHTML=value.blocks.find(b=>b.id===field.id)?.html||field.empty||'';
+  if(spec)for(const field of spec.fields){
+   const node=$(field.id+'Editor');
+   node.innerHTML=AL.blockHTML(value.blocks.find(b=>b.id===field.id)?.html||'',field)||field.empty||'';
+   if(field.list)node.dataset.listType=field.list;
+  }
   $('freeCopyBtn').hidden=!spec;$('recipeNameMarker').hidden=!spec;
   const titleLabel=spec?.titleLabel||'Título do texto';
   const marker=$('recipeNameMarker');let symbol=$('genreTitleSymbol');
@@ -120,7 +129,13 @@
  function crossBlockSelection(){const s=getSelection();return !!(isStructured()&&s.rangeCount&&!s.isCollapsed&&!(editor.contains(s.anchorNode)&&editor.contains(s.focusNode)));}
  function format(command,value=null){
   if(switching||context.readOnly||editor.contentEditable==='false')return;
-  if(crossBlockSelection()){toast('Escolha um trecho dentro de um bloco.');return;}
+   if(crossBlockSelection()){toast('Escolha um trecho dentro de um bloco.');return;}
+   if(command.startsWith('justify')){
+    const type=AL.kind(doc);
+    if(type!=='free'&&(type!=='poem'||!['justifyLeft','justifyCenter'].includes(command))){
+     toast('A posição do texto já está definida neste modelo.');return;
+    }
+   }
   restoreRange();
   // Isolated legacy browser adapter, intentionally replaceable. execCommand is
   // deprecated; formatting is covered by DOM tests in this prototype. No HTML input.
@@ -179,20 +194,69 @@
   }catch(error){toast(error.message||'Não foi possível abrir o arquivo. Seu texto foi mantido.');}
   finally{$('fileInput').value='';}
  }
+ // Keep the caret when a native edit removes the only list element (for example,
+ // Backspace on an empty bullet). Canonicalization also runs when exporting/saving.
+ function caretTextOffset(root){
+  const sel=getSelection();if(!sel.rangeCount||!root.contains(sel.anchorNode))return null;
+  const r=sel.getRangeAt(0);const before=r.cloneRange();before.selectNodeContents(root);before.setEnd(r.startContainer,r.startOffset);
+  return before.toString().length;
+ }
+ function restoreTextOffset(root,offset){
+  if(offset===null)return;
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let node,remaining=offset,last=null;
+  while(node=walker.nextNode()){
+   last=node;
+   if(remaining<=node.length){const r=document.createRange();r.setStart(node,remaining);r.collapse(true);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);rememberRange();return;}
+   remaining-=node.length;
+  }
+  const r=document.createRange();if(last)r.setStart(last,last.length);else{r.selectNodeContents(root);r.collapse(false);}r.collapse(true);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);rememberRange();
+ }
+ function restoreListShape(field){
+  const listTag=field.dataset.listType;if(!listTag)return;
+  const children=[...field.children],list=children[0];
+  if(children.length===1&&list.tagName===listTag.toUpperCase()&&list.children.length&&[...list.children].every(e=>e.tagName==='LI'&&!([...e.querySelectorAll('br')].length&&e.textContent.trim())))return;
+  const spec=activeFields().find(x=>x.id===field.dataset.field);if(!spec)return;
+  const at=caretTextOffset(field);const fixed=AL.blockHTML(field.innerHTML,spec);
+  if(fixed!==field.innerHTML){field.innerHTML=fixed;restoreTextOffset(field,at);}
+ }
  function bindEditor(field){
  field.addEventListener('focus',()=>activate(field));
  field.addEventListener('pointerdown',()=>activate(field));
- field.addEventListener('beforeinput',event=>{if(crossBlockSelection())event.preventDefault();});
+  field.addEventListener('beforeinput',event=>{
+   if(crossBlockSelection())event.preventDefault();
+   if(isStructured()&&/^formatJustify/.test(event.inputType||'')&&(AL.kind(doc)!=='poem'||!['formatJustifyLeft','formatJustifyCenter'].includes(event.inputType)))event.preventDefault();
+  });
+  field.addEventListener('keydown',event=>{
+   if(!field.dataset.listType)return;
+   const list=field.firstElementChild;
+   if(event.key==='Backspace'&&list?.children.length===1&&list.firstElementChild?.textContent?.trim()===''){
+    event.preventDefault();return;
+   }
+   if(event.key==='Enter'&&field.contains(getSelection()?.anchorNode)){
+    // Native Enter within <li> creates the next list item. Repair on input
+    // if the browser instead exits the list on an empty last item.
+   }
+  });
  // Plain-text paste avoids remote images, hidden markup and injected handlers.
  field.addEventListener('paste',event=>{
   event.preventDefault();if(context.readOnly||field.contentEditable==='false')return;activate(field);const pasted=event.clipboardData?.getData('text/plain')||'';if(!pasted)return;
   if(text().length+pasted.length>AL.MAX_TEXT){toast('Este trecho ultrapassa o limite de tamanho desta versão.');return;}
   const selection=window.getSelection();if(!selection.rangeCount)return;const r=selection.getRangeAt(0);if(!editor.contains(r.commonAncestorContainer))return;
-  r.deleteContents();const fragment=document.createDocumentFragment();pasted.replace(/\r\n?/g,'\n').split('\n').forEach((line,i)=>{if(i)fragment.append(document.createElement('br'));fragment.append(document.createTextNode(line));});const last=fragment.lastChild;r.insertNode(fragment);if(last){r.setStartAfter(last);r.collapse(true);selection.removeAllRanges();selection.addRange(r);}rememberRange();markDirty();
+  r.deleteContents();
+  // Replacing an empty first bullet must not leave a phantom bullet above the
+  // pasted lines. The browser puts a <br> placeholder in every empty <li>.
+  if(field.dataset.listType){
+   const anchor=r.startContainer.nodeType===1?r.startContainer:r.startContainer.parentElement;
+   const li=anchor?.closest?.('li')||(field.querySelectorAll('li').length===1&&field.textContent.trim()===''?field.querySelector('li'):null);
+   if(li&&li.textContent.trim()===''&&li.querySelector('br')){
+    li.replaceChildren();r.selectNodeContents(li);r.collapse(true);
+   }
+  }
+  const fragment=document.createDocumentFragment();pasted.replace(/\r\n?/g,'\n').split('\n').forEach((line,i)=>{if(i)fragment.append(document.createElement('br'));fragment.append(document.createTextNode(line));});const last=fragment.lastChild;r.insertNode(fragment);if(last){r.setStartAfter(last);r.collapse(true);selection.removeAllRanges();selection.addRange(r);}rememberRange();restoreListShape(field);markDirty();
  });
  field.addEventListener('drop',event=>{event.preventDefault();toast('Use Abrir arquivo para trazer um texto. Imagens não fazem parte desta versão.');});
- field.addEventListener('input',()=>{activate(field);try{normalizeTypography();markDirty();}catch(error){status('Texto muito grande. Baixe ou reduza antes de sair.','error');toast(error.message);}});
- field.addEventListener('keyup',()=>{rememberRange();updateToolbar();});field.addEventListener('mouseup',()=>{rememberRange();updateToolbar();}); field.addEventListener('blur',rememberRange);
+ field.addEventListener('input',()=>{activate(field);try{restoreListShape(field);normalizeTypography();markDirty();}catch(error){status('Texto muito grande. Baixe ou reduza antes de sair.','error');toast(error.message);}});
+ field.addEventListener('blur',()=>{if(field.dataset.listType){restoreListShape(field);rememberRange();}});field.addEventListener('keyup',()=>{rememberRange();updateToolbar();});field.addEventListener('mouseup',()=>{rememberRange();updateToolbar();}); field.addEventListener('blur',rememberRange);
  }
  for(const field of editors)bindEditor(field);
  title.addEventListener('input',()=>{try{markDirty();}catch(error){status('Baixe uma cópia em texto simples antes de sair.','error');toast(error.message);}});
@@ -218,6 +282,7 @@
   if(event.key==='Escape'&&document.body.classList.contains('focus-mode')){focusMode(false);}
   if(!(event.ctrlKey||event.metaKey))return;const key=event.key.toLowerCase();const isEditor=document.activeElement===editor||editor.contains(document.activeElement);
   if(key==='s'){event.preventDefault();$('downloadDialog').showModal();}
+  if(isStructured()&&key==='e'&&event.ctrlKey&&AL.kind(doc)!=='poem'){event.preventDefault();return;}
   if((key==='z'||key==='y')&&!document.querySelector('dialog[open]')){event.preventDefault();historyMove(key==='y'||event.shiftKey?1:-1);}
   if(isEditor&&['b','i','u'].includes(key)){event.preventDefault();format({b:'bold',i:'italic',u:'underline'}[key]);}
  });

@@ -49,13 +49,72 @@
  function settings(value={}){return {font:FONTS.includes(value?.font)?value.font:'Arial',size:SIZES.includes(Number(value?.size))?Number(value.size):24};}
  function id(){if(typeof crypto.randomUUID==='function')return crypto.randomUUID();const b=crypto.getRandomValues(new Uint8Array(16));b[6]=(b[6]&15)|64;b[8]=(b[8]&63)|128;const h=[...b].map(n=>n.toString(16).padStart(2,'0')).join('');return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20);}
  // Layouts have fixed field identifiers/order. The child can write freely inside each field.
+ // A genre owns structural typography and lists; the child owns the words and emphasis.
+ // align=left is fixed; align=verse permits left/center, never right/justify.
  const GENRES=Object.freeze({
-  recipe:{version:1,label:'Receita',titleLabel:'Nome da receita',symbol:'♨',fields:[{id:'ingredients',label:'Ingredientes',symbol:'▤',empty:'<ul><li><br></li></ul>'},{id:'preparation',label:'Modo de preparo',symbol:'①',empty:'<ol><li><br></li></ol>'}]},
-  list:{version:1,label:'Lista',titleLabel:'Nome da lista',symbol:'☷',fields:[{id:'items',label:'Itens',symbol:'☷',empty:'<ul><li><br></li></ul>'}]},
-  note:{version:1,label:'Bilhete',titleLabel:'Título do bilhete',symbol:'✉',fields:[{id:'recipient',label:'Para',symbol:'→'},{id:'message',label:'Mensagem',symbol:'✎'},{id:'signature',label:'De',symbol:'✍'}]},
-  invitation:{version:1,label:'Convite',titleLabel:'Título do convite',symbol:'✦',fields:[{id:'event',label:'Ocasião',symbol:'✦'},{id:'recipient',label:'Para quem',symbol:'→'},{id:'datetime',label:'Dia e hora',symbol:'◷'},{id:'place',label:'Local',symbol:'⌂'},{id:'sender',label:'Quem convida',symbol:'✍'}]},
-  poem:{version:1,label:'Poema',titleLabel:'Título do poema',symbol:'❞',fields:[{id:'verses',label:'Versos e estrofes',symbol:'❞'}]}
+  recipe:{version:1,label:'Receita',titleLabel:'Nome da receita',symbol:'♨',titleAlign:'left',fields:[{id:'ingredients',label:'Ingredientes',symbol:'▤',list:'ul',align:'left',empty:'<ul><li><br></li></ul>'},{id:'preparation',label:'Modo de preparo',symbol:'①',list:'ol',align:'left',empty:'<ol><li><br></li></ol>'}]},
+  list:{version:1,label:'Lista',titleLabel:'Nome da lista',symbol:'☷',titleAlign:'left',fields:[{id:'items',label:'Itens',symbol:'☷',list:'ul',align:'left',empty:'<ul><li><br></li></ul>'}]},
+  note:{version:1,label:'Bilhete',titleLabel:'Título do bilhete',symbol:'✉',titleAlign:'left',fields:[{id:'recipient',label:'Para',symbol:'→',align:'left'},{id:'message',label:'Mensagem',symbol:'✎',align:'left'},{id:'signature',label:'De',symbol:'✍',align:'left'}]},
+  invitation:{version:1,label:'Convite',titleLabel:'Título do convite',symbol:'✦',titleAlign:'center',fields:[{id:'event',label:'Ocasião',symbol:'✦',align:'left'},{id:'recipient',label:'Para quem',symbol:'→',align:'left'},{id:'datetime',label:'Dia e hora',symbol:'◷',align:'left'},{id:'place',label:'Local',symbol:'⌂',align:'left'},{id:'sender',label:'Quem convida',symbol:'✍',align:'left'}]},
+  poem:{version:1,label:'Poema',titleLabel:'Título do poema',symbol:'❞',titleAlign:'center',fields:[{id:'verses',label:'Versos e estrofes',symbol:'❞',align:'verse'}]}
  });
+ // Canonical HTML guarantees that a downloaded, reloaded or cloud-saved structured
+ // document still has its genre's numbering/alignment, including imported documents.
+ function blockHTML(value,field){
+  const container=document.createElement('div');container.innerHTML=cleanHTML(value);
+  if(field.list){
+   const items=[];
+   let segment=document.createElement('div');
+   const flush=(allowBlank=false)=>{
+    const h=segment.innerHTML;
+    if(h||allowBlank)items.push(h||'<br>');
+    segment=document.createElement('div');
+   };
+   const parseChildren=(node,blank=false)=>{
+    for(const child of [...node.childNodes]){
+     if(child.nodeType===1&&['UL','OL'].includes(child.tagName)){
+      flush();for(const li of [...child.children]){if(li.tagName==='LI')parseChildren(li,true);else parseChildren(li,true);}continue;
+     }
+     if(child.nodeType===1&&['P','DIV','LI'].includes(child.tagName)){
+      flush();parseChildren(child,true);continue;
+     }
+     if(child.nodeType===1&&child.tagName==='BR'){
+      if(segment.innerHTML||!blank)flush(true);continue;
+     }
+     segment.appendChild(child.cloneNode(true));
+    }
+    flush(blank);
+   };
+   parseChildren(container);
+   const list=document.createElement(field.list);
+   for(const item of items.length?items:['<br>']){
+    const li=document.createElement('li');li.innerHTML=item;
+    for(const e of [li,...li.querySelectorAll('*')])e.style?.removeProperty('text-align');
+    list.append(li);
+   }
+   return list.outerHTML;
+  }
+  // Pasted/imported bullets are not part of Bilhete, Convite or Poema.
+  for(const el of [...container.querySelectorAll('ul,ol')].reverse()){
+   const fragment=document.createDocumentFragment();
+   for(const child of [...el.childNodes]){
+    const line=document.createElement('div');
+    if(child.nodeType===1&&child.tagName==='LI')while(child.firstChild)line.append(child.firstChild);
+    else line.append(child);
+    fragment.append(line);
+   }
+   el.replaceWith(fragment);
+  }
+  for(const li of container.querySelectorAll('li')){
+   const line=document.createElement('div');while(li.firstChild)line.append(li.firstChild);
+   li.replaceWith(line);
+  }
+  for(const el of [container,...container.querySelectorAll('*')]){
+   if(field.align==='verse'&&['left','center'].includes(el.style.textAlign))continue;
+   el.style.removeProperty('text-align');
+  }
+  return container.innerHTML;
+ }
  function kind(doc){return doc?.kind||'free';}
  function fresh(type='free'){const now=new Date().toISOString();return {id:id(),title:'',html:'',settings:settings(),createdAt:now,updatedAt:now,revision:0,...(Object.hasOwn(GENRES,type)?{kind:type,layoutVersion:GENRES[type].version,blocks:GENRES[type].fields.map(f=>({id:f.id,html:''}))}:{})};}
  function validateDocument(raw){
@@ -70,7 +129,7 @@
   if(!spec||raw.layoutVersion!==spec.version||!Array.isArray(raw.blocks)||raw.blocks.length!==spec.fields.length)throw new Error('Modelo de texto não reconhecido. O texto atual foi mantido.');
   const blocks=spec.fields.map((field,i)=>{
    const item=raw.blocks[i];if(!item||item.id!==field.id||typeof item.html!=='string')throw invalid();
-   return {id:field.id,html:cleanHTML(item.html)};
+   return {id:field.id,html:blockHTML(item.html,field)};
   });
   const joined=blocks.map(b=>b.html).join('');
   if(joined.length>MAX_FILE_BYTES||blocks.reduce((n,b)=>n+textFromHTML(b.html).length,0)>MAX_TEXT)throw new Error('Este texto é grande demais para esta versão.');
@@ -98,5 +157,5 @@
   return result;
  }
  function filename(title){return (title.trim()||'Meu texto').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'-').slice(0,100);}
- globalThis.AL={GENRES,kind,asFree,VERSION,MAX_FILE_BYTES,MAX_TEXT,FONTS,SIZES,STEP_SIZES,HTML_SIZES,fontKey,fontStack,pixelSize,cleanHTML,plainHTML,textFromHTML,settings,id,fresh,validateDocument,importFile,exportFile,filename};
+ globalThis.AL={GENRES,kind,asFree,blockHTML,VERSION,MAX_FILE_BYTES,MAX_TEXT,FONTS,SIZES,STEP_SIZES,HTML_SIZES,fontKey,fontStack,pixelSize,cleanHTML,plainHTML,textFromHTML,settings,id,fresh,validateDocument,importFile,exportFile,filename};
 })();

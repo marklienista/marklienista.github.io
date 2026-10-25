@@ -64,3 +64,20 @@ body[data-mode=text] .genre-glyph,body[data-mode=text] .field-glyph{display:none
 #structuredSheet [data-field=items],#structuredSheet [data-field=verses],#structuredSheet [data-field=message]{min-height:165px}
 @media(max-width:740px){.genre-options{grid-template-columns:repeat(2,minmax(0,1fr))}.genre-card{min-height:112px}.genre-glyph{font-size:40px}}
 @media print{.paper[data-kind]:not([data-kind=free]) #editor{display:none!important}#structuredSheet{display:block}#structuredSheet[hidden]{display:none!important}}
+
+/* Genre-driven structure: decorations and author-controlled typography are separate. */
+.tool-section[hidden],.align-tools [hidden]{display:none!important}
+.paper[data-kind=recipe] .recipe-field,.paper[data-kind=list] .recipe-field,
+.paper[data-kind=note] .recipe-field,.paper[data-kind=invitation] .recipe-field,
+.paper[data-kind=recipe] .recipe-field *, .paper[data-kind=list] .recipe-field *,
+.paper[data-kind=note] .recipe-field *, .paper[data-kind=invitation] .recipe-field *{text-align:left!important}
+.paper[data-kind=invitation] #docTitle,.paper[data-kind=poem] #docTitle,
+.paper[data-kind=invitation] #printTitle,.paper[data-kind=poem] #printTitle{text-align:center;font-weight:700}
+.paper[data-kind=recipe] .recipe-field>ul,.paper[data-kind=list] .recipe-field>ul{list-style-type:disc;list-style-position:outside}
+.paper[data-kind=recipe] .recipe-field>ol{list-style-type:decimal;list-style-position:outside}
+.paper[data-kind=poem] #versesEditor{white-space:pre-wrap}
+@media print{
+ .paper[data-kind=invitation] #printTitle,.paper[data-kind=poem] #printTitle{text-align:center!important}
+ .paper[data-kind=recipe] .recipe-field>ul,.paper[data-kind=list] .recipe-field>ul{list-style-type:disc!important}
+ .paper[data-kind=recipe] .recipe-field>ol{list-style-type:decimal!important}
+}

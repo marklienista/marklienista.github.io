@@ -30,7 +30,7 @@
  function sheet({activity,participant=null,production=null,model=false}){
   const payload=model?activity.model:production.payload;
   const doc=AL.importFile('impressao.apertaletra',JSON.stringify(payload));
-  const article=make('article','batch-sheet');
+  const article=make('article','batch-sheet');article.dataset.genre=AL.kind(doc);
   const header=make('header','batch-sheet-header');
   header.append(make('p','batch-activity-name',activity.title||'Atividade sem título'));
   header.append(make('h2','batch-participant',model?'Proposta da atividade':participant.display_name||'Participante'));

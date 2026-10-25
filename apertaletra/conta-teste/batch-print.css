@@ -38,3 +38,12 @@
  .batch-writing-section,.batch-text{break-inside:auto;orphans:3;widows:3}
  .batch-text p,.batch-text div,.batch-text li{break-inside:auto}
 }
+
+/* Genre typography stays consistent in teacher-generated batches. */
+.batch-sheet[data-genre=invitation] .batch-text-title,
+.batch-sheet[data-genre=poem] .batch-text-title{text-align:center}
+.batch-sheet[data-genre=recipe] .batch-text,.batch-sheet[data-genre=list] .batch-text,
+.batch-sheet[data-genre=note] .batch-text,.batch-sheet[data-genre=invitation] .batch-text{text-align:left}
+.batch-sheet[data-genre=recipe] .batch-text :is(ul,ol),.batch-sheet[data-genre=list] .batch-text ul{list-style-position:outside}
+.batch-sheet[data-genre=recipe] .batch-text ul,.batch-sheet[data-genre=list] .batch-text ul{list-style-type:disc}
+.batch-sheet[data-genre=recipe] .batch-text ol{list-style-type:decimal}

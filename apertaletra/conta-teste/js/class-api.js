@@ -27,7 +27,22 @@
    const work=this.tail.then(()=>this._save(input));this.tail=work.catch(()=>{});return work;
   }
   async _save(input){
-   const payload=JSON.parse(AL.exportFile(input));const old=await this.db.get(this.scope,this.boundId);
+   const payload=JSON.parse(AL.exportFile(input));
+   // Existing prototype proposals can contain an empty/older rendering of a
+   // protected field. Preserve its exact server value when a child saves another
+   // field; formatting normalization must never count as a student edit.
+   if(!this.teacher&&this.policy.locked?.length){
+    const original=this.info.production.payload?.document,target=payload.document;
+    for(const field of this.policy.locked){
+     if(field==='title'&&typeof original?.title==='string')target.title=original.title;
+     else if(field==='body'&&typeof original?.html==='string'&&!original?.kind)target.html=original.html;
+     else if(Array.isArray(original?.blocks)&&Array.isArray(target.blocks)){
+      const before=original.blocks.find(b=>b.id===field),after=target.blocks.find(b=>b.id===field);
+      if(before&&after&&typeof before.html==='string')after.html=before.html;
+     }
+    }
+   }
+   const old=await this.db.get(this.scope,this.boundId);
    if(old&&!old.pending&&equal(old.payload,payload))return {doc:{...old.doc,syncState:'synced'},syncState:'synced',conflict:false};
    const revision=(input.revision||0)+1,doc={...input,id:this.boundId,revision};
    const samePending=old?.pending&&equal(old.payload,payload);
