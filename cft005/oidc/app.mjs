@@ -36,10 +36,16 @@ async function run(){
   });
   if(refreshButton) refreshButton.addEventListener('click',async()=>{
     refreshButton.disabled=true;
-    try{const user=await refreshCurrentSession(client);
+    try{
+      const user=await refreshCurrentSession(client);
+      leave.disabled=!user;
+      refreshButton.disabled=!user;
       message(user?'Sessão renovada e verificada no servidor.':'Sem sessão válida para renovar.');
-    }catch(error){message(authFailureMessage(error));}
-    finally{refreshButton.disabled=false;}
+    }catch(error){
+      leave.disabled=true;
+      message(authFailureMessage(error));
+      // Keep manual-refresh disabled until 'Verificar sessão' succeeds.
+    }
   });
   check.addEventListener('click',async()=>{
     try {await refresh();}catch {message('Não foi possível verificar a sessão.');}
