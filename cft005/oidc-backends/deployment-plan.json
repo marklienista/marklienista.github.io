@@ -1,0 +1,20 @@
+{
+  "status": "BLOCKED_PENDING_WORKSPACE_AND_AUTH0_ACCESS",
+  "applied": false,
+  "repository": "https://github.com/marklienista/marklienista.github.io",
+  "branch": "cft005-oidc-dominios",
+  "services": [
+    {"plannedName": "cft005-bff-a-teste", "product": "A", "runtime": "node", "plan": "free", "autoDeploy": "no"},
+    {"plannedName": "cft005-bff-b-teste", "product": "B", "runtime": "node", "plan": "free", "autoDeploy": "no"}
+  ],
+  "buildCommand": "npx --yes pnpm@11.25.0 --dir cft005/oidc-backends install --frozen-lockfile --ignore-scripts",
+  "startCommand": "node cft005/oidc-backends/start.mjs",
+  "healthPath": "/health",
+  "requiredEnvironmentKeys": [
+    "PRODUCT", "PUBLIC_ORIGIN", "AUTH0_ISSUER", "AUTH0_AUDIENCE", "AUTH0_CLIENT_ID_A",
+    "AUTH0_CLIENT_ID_B", "AUTH0_CLIENT_SECRET", "SYNTHETIC_SUBJECTS_JSON"
+  ],
+  "secretHandling": "Set the unique client secret directly in each service's secret environment. Never commit, log or send it in chat.",
+  "originHandling": "Use only service URLs actually returned by Render after creation, with exact /auth/callback registration; no predicted callback URLs.",
+  "costConstraint": "Free only; stop if unavailable. Do not change existing services or enable billing."
+}

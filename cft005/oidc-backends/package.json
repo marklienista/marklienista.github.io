@@ -1,0 +1,10 @@
+{
+  "name": "cft005-oidc-confidential-backends",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {"node": ">=22"},
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {"start": "node start.mjs", "test": "node --test integration.test.mjs"},
+  "dependencies": {"jose": "6.2.13", "openid-client": "6.8.8"}
+}
