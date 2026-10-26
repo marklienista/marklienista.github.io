@@ -1,12 +1,17 @@
 {
-  "status": "BLOCKED_PENDING_WORKSPACE_AND_AUTH0_ACCESS",
-  "applied": false,
+  "status": "PROVISIONED_AUTH0_AUTHORIZATION_PENDING",
+  "applied": true,
+  "runtimeReady": false,
+  "realAuth0Issuance": "BLOCKED",
+  "workspace": {"name": "My Workspace", "id": "tea-dattm47lk1mc73cu74bg", "account": "Primary", "confirmedByUser": true},
+  "auth0Connection": {"provider": "Make", "team": "Marcelo's space", "teamId": 2908515, "status": "PENDING_USER_AUTHORIZATION", "clientsRegistered": false},
   "repository": "https://github.com/marklienista/marklienista.github.io",
   "branch": "cft005-oidc-dominios",
   "services": [
-    {"plannedName": "cft005-bff-a-teste", "product": "A", "runtime": "node", "plan": "free", "autoDeploy": "no"},
-    {"plannedName": "cft005-bff-b-teste", "product": "B", "runtime": "node", "plan": "free", "autoDeploy": "no"}
+    {"name": "cft005-bff-a-teste", "id": "srv-dbftdpvf3r2c73bflvjg", "origin": "https://cft005-bff-a-teste.onrender.com", "callback": "https://cft005-bff-a-teste.onrender.com/auth/callback", "product": "A", "runtime": "node", "plan": "free", "region": "virginia", "autoDeploy": "no", "latestDeployId": "dep-dbfte6ff3r2c73bfnd8g", "latestDeployStatus": "update_failed"},
+    {"name": "cft005-bff-b-teste", "id": "srv-dbftdt3l550s739sao1g", "origin": "https://cft005-bff-b-teste.onrender.com", "callback": "https://cft005-bff-b-teste.onrender.com/auth/callback", "product": "B", "runtime": "node", "plan": "free", "region": "virginia", "autoDeploy": "no", "latestDeployId": "dep-dbfte7fb9u1s73e9bp50", "latestDeployStatus": "update_failed"}
   ],
+  "provisioningEvidence": {"date": "2026-10-26", "sourceCommit": "65c6816e98b0b4d1bfb26e368abf5bf1e411257c", "build": "PASS", "startup": "FAIL_CLOSED_MISSING_AUTH0_CONFIGURATION", "auth0CredentialsInstalled": false, "syntheticSubjectsInstalled": false, "successfulHostedBackends": 0, "existingServicesModified": false},
   "buildCommand": "npx --yes pnpm@11.25.0 --dir cft005/oidc-backends install --frozen-lockfile --ignore-scripts",
   "startCommand": "node cft005/oidc-backends/start.mjs",
   "healthPath": "/health",
