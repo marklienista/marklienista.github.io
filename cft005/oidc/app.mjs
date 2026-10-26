@@ -28,6 +28,13 @@ async function run(){
     leave.disabled=!user;
     if(refreshButton) refreshButton.disabled=!user;
   };
+  const sessionFailure=error=>{
+    // A failed verification does not mean local credentials have been removed.
+    // Keep cleanup available, including after a transient network failure.
+    leave.disabled=false;
+    if(refreshButton) refreshButton.disabled=true;
+    message(authFailureMessage(error));
+  };
   enter.disabled=check.disabled=false;
   enter.addEventListener('click',async()=>{
     enter.disabled=true;
@@ -42,18 +49,17 @@ async function run(){
       refreshButton.disabled=!user;
       message(user?'Sessão renovada e verificada no servidor.':'Sem sessão válida para renovar.');
     }catch(error){
-      leave.disabled=true;
-      message(authFailureMessage(error));
+      sessionFailure(error);
       // Keep manual-refresh disabled until 'Verificar sessão' succeeds.
     }
   });
   check.addEventListener('click',async()=>{
-    try {await refresh();}catch {message('Não foi possível verificar a sessão.');}
+    try {await refresh();}catch(error) {sessionFailure(error);}
   });
   leave.addEventListener('click',async()=>{
     try {await signOutHere(client);await refresh();}
     catch {message('Não foi possível encerrar a sessão local.');}
   });
-  await refresh();
+  try {await refresh();}catch(error) {sessionFailure(error);}
 }
 run().catch(error => message(authFailureMessage(error)));

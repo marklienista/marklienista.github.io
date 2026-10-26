@@ -80,3 +80,27 @@ test('9. retorno sem e-mail classifica erro de forma segura', async () => {
  assert.match(authFailureMessage(new Error('provider_email_missing')), /E_EMAIL/);
  assert.equal(authFailureMessage(new Error('internal-sensitive-detail')).includes('internal-sensitive-detail'),false);
 });
+
+test('SDK structured errors keep their safe classification even with a different message', () => {
+ for (const error of [
+   {name:'AuthPKCECodeVerifierMissingError',message:'PKCE verifier missing: private fixture'},
+   {code:'flow_state_not_found',message:'private fixture'},
+   {code:'bad_code_verifier',message:'private fixture'}
+ ]) {
+   assert.match(authFailureMessage(error), /E_PKCE/);
+   assert.equal(authFailureMessage(error).includes('private fixture'), false);
+ }
+ for (const code of ['refresh_token_not_found','refresh_token_already_used','session_not_found']) {
+   assert.match(authFailureMessage({code,message:'private fixture'}), /E_REFRESH/);
+ }
+ assert.doesNotMatch(authFailureMessage({name:'AuthRetryableFetchError',message:'offline'}), /E_REFRESH/);
+});
+
+test('callback rejects credentials and token-bearing error responses before exchange', async () => {
+ const a=mockAuth();
+ for (const href of [uriA.replace('127.0.0.1','user:password@127.0.0.1')+'?code=fixture',
+   uriA+'?error=access_denied&access_token=fixture',uriA+'?error=access_denied#fixture']) {
+   await assert.rejects(()=>completeLogin(a,base,href), {message:'callback_invalid'});
+ }
+ assert.equal(a.calls.length,0);
+});

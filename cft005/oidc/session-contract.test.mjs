@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import {readFile} from 'node:fs/promises';
+import vm from 'node:vm';
+import * as identity from './identity.mjs';
 import {currentUser, makeClient, signOutHere, refreshCurrentSession, authFailureMessage} from './identity.mjs';
 
 // Simulated-only contract. No real Auth0 sessions, JWT or database writes.
@@ -146,4 +149,45 @@ test('revoked refresh is classified safely, without leaking the error details',(
   const text=authFailureMessage(new Error('Invalid Refresh Token'));
   assert.match(text,/E_REFRESH/);
   assert.equal(text.includes('fixture-token'),false);
+});
+
+test('UI: a failed refresh or identity check still allows local logout and recovery', async()=>{
+  const source=(await readFile(new URL('./app.mjs',import.meta.url),'utf8')).replace(/^import .*?;\r?\n/, '');
+  const elements=new Map(['status','enter','check','leave','refresh'].map(id=>[id,{
+    disabled:true,textContent:'',listeners:{},addEventListener(event,handler){this.listeners[event]=handler;}
+  }]));
+  let failing=true, session=true, signouts=0;
+  const auth={
+    getSession:async()=>({data:{session:session?{access_token:'fixture'}:null},error:null}),
+    getUser:async()=>({data:{user:{id:USER1}},error:failing?{code:'session_not_found',message:'private fixture'}:null}),
+    refreshSession:async()=>({data:{session:null},error:{code:'refresh_token_not_found',message:'private fixture'}}),
+    signOut:async({scope})=>{assert.equal(scope,'local');signouts++;session=false;return {error:null};}
+  };
+  const cfg={provider:'custom:conta-central',allowedCallbacks:[A+'/callback.html'],supabaseUrl:'https://example.supabase.co',publishableKey:'sb_publishable_FIXTURE'};
+  const context=vm.createContext({...identity,URL,document:{getElementById:id=>elements.get(id)},
+    location:{pathname:'/index.html',href:A+'/index.html'},
+    fetch:async()=>({ok:true,json:async()=>cfg}),window:{supabase:{createClient:()=>({auth})}}
+  });
+  // Await startup without installing any real browser or SDK.
+  await vm.runInContext(source.replace(/run\(\)\.catch\([\s\S]*$/, 'run()'),context);
+  assert.equal(elements.get('leave').disabled,false);
+  assert.match(elements.get('status').textContent,/E_REFRESH/);
+  failing=false;
+  await elements.get('check').listeners.click();
+  await elements.get('refresh').listeners.click();
+  assert.match(elements.get('status').textContent,/E_REFRESH/);
+  assert.equal(elements.get('leave').disabled,false,'failed refresh must not trap local credentials');
+  assert.equal(elements.get('refresh').disabled,true);
+  failing=true;
+  await elements.get('check').listeners.click();
+  assert.match(elements.get('status').textContent,/E_REFRESH/);
+  assert.equal(elements.get('leave').disabled,false);
+  failing=false;
+  await elements.get('check').listeners.click();
+  assert.equal(elements.get('refresh').disabled,false);
+  await elements.get('leave').listeners.click();
+  assert.equal(signouts,1);
+  assert.equal(elements.get('leave').disabled,true);
+  assert.equal(elements.get('refresh').disabled,true);
+  assert.equal(elements.get('status').textContent.includes('private fixture'),false);
 });

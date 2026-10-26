@@ -16,11 +16,11 @@ Documentação: https://supabase.com/docs/guides/auth/custom-oauth-providers e h
 ## Preparação disponível
 
 - `identity.mjs`: valida callbacks exatos, inicializa Supabase com PKCE, inicia o provedor externo, troca o código na origem e verifica usuário em Auth.
-- `identity.test.mjs`: contratos locais, com dados sintéticos. Executar `node --test cft005/oidc/identity.test.mjs` a partir da raiz do repositório. Teste local: 8/8 PASS.
+- `identity.test.mjs`: contratos locais, com dados sintéticos. Executar `node --test cft005/oidc/identity.test.mjs` a partir da raiz do repositório. Rodada atual: 11/11 PASS; suíte de sessões: 11/11 PASS. Isso não comprova sessões reais.
 - `index.html`, `callback.html`, `app.mjs`: interfaces de demonstração. Não coletam senha.
-- `config.example.json`: **modelo de configuração pública**. `config.json` não é versionado aqui nem existe na branch: é criado somente na hospedagem isolada de teste com URLs de callback exatas e chave publicável do Supabase.
+- `config.example.json`: **modelo de configuração pública**. A branch já contém `config.json` dos clientes fictícios, com chave publicável (não secreta) e duas callbacks de teste. A afirmação anterior de ausência desse arquivo estava desatualizada. Não incluir segredos de backend nesse arquivo.
 
-## Conexão real — ainda não executada
+## Procedimento de conexão — referência histórica (A→B já relatado)
 
 1. Criar ou conectar tenant gratuito do Auth0 por ação explícita do titular. Criar aplicação OIDC **Regular Web Application**, com Universal Login. Não habilitar cobrança nem domínio personalizado nesta prova.
 2. No painel Supabase `conta_base` (ref `jxyylpdgwvswaapeefsy`), cadastrar **Custom OAuth/OIDC Provider** `custom:conta-central`, usando o issuer OIDC, client ID e client secret do Auth0. **Nunca colocar o secret no GitHub ou no frontend.**
@@ -72,3 +72,7 @@ S14 Revisão de dependência externa, CSP, XSS, URLs, logs e segredos.
 Escopo Codex: sincronizar a branch cft005-oidc-dominios, testar A https://cft005-login-a-teste.onrender.com/ e B https://cft005-login-b-teste.onrender.com/, corrigir código apenas nesta branch e repetir os testes afetados. Não registrar tokens, refresh tokens, senhas, segredos, códigos OAuth ou URLs contendo credenciais; não mudar a configuração do Auth0 ou Supabase, não apagar dados, não contratar serviços, não tocar o Apertaquem ou publicar em main. Se não houver duas contas de teste sob controle, marcar S02/S11 como BLOCKED, sem usar contas pessoais como dados sintéticos. Atualizar somente o CFT-005 existente com evidências e limites; um escritor por arquivo.
 
 Decisão técnica ainda necessária: a autenticação prova QUEM é a pessoa, não QUAL aplicativo. Para isolar produtos, exigir claims por aplicativo assinadas por um emissor confiável e verificadas pelo backend, ou separar os recursos em fronteiras próprias. Não resolver somente na interface JavaScript.
+
+## Rodada Windows de continuidade
+
+Consultar [matriz consolidada, correções e limites](./VERIFICACAO-2026-10-26.md) e [avaliação de autorização por produto](./AUTORIZACAO-POR-PRODUTO.md). As correções desta rodada estão somente na branch; não foram implantadas nos clientes Render. O navegador externo foi bloqueado pelo mecanismo de segurança antes da leitura da página. CFT-005 permanece aberto, com isolamento por produto FAIL.
