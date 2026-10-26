@@ -85,3 +85,20 @@ export async function signOutHere(client) {
   // Local sign-out does not terminate the central IdP's SSO session.
   return true;
 }
+
+/**
+ * Maps known callback failures to safe, actionable messages.
+ * Never reflect untrusted error_description or authentication codes into the UI.
+ */
+export function authFailureMessage(error) {
+  const code = error?.message || error?.name || error?.code || '';
+  if (code === 'provider_email_missing') return 'O Auth0 não informou o e-mail necessário ao Supabase (E_EMAIL). Verifique os escopos openid, email e profile.';
+  if (code === 'login_denied') return 'Entrada cancelada ou recusada (E_DENIED).';
+  if (code === 'provider_login_failed') return 'A autorização retornou uma falha (E_PROVIDER). Confira os registros do Supabase.';
+  if (code === 'callback_mismatch' || code === 'callback_not_allowed') return 'Endereço de retorno não autorizado (E_CALLBACK).';
+  if (code === 'code_missing_or_repeated' || code === 'callback_invalid') return 'Retorno inválido ou incompleto (E_CODE). Inicie a entrada novamente.';
+  if (code === 'AuthPKCECodeVerifierMissingError' || code === 'invalid_flow_state' || code === 'bad_code_verifier') return 'O navegador perdeu a confirmação da entrada (E_PKCE). Recomece no mesmo navegador e aba.';
+  if (code === 'supabase_sdk_missing' || code === 'sdk_unavailable') return 'A biblioteca de autenticação não carregou (E_SDK). Atualize a página.';
+  if (code === 'publishable_key_missing' || code === 'config_missing' || code === 'provider_invalid') return 'Configuração pública do aplicativo incompleta (E_CONFIG).';
+  return 'Não foi possível concluir a entrada (E_AUTH). Consulte o código de erro e os registros do servidor.';
+}
