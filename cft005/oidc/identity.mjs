@@ -105,6 +105,7 @@ export async function signOutHere(client) {
  */
 export function authFailureMessage(error) {
   const code = error?.message || error?.name || error?.code || '';
+  if (/Invalid Refresh Token|Refresh Token Not Found/i.test(code)) return 'A sessão expirou ou foi revogada (E_REFRESH). Entre novamente.';
   if (code === 'provider_email_missing') return 'O Auth0 não informou o e-mail necessário ao Supabase (E_EMAIL). Verifique os escopos openid, email e profile.';
   if (code === 'login_denied') return 'Entrada cancelada ou recusada (E_DENIED).';
   if (code === 'provider_login_failed') return 'A autorização retornou uma falha (E_PROVIDER). Confira os registros do Supabase.';
