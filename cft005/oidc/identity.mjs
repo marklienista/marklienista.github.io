@@ -80,6 +80,18 @@ export async function currentUser(client) {
   return {id: data.user.id}; // avoid leaking full session or tokens
 }
 
+/**
+ * Explicitly refreshes a test-only Supabase session without leaking credentials.
+ * This does not terminate or refresh the Auth0 central SSO cookie.
+ */
+export async function refreshCurrentSession(client) {
+  if (typeof client?.auth?.refreshSession !== 'function') throw new Error('refresh_not_supported');
+  const {data, error} = await client.auth.refreshSession();
+  if (error) throw error;
+  if (!data?.session?.access_token) throw new Error('refresh_no_session');
+  return currentUser(client);
+}
+
 export async function signOutHere(client) {
   const {error} = await client.auth.signOut({scope:'local'});
   if (error) throw error;
