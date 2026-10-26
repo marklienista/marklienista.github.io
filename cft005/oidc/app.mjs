@@ -1,4 +1,4 @@
-import {assertConfig,makeClient,beginLogin,completeLogin,currentUser,signOutHere} from './identity.mjs';
+import {assertConfig,makeClient,beginLogin,completeLogin,currentUser,signOutHere,authFailureMessage} from './identity.mjs';
 const status=document.getElementById('status');
 const isCallback=location.pathname.endsWith('/callback.html');
 const enter=document.getElementById('enter');
@@ -6,15 +6,18 @@ const check=document.getElementById('check');
 const leave=document.getElementById('leave');
 function message(text){status.textContent=text;}
 async function run(){
+  // Keep the one-use authorization code only in memory; clear the URL immediately.
+  const callbackHref = isCallback ? location.href : null;
+  if (isCallback) history.replaceState(null, '', location.pathname);
   const response=await fetch('./config.json',{cache:'no-store'});
   if (!response.ok) {message('Aguardando configuração pública do provedor central. Nenhuma autenticação foi iniciada.');return;}
   const cfg=await response.json();
   const callbackUrl=new URL('./callback.html',location.href).href;
   const settings=assertConfig({...cfg,callbackUrl});
+  if (!window.supabase?.createClient) throw new Error('sdk_unavailable');
   const client=makeClient(window.supabase,settings);
   if(isCallback){
-    await completeLogin(client,settings,location.href);
-    history.replaceState(null,'',location.pathname);
+    await completeLogin(client,settings,callbackHref);
     location.replace('./index.html');
     return;
   }
@@ -38,4 +41,4 @@ async function run(){
   });
   await refresh();
 }
-run().catch(()=>message('Configuração inválida ou biblioteca de autenticação indisponível.'));
+run().catch(error => message(authFailureMessage(error)));
