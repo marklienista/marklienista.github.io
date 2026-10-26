@@ -41,7 +41,7 @@ export async function beginLogin(client, config) {
   if (typeof client?.auth?.signInWithOAuth !== 'function') throw new Error('oauth_client_missing');
   const {data, error} = await client.auth.signInWithOAuth({
     provider: config.provider,
-    options: {redirectTo: config.callbackUrl}
+    options: {redirectTo: config.callbackUrl, scopes: 'openid email profile'}
   });
   if (error) throw error;
   return data;
@@ -51,7 +51,14 @@ export async function completeLogin(client, config, href) {
   assertConfig(config);
   const url = new URL(href);
   if ((url.origin + url.pathname) !== config.callbackUrl || url.hash) throw new Error('callback_mismatch');
-  if (url.searchParams.has('error')) throw new Error('login_denied');
+  if (url.searchParams.has('error')) {
+    const description = url.searchParams.get('error_description') || '';
+    if (/Error getting user email from external provider|email_address_not_provided/i.test(description)) {
+      throw new Error('provider_email_missing');
+    }
+    if (url.searchParams.get('error') === 'access_denied') throw new Error('login_denied');
+    throw new Error('provider_login_failed');
+  }
   if (url.searchParams.getAll('code').length !== 1) throw new Error('code_missing_or_repeated');
   const code = url.searchParams.get('code');
   if (!code || url.searchParams.has('access_token') || url.searchParams.has('refresh_token')) throw new Error('callback_invalid');
