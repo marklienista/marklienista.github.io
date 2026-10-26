@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {currentUser, makeClient, signOutHere, refreshCurrentSession} from './identity.mjs';
+import {currentUser, makeClient, signOutHere, refreshCurrentSession, authFailureMessage} from './identity.mjs';
 
 // Simulated-only contract. No real Auth0 sessions, JWT or database writes.
 const A = 'https://cft005-login-a-teste.onrender.com';
@@ -139,4 +139,11 @@ test('manual session refresh: revoked token fails and does not read identity', a
   };
   await assert.rejects(()=>refreshCurrentSession({auth}), e=>e?.message==='Invalid Refresh Token');
   assert.equal(askedForUser,false);
+});
+
+
+test('revoked refresh is classified safely, without leaking the error details',()=>{
+  const text=authFailureMessage(new Error('Invalid Refresh Token'));
+  assert.match(text,/E_REFRESH/);
+  assert.equal(text.includes('fixture-token'),false);
 });
