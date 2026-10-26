@@ -1,6 +1,6 @@
 # CFT-005 — OIDC externo com domínios independentes
 
-Estado em 25/10/2026: **preparação funcional isolada**, não publicada. Oito testes unitários com mocks passaram em Node.js; o browser automatizado foi bloqueado pelo ambiente antes de navegar. SSO real A → B **não executado**. Não criar clientes de produção, contas ou tokens de prova antes de configurar o provedor.
+Estado em 26/10/2026: **SSO entre duas origens confirmado por relato do usuário e corroborado parcialmente no Supabase**; testes locais ampliados. O **isolamento dos dados por aplicativo está BLOQUEADO** no modelo de tokens atual. Os testes reais de refresh, expiração e logout ainda não foram concluídos. OAuth Server beta segue desligado, sem migração ou lançamento.
 
 ## Decisão técnica
 
@@ -39,3 +39,36 @@ Documentação: https://supabase.com/docs/guides/auth/custom-oauth-providers e h
 - Sem implantação pública, migração, alteração de credenciais, nova contratação ou modificação do Apertaquem.
 
 Fonte de decisão: [ARC-001](https://docs.google.com/document/d/1vctr9mkKTUa5ZHRcb_x4k3iXldXkmQWBSsOr2jT6ZAg/edit) e [CFT-005](https://docs.google.com/document/d/14Tgta3SrAmtJgk8XaQcS-z6SeEnlzIyUGYHkhFQqCPY/edit).
+
+## Verificação de segurança/sessões — 26/10/2026
+
+Resultados executados:
+- Banco conta_base, tabelas públicas: 1 tabela, RLS ligada, sem permissões de tabela para anon. Funções públicas MeEmpresta são SECURITY INVOKER e não permitem EXECUTE por anon; nenhuma função pública SECURITY DEFINER.
+- RLS SELECT efetiva em transação SQL com rollback, sem leitura do conteúdo nem alteração de dados: proprietário vê 1 registro; UUID sintético diferente vê zero; JWT simulado do antigo OAuth Server com client_id vê zero. Todos PASS.
+- BLOQUEIO DE SEGREGAÇÃO POR PRODUTO: teste SQL com mesmo usuário e token sem client_id, variando o Origin simulado entre A e B, consegue ler o mesmo registro do MeEmpresta em ambos os casos. Origin, Referer ou CORS não provam a identidade de um aplicativo. Antes de migrar dados de outros produtos, exigir uma fronteira real de autorização por cliente.
+- Autenticação A para B foi confirmada anteriormente pelo usuário; o banco confirmou duas identidades (e-mail e provedor customizado) do mesmo UUID. Nenhum acesso real de segundo usuário foi testado.
+- Node: 19 testes locais PASS, zero falhas. Comando: node --test cft005/oidc/identity.test.mjs cft005/oidc/session-contract.test.mjs . A suíte adicional usa apenas mocks e NÃO prova renovação, timeout ou revogação reais.
+- Código de teste ampliado: botão Renovar sessão (teste) disponível em index.html, com função refreshCurrentSession, verificação pelo servidor e mensagem E_REFRESH quando falhar. Nenhum token é exibido.
+- Supabase tem 5 sessões registradas (um usuário), duas atualizadas nas últimas 24h no momento da inspeção; oauth_client_id não nulo = zero. Isso NÃO é teste de expiração.
+- Playwright local bloqueado pelo administrador do ambiente antes de navegar; não declarar teste visual PASS.
+- Advisor de segurança mantém WARN preexistente: leaked password protection desabilitada. Não fazer upgrade por esta rodada.
+
+Próxima matriz para Codex no Windows — somente ambiente de teste:
+S01 Entrada em A e depois B sem repetir senha, comparar UUID.
+S02 Dois usuários sintéticos em perfis distintos: impedir acesso cruzado.
+S03 Clicar Renovar sessão (teste) em A e confirmar mesma pessoa.
+S04 Confirmar que B continua autenticado após renovar A.
+S05 Sair apenas de A e confirmar B ainda ativa.
+S06 Sair também de B; sessão central Auth0 pode continuar válida.
+S07 Reentrar em A e observar se Auth0 dispensa senha (isso NÃO significa logout central).
+S08 Cancelar login, retorno inválido, PKCE e não exposição de código em URL.
+S09 Expiração e refresh inválido em ambiente sintético, sem mudar TTL global.
+S10 Persistência de sessão após reload, sem localStorage compartilhado entre domínios.
+S11 Testes de leitura e escrita com usuários distintos em dados sintéticos.
+S12 Isolamento POR PRODUTO, mesmo UUID: BLOQUEADO até solução de autorização baseada em identificador de cliente confiável.
+S13 Logout central/revogação Auth0: ainda não implementado; registrar limitação sem fingir aprovação.
+S14 Revisão de dependência externa, CSP, XSS, URLs, logs e segredos.
+
+Escopo Codex: sincronizar a branch cft005-oidc-dominios, testar A https://cft005-login-a-teste.onrender.com/ e B https://cft005-login-b-teste.onrender.com/, corrigir código apenas nesta branch e repetir os testes afetados. Não registrar tokens, refresh tokens, senhas, segredos, códigos OAuth ou URLs contendo credenciais; não mudar a configuração do Auth0 ou Supabase, não apagar dados, não contratar serviços, não tocar o Apertaquem ou publicar em main. Se não houver duas contas de teste sob controle, marcar S02/S11 como BLOCKED, sem usar contas pessoais como dados sintéticos. Atualizar somente o CFT-005 existente com evidências e limites; um escritor por arquivo.
+
+Decisão técnica ainda necessária: a autenticação prova QUEM é a pessoa, não QUAL aplicativo. Para isolar produtos, exigir claims por aplicativo assinadas por um emissor confiável e verificadas pelo backend, ou separar os recursos em fronteiras próprias. Não resolver somente na interface JavaScript.
