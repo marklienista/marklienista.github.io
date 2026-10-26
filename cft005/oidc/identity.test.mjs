@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {DEFAULT_PROVIDER, callbackIsAllowed,assertConfig,makeClient,beginLogin,completeLogin,currentUser,signOutHere} from './identity.mjs';
+import {DEFAULT_PROVIDER, callbackIsAllowed,assertConfig,makeClient,beginLogin,completeLogin,currentUser,signOutHere,authFailureMessage} from './identity.mjs';
 
 const uriA='http://127.0.0.1:4311/auth/callback';
 const uriB='http://127.0.0.2:4312/auth/callback';
@@ -41,6 +41,8 @@ test('4. A e B iniciam OIDC com redirects próprios',async()=>{
  assert.equal(a.calls[0][1].options.redirectTo,uriA);
  assert.equal(b.calls[0][1].options.redirectTo,uriB);
  assert.equal(a.calls[0][1].provider,'custom:conta-central');
+ assert.equal(a.calls[0][1].options.scopes,'openid email profile');
+ assert.equal(b.calls[0][1].options.scopes,'openid email profile');
 });
 test('5. callback A e B aceitam o mesmo UUID simulado e não retornam tokens',async()=>{
  const a=mockAuth(),b=mockAuth();
@@ -66,4 +68,15 @@ test('8. sem sessão não acessa usuário nem considera autenticado', async()=>{
  const client={auth:{getSession:async()=>({data:{session:null},error:null}),getUser:async()=>{touched=true;return {data:{user:{id:'spoof'}}}}}};
  assert.equal(await currentUser(client),null);
  assert.equal(touched,false);
+});
+
+test('9. retorno sem e-mail classifica erro de forma segura', async () => {
+ const a=mockAuth();
+ await assert.rejects(
+   ()=>completeLogin(a,base,uriA+'?error=server_error&error_description=Error+getting+user+email+from+external+provider'),
+   {message:'provider_email_missing'}
+ );
+ assert.equal(a.calls.length,0);
+ assert.match(authFailureMessage(new Error('provider_email_missing')), /E_EMAIL/);
+ assert.equal(authFailureMessage(new Error('internal-sensitive-detail')).includes('internal-sensitive-detail'),false);
 });
