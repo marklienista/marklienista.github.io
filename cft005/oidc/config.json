@@ -1,0 +1,9 @@
+{
+  "provider": "custom:conta-central",
+  "supabaseUrl": "https://jxyylpdgwvswaapeefsy.supabase.co",
+  "publishableKey": "sb_publishable_nEFeXMH1mI4Pcf_IV8Exuw_ahQIpgoT",
+  "allowedCallbacks": [
+    "https://cft005-login-a-teste.onrender.com/callback.html",
+    "https://cft005-login-b-teste.onrender.com/callback.html"
+  ]
+}
