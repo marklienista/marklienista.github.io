@@ -1,6 +1,6 @@
 # CFT-005 — Avaliação de autorização por produto
 
-26/10/2026. Estado: proposta avaliada, sem implantação ou prova integrada. S12 permanece FAIL no desenho atual. Nenhum dado real foi consultado nesta rodada.
+26/10/2026. Estado: [prova criptográfica local implementada e executada](../backend-proof/README.md), com 91/91 cenários HTTP PASS e somente identidades/dados sintéticos. Ainda sem implantação ou integração com o IdP e os recursos existentes. S12 permanece FAIL no desenho atual. Nenhum dado real foi consultado.
 
 ## Por que a configuração atual não atende
 
@@ -17,7 +17,7 @@ Adicionar `app_id` no corpo, em um cabeçalho, em localStorage, em `user_metadat
 5. Os recursos novos da prova ficam em fronteira privada, sem acesso direto por tokens compartilhados `anon`/`authenticated`, incluindo RPCs, views, Storage e Realtime. Usar privilégios de banco mínimos e separados por produto; credencial `service_role` ampla em todos os backends não constitui isolamento. Alternativa: projetos/bancos independentes por produto, mantendo o mesmo IdP. Não modificar as tabelas existentes nesta etapa.
 6. Logout local remove a sessão daquele backend; logout central é outro fluxo. Para revogação imediata em operações sensíveis, validar sessão no servidor. Um JWT já emitido pode continuar válido até expirar: não prometer revogação instantânea nem mudar TTL global.
 
-Esse candidato exige mudança de arquitetura e configuração isolada, não apenas ajuste do frontend. Não foi criado cliente OIDC, credencial, serviço, tabela ou contrato pago nesta rodada. Nenhum JWT real foi inspecionado ou armazenado. A proposta não recebe PASS com base em testes locais.
+Esse candidato exige mudança de arquitetura e configuração isolada, não apenas ajuste do frontend. A prova local criou somente chaves efêmeras, identidades e registros em memória; não criou cliente OIDC, credencial externa, serviço hospedado, tabela real ou contrato pago. Nenhum JWT real foi inspecionado ou armazenado. O PASS do experimento local não homologa a arquitetura real.
 
 ## Prova mínima para remover o gate
 

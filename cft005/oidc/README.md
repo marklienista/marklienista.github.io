@@ -76,3 +76,5 @@ Decisão técnica ainda necessária: a autenticação prova QUEM é a pessoa, n�
 ## Rodada Windows de continuidade
 
 Consultar [matriz consolidada, correções e limites](./VERIFICACAO-2026-10-26.md) e [avaliação de autorização por produto](./AUTORIZACAO-POR-PRODUTO.md). As correções desta rodada estão somente na branch; não foram implantadas nos clientes Render. O navegador externo foi bloqueado pelo mecanismo de segurança antes da leitura da página. CFT-005 permanece aberto, com isolamento por produto FAIL.
+
+Continuidade autorizada: [prova isolada de backend](../backend-proof/README.md) executada com 91/91 cenários HTTP PASS, assinaturas reais e dados inteiramente sintéticos. Esse resultado comprova o contrato da API local; não altera o status FAIL de S12 na arquitetura publicada nem substitui os testes pendentes de sessão/IdP/navegador.

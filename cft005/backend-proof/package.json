@@ -1,0 +1,11 @@
+{
+  "name": "cft005-isolated-backend-proof",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Loopback-only synthetic authorization proof. No production integration.",
+  "engines": { "node": ">=22" },
+  "packageManager": "pnpm@11.25.0",
+  "scripts": { "test": "node --test proof.test.mjs" },
+  "dependencies": { "jose": "6.2.13" }
+}

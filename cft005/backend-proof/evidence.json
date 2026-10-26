@@ -1,0 +1,664 @@
+{
+  "schema": 1,
+  "scope": "isolated-loopback-http-synthetic-issuer-and-data",
+  "generatedAt": "2026-10-26T18:35:29.738Z",
+  "node": "v24.19.0",
+  "jose": "6.2.13",
+  "productionIntegrated": false,
+  "realAccountsUsed": 0,
+  "realDataAccessed": false,
+  "serverClosed": true,
+  "syntheticUsers": 2,
+  "syntheticProducts": 2,
+  "syntheticRecords": 4,
+  "sourceHashEncoding": "UTF-8 with LF line endings",
+  "sourceSha256": {
+    "gateway.mjs": "9e008af5859bb5d59d8365c5388f633ffb16f80d8b42aabc5adf2d05fcd47364",
+    "fixtures.mjs": "c542521f49641f71eaf1b728d5a2ce996e77aca095d75be9c317d490ff9c7e48",
+    "proof.test.mjs": "b60db5034ebd440a262cc81c65331dc0748674b846f738e1a6b08d0417bfe014",
+    "package.json": "e78a03c368c20be4f186ab67e4644be04e13e71f0f8a6a9e7b816217195b7902",
+    "pnpm-lock.yaml": "77ca5cf94747b80c7bb9eefc7f83a82c0070de6093e326eeb28665e7ff848dd7"
+  },
+  "total": 91,
+  "passed": 91,
+  "failed": 0,
+  "cases": [
+    {
+      "id": "P01",
+      "label": "U1/A reads own record",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P02",
+      "label": "U1/A writes own record",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P03",
+      "label": "U1/A reads persisted synthetic update",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P04",
+      "label": "U1/B reads own record",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P05",
+      "label": "U1/B writes own record",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P06",
+      "label": "U1/B reads persisted synthetic update",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P07",
+      "label": "U2/A reads own record",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P08",
+      "label": "U2/A writes own record",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P09",
+      "label": "U2/A reads persisted synthetic update",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P10",
+      "label": "U2/B reads own record",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P11",
+      "label": "U2/B writes own record",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P12",
+      "label": "U2/B reads persisted synthetic update",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P13",
+      "label": "U1/A cannot read U2/A",
+      "expectedHttp": 404,
+      "actualHttp": 404,
+      "result": "PASS"
+    },
+    {
+      "id": "P14",
+      "label": "U1/A cannot overwrite U2/A",
+      "expectedHttp": 404,
+      "actualHttp": 404,
+      "result": "PASS"
+    },
+    {
+      "id": "P15",
+      "label": "U2/A cannot read U1/A",
+      "expectedHttp": 404,
+      "actualHttp": 404,
+      "result": "PASS"
+    },
+    {
+      "id": "P16",
+      "label": "U2/A cannot overwrite U1/A",
+      "expectedHttp": 404,
+      "actualHttp": 404,
+      "result": "PASS"
+    },
+    {
+      "id": "P17",
+      "label": "U1/B cannot read U2/B",
+      "expectedHttp": 404,
+      "actualHttp": 404,
+      "result": "PASS"
+    },
+    {
+      "id": "P18",
+      "label": "U1/B cannot overwrite U2/B",
+      "expectedHttp": 404,
+      "actualHttp": 404,
+      "result": "PASS"
+    },
+    {
+      "id": "P19",
+      "label": "U2/B cannot read U1/B",
+      "expectedHttp": 404,
+      "actualHttp": 404,
+      "result": "PASS"
+    },
+    {
+      "id": "P20",
+      "label": "U2/B cannot overwrite U1/B",
+      "expectedHttp": 404,
+      "actualHttp": 404,
+      "result": "PASS"
+    },
+    {
+      "id": "P21",
+      "label": "same user: backend A cannot read product B",
+      "expectedHttp": 403,
+      "actualHttp": 403,
+      "result": "PASS"
+    },
+    {
+      "id": "P22",
+      "label": "same user: backend A cannot write product B",
+      "expectedHttp": 403,
+      "actualHttp": 403,
+      "result": "PASS"
+    },
+    {
+      "id": "P23",
+      "label": "token A copied to backend B is refused",
+      "expectedHttp": 403,
+      "actualHttp": 403,
+      "result": "PASS"
+    },
+    {
+      "id": "P24",
+      "label": "record ID cannot cross product inside route A",
+      "expectedHttp": 404,
+      "actualHttp": 404,
+      "result": "PASS"
+    },
+    {
+      "id": "P25",
+      "label": "same user: backend B cannot read product A",
+      "expectedHttp": 403,
+      "actualHttp": 403,
+      "result": "PASS"
+    },
+    {
+      "id": "P26",
+      "label": "same user: backend B cannot write product A",
+      "expectedHttp": 403,
+      "actualHttp": 403,
+      "result": "PASS"
+    },
+    {
+      "id": "P27",
+      "label": "token B copied to backend A is refused",
+      "expectedHttp": 403,
+      "actualHttp": 403,
+      "result": "PASS"
+    },
+    {
+      "id": "P28",
+      "label": "record ID cannot cross product inside route B",
+      "expectedHttp": 404,
+      "actualHttp": 404,
+      "result": "PASS"
+    },
+    {
+      "id": "P29",
+      "label": "bearer alone has no backend identity",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P30",
+      "label": "service signature alone has no user identity",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P31",
+      "label": "untrusted service key cannot impersonate A",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P32",
+      "label": "unregistered service key ID is refused",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P33",
+      "label": "service A cannot relabel its key as B",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P34",
+      "label": "wrong identity signature",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P35",
+      "label": "wrong issuer",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P36",
+      "label": "wrong API audience",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P37",
+      "label": "expired access token",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P38",
+      "label": "future not-before",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P39",
+      "label": "future issued-at",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P40",
+      "label": "excessive access lifetime",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P41",
+      "label": "unknown subject",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P42",
+      "label": "missing subject",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P43",
+      "label": "missing client identity",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P44",
+      "label": "ID token cannot substitute access token",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P45",
+      "label": "unregistered issuer key ID",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P46",
+      "label": "attacker-controlled JWKS header",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P47",
+      "label": "generic Supabase-style token is not product authorization",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P48",
+      "label": "unknown signed client is refused",
+      "expectedHttp": 403,
+      "actualHttp": 403,
+      "result": "PASS"
+    },
+    {
+      "id": "P49",
+      "label": "conflicting access-token client profiles are refused",
+      "expectedHttp": 403,
+      "actualHttp": 403,
+      "result": "PASS"
+    },
+    {
+      "id": "P50",
+      "label": "read-only scope cannot write",
+      "expectedHttp": 403,
+      "actualHttp": 403,
+      "result": "PASS"
+    },
+    {
+      "id": "P51",
+      "label": "write-only scope cannot read",
+      "expectedHttp": 403,
+      "actualHttp": 403,
+      "result": "PASS"
+    },
+    {
+      "id": "P52",
+      "label": "wrong service issuer",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P53",
+      "label": "wrong service audience",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P54",
+      "label": "wrong service subject",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P55",
+      "label": "expired service proof",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P56",
+      "label": "excessive service proof lifetime",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P57",
+      "label": "service proof future issued-at",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P58",
+      "label": "missing replay nonce",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P59",
+      "label": "changed HTTP method",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P60",
+      "label": "changed request destination",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P61",
+      "label": "changed body hash",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P62",
+      "label": "changed bearer hash",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P63",
+      "label": "service proof cannot substitute identity type",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P64",
+      "label": "untrusted key URL cannot override pinned service key",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P65",
+      "label": "first bound service proof succeeds",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P66",
+      "label": "replayed service proof is rejected",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P67",
+      "label": "concurrent replay allows exactly one call",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P68",
+      "label": "write body cannot be changed after signing",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P69",
+      "label": "user bearer cannot be swapped after signing",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P70",
+      "label": "modified product claim invalidates the user signature",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P71",
+      "label": "unsigned alg none token is refused",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P72",
+      "label": "malformed bearer is refused",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P73",
+      "label": "own access without Origin",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P74",
+      "label": "cross-product access without Origin",
+      "expectedHttp": 403,
+      "actualHttp": 403,
+      "result": "PASS"
+    },
+    {
+      "id": "P75",
+      "label": "own access with Origin A",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P76",
+      "label": "cross-product access with Origin A",
+      "expectedHttp": 403,
+      "actualHttp": 403,
+      "result": "PASS"
+    },
+    {
+      "id": "P77",
+      "label": "own access with forged Origin B",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P78",
+      "label": "cross-product access with forged Origin B",
+      "expectedHttp": 403,
+      "actualHttp": 403,
+      "result": "PASS"
+    },
+    {
+      "id": "P79",
+      "label": "own access with forged app and forwarding headers",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P80",
+      "label": "cross-product access with forged app and forwarding headers",
+      "expectedHttp": 403,
+      "actualHttp": 403,
+      "result": "PASS"
+    },
+    {
+      "id": "P81",
+      "label": "body cannot select product or owner",
+      "expectedHttp": 400,
+      "actualHttp": 400,
+      "result": "PASS"
+    },
+    {
+      "id": "P82",
+      "label": "bearer-only direct data route is inaccessible",
+      "expectedHttp": 401,
+      "actualHttp": 401,
+      "result": "PASS"
+    },
+    {
+      "id": "P83",
+      "label": "no authenticated generic data bypass route exists",
+      "expectedHttp": 404,
+      "actualHttp": 404,
+      "result": "PASS"
+    },
+    {
+      "id": "P84",
+      "label": "malformed write body is rejected",
+      "expectedHttp": 400,
+      "actualHttp": 400,
+      "result": "PASS"
+    },
+    {
+      "id": "P85",
+      "label": "unknown JSON properties are rejected",
+      "expectedHttp": 400,
+      "actualHttp": 400,
+      "result": "PASS"
+    },
+    {
+      "id": "P86",
+      "label": "oversized write is rejected",
+      "expectedHttp": 413,
+      "actualHttp": 413,
+      "result": "PASS"
+    },
+    {
+      "id": "P87",
+      "label": "forged Host is rejected",
+      "expectedHttp": 400,
+      "actualHttp": 400,
+      "result": "PASS"
+    },
+    {
+      "id": "P88",
+      "label": "negative writes preserved U1/A",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P89",
+      "label": "negative writes preserved U1/B",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P90",
+      "label": "negative writes preserved U2/A",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    },
+    {
+      "id": "P91",
+      "label": "negative writes preserved U2/B",
+      "expectedHttp": 200,
+      "actualHttp": 200,
+      "result": "PASS"
+    }
+  ]
+}
