@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {currentUser, makeClient, signOutHere} from './identity.mjs';
+import {currentUser, makeClient, signOutHere, refreshCurrentSession} from './identity.mjs';
 
 // Simulated-only contract. No real Auth0 sessions, JWT or database writes.
 const A = 'https://cft005-login-a-teste.onrender.com';
@@ -118,3 +118,25 @@ test('SDK configuration: PKCE, persistence and auto-refresh, no automatic URL-to
 
 // This suite does NOT validate real browser/session state, server JWT signatures,
 // global logout, Auth0 revocation, RLS product isolation or session timeouts.
+
+test('manual session refresh: returns verified ID only, not tokens', async()=>{
+  let refreshCount=0;
+  const auth={
+    refreshSession:async()=>{refreshCount++;return {data:{session:{access_token:'fixture'}},error:null}},
+    getSession:async()=>({data:{session:{access_token:'fixture'}},error:null}),
+    getUser:async()=>({data:{user:{id:USER1,email:'fixture@example.test'}},error:null})
+  };
+  assert.deepEqual(await refreshCurrentSession({auth}),{id:USER1});
+  assert.equal(refreshCount,1);
+});
+
+test('manual session refresh: revoked token fails and does not read identity', async()=>{
+  let askedForUser=false;
+  const auth={
+    refreshSession:async()=>({data:{session:null},error:{name:'AuthApiError',message:'Invalid Refresh Token'}}),
+    getSession:async()=>{askedForUser=true;return {data:{session:null},error:null}},
+    getUser:async()=>{askedForUser=true;return {data:{user:{id:USER1}},error:null}}
+  };
+  await assert.rejects(()=>refreshCurrentSession({auth}), e=>e?.message==='Invalid Refresh Token');
+  assert.equal(askedForUser,false);
+});
