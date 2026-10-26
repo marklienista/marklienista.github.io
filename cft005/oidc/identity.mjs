@@ -50,7 +50,7 @@ export async function beginLogin(client, config) {
 export async function completeLogin(client, config, href) {
   assertConfig(config);
   const url = new URL(href);
-  if ((url.origin + url.pathname) !== config.callbackUrl || url.hash) throw new Error('callback_mismatch');
+  if ((url.origin + url.pathname) !== config.callbackUrl) throw new Error('callback_mismatch');
   if (url.searchParams.has('error')) {
     const description = url.searchParams.get('error_description') || '';
     if (/Error getting user email from external provider|email_address_not_provided/i.test(description)) {
@@ -59,6 +59,7 @@ export async function completeLogin(client, config, href) {
     if (url.searchParams.get('error') === 'access_denied') throw new Error('login_denied');
     throw new Error('provider_login_failed');
   }
+  if (url.hash) throw new Error('callback_mismatch');
   if (url.searchParams.getAll('code').length !== 1) throw new Error('code_missing_or_repeated');
   const code = url.searchParams.get('code');
   if (!code || url.searchParams.has('access_token') || url.searchParams.has('refresh_token')) throw new Error('callback_invalid');
