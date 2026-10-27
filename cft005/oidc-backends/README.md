@@ -14,9 +14,17 @@ Em seguida, o backend envia o access token, somente por HTTPS, ao endpoint fixo 
 
 `GET /proof/results` publica no máximo oito recibos em memória, contendo somente horários, produto, rótulo U1/U2 e códigos/veredictos. Não contém registro, subject, e-mail, token, cookie, CSRF ou segredo. Apenas uma sessão válida pode gerar um recibo. O processo não registra requisições ou erros brutos. Conforme [documentação Render](https://render.com/docs/logging), o explorador de logs HTTP é recurso Pro; não foi ativado nem contratado. O callback continua `form_post`, mantendo código OAuth fora da URL. Não foi feita inspeção de logs brutos de autenticação; esta verificação não garante políticas internas de retenção dos provedores.
 
-Regressão do runner: **49/49 cenários locais PASS** (50 testes incluindo o agrupador). São fixtures OIDC, sem emissão real. Os três casos novos verificam o runner em A/B, recusas após assinatura, limites de autenticação e ausência de credenciais nos recibos. Os resultados desta seção substituem apenas o estado atual; as seções datadas abaixo preservam o histórico.
+Regressão do runner: **50/50 cenários locais PASS** (51 testes incluindo o agrupador). São fixtures OIDC, sem emissão real. Os três casos novos verificam o runner em A/B, recusas após assinatura, limites de autenticação e ausência de credenciais nos recibos. Os resultados desta seção substituem apenas o estado atual; as seções datadas abaixo preservam o histórico.
 
 O runner foi implantado em A (`dep-dbghl8bl550s738dqm1g`) e B (`dep-dbghl9ek1f9s738qeaag`), ambos LIVE às 21:42:18Z, commit `376b814a34dff3d7669b43e8fbd0191cf5e00968`. [runtime-gate-evidence.json](runtime-gate-evidence.json) registra **16/16 verificações HTTPS públicas PASS**: saúde, página/runner disponível, recusa anônima de sessão/dados/execução, recusa de bearer forjado nas rotas e na sonda. Os recibos estavam vazios. Isso não comprova login ou bloqueio de token válido de outro cliente.
+
+## Diagnóstico da tentativa humana de entrada
+
+O usuário relatou que a primeira tentativa chegou ao Google, mas as entradas seguintes voltaram rapidamente para Sem sessão local. Isso é uma falha relatada, ainda sem causa confirmada no servidor. A página anterior descartava toda categoria de erro no callback e exibia apenas ausência de sessão.
+
+A correção adiciona `GET /auth/status`, com contadores e somente o horário/resultado/etapa fixa da última tentativa desta instância sintética. O frontend explica a etapa em linguagem simples. As categorias distinguem cookie/transação ausente, credencial do serviço recusada, troca de código, validação OIDC/ID Token/access token, conta permitida, escopo e criação de sessão. Mensagens/descrições brutas, códigos OAuth, claims, subjects, e-mails, cookies e tokens nunca são retornados ou registrados. A falha continua fechada: nenhum cheque de autenticação foi relaxado. O diagnóstico é compartilhado por instância e pode refletir tentativas anônimas; não é identidade ou atestação do usuário.
+
+O cenário local adicional comprova que erros com material privado e categorias não autorizadas não aparecem no diagnóstico. **50/50 cenários locais PASS (51 com agrupador)**. Ainda é necessário repetir o login no serviço atualizado para identificar a causa real; esta correção de diagnóstico não comprova a solução da entrada.
 
 ## Estado comprovado em 26/10/2026
 
@@ -76,7 +84,7 @@ O callback POST mantém o código OAuth fora da URL. Respostas não refletem par
 
 ## Testes executados: PASS local, emissão real bloqueada
 
-`node --test integration.test.mjs`: **49/49 cenários locais PASS** (50 testes contando o agrupador). Duas instâncias HTTP de backend e um emissor de protocolo local foram usados no mesmo processo, com RS256, JWKS, endpoints HTTP e troca de código reais do protocolo. O emissor e todas as identidades são fixtures; não são o Auth0.
+`node --test integration.test.mjs`: **50/50 cenários locais PASS** (51 testes contando o agrupador). Duas instâncias HTTP de backend e um emissor de protocolo local foram usados no mesmo processo, com RS256, JWKS, endpoints HTTP e troca de código reais do protocolo. O emissor e todas as identidades são fixtures; não são o Auth0.
 
 Foram verificados login e escrita/leitura próprias U1/U2 em A/B; recusa de outro usuário/produto; cliente, audience, issuer, assinatura, nonce e escopo incorretos; PKCE inválido; state incorreto antes da troca; replay de callback; código A apresentado ao cliente B; cookies de sessão/transação copiados entre instâncias; bearer do navegador; CSRF; alteração de proprietário no corpo; callback com código em query; rota genérica de dados; preservação dos quatro registros; logout A sem encerrar B e logout durante indisponibilidade do provedor. Configuração vazia ou clientes iguais falha de forma fechada.
 

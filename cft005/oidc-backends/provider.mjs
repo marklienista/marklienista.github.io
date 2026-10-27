@@ -1,6 +1,16 @@
 import * as oidc from 'openid-client';
 import {createRemoteJWKSet,jwtVerify,customFetch} from 'jose';
 
+function loginFailure(stage){const error=new Error('E_LOGIN');error.loginStage=stage;return error;}
+function exchangeFailure(error){
+  // Only fixed categories. Never retain/return provider messages, descriptions, claims or responses.
+  if(error?.error==='invalid_client')return 'client_authentication';
+  if(error?.error==='invalid_grant')return 'code_exchange';
+  if(error?.error==='access_denied')return 'provider_denied';
+  if(error?.code==='OAUTH_TIMEOUT'||error?.code==='OAUTH_ABORT')return 'provider_connection';
+  return 'oidc_response_validation';
+}
+
 // The optional fetch injection is only for the local protocol test. start.mjs never
 // provides it and no environment variable can disable TLS or override verification.
 export async function createProvider(cfg,{fetchForTest}={}) {
@@ -26,9 +36,10 @@ export async function createProvider(cfg,{fetchForTest}={}) {
       requiredClaims:['sub','azp','scope','iat','exp'],clockTolerance:0
     });
     // Explicit Auth0 default profile. The RFC 9068 profile requires a separate policy.
-    if(protectedHeader.typ!=='JWT'||'client_id' in payload||typeof payload.sub!=='string'||!subjects.has(payload.sub)||
-      typeof payload.scope!=='string'||!payload.scope.split(' ').includes(permission)||
-      !Number.isInteger(payload.iat)||payload.iat>Math.floor(Date.now()/1000)) throw new Error('E_AUTH');
+    if(protectedHeader.typ!=='JWT'||'client_id' in payload)throw new Error('E_PROFILE');
+    if(typeof payload.sub!=='string'||!subjects.has(payload.sub))throw new Error('E_SUBJECT');
+    if(typeof payload.scope!=='string'||!payload.scope.split(' ').includes(permission))throw new Error('E_SCOPE');
+    if(!Number.isInteger(payload.iat)||payload.iat>Math.floor(Date.now()/1000))throw new Error('E_AUTH');
     // This reason is used only by the data-free test probe, after cryptographic verification.
     if(payload.azp!==cfg.clientId)throw new Error(payload.azp===cfg.otherClientId?'E_PRODUCT':'E_AUTH');
     return {subject:payload.sub,label:subjects.get(payload.sub),expiresAt:payload.exp};
@@ -42,15 +53,20 @@ export async function createProvider(cfg,{fetchForTest}={}) {
       return {url:url.href,verifier,state,nonce};
     },
     async complete(transaction,request) {
-      const tokens=await oidc.authorizationCodeGrant(client,request,{
+      let tokens;
+      try{tokens=await oidc.authorizationCodeGrant(client,request,{
         pkceCodeVerifier:transaction.verifier,expectedState:transaction.state,expectedNonce:transaction.nonce,idTokenExpected:true
-      });
+      });}catch(error){throw loginFailure(exchangeFailure(error));}
       // Independently verify both JWT signatures, including the ID Token.
-      const {payload:id}=await jwtVerify(tokens.id_token,jwks,{algorithms:['RS256'],issuer:cfg.issuer,
-        audience:cfg.clientId,requiredClaims:['sub','iat','exp','nonce'],clockTolerance:0});
-      if(id.nonce!==transaction.nonce || (id.azp!==undefined&&id.azp!==cfg.clientId)) throw new Error('E_AUTH');
-      const principal=await authorize(tokens.access_token,'records:read');
-      if(principal.subject!==id.sub) throw new Error('E_AUTH');
+      let id;
+      try{({payload:id}=await jwtVerify(tokens.id_token,jwks,{algorithms:['RS256'],issuer:cfg.issuer,
+        audience:cfg.clientId,requiredClaims:['sub','iat','exp','nonce'],clockTolerance:0}));
+        if(id.nonce!==transaction.nonce || (id.azp!==undefined&&id.azp!==cfg.clientId))throw new Error('E_AUTH');
+      }catch{throw loginFailure('id_token_validation');}
+      let principal;
+      try{principal=await authorize(tokens.access_token,'records:read');}
+      catch(error){throw loginFailure(({E_SUBJECT:'subject_allowlist',E_PROFILE:'access_token_profile',E_SCOPE:'access_token_scope',E_PRODUCT:'access_token_client'})[error.message]??'access_token_validation');}
+      if(principal.subject!==id.sub)throw loginFailure('subject_binding');
       return {...principal,accessToken:tokens.access_token};
     },
     authorize

@@ -162,6 +162,30 @@ test('two confidential BFFs against LOCAL protocol fixture; NOT real Auth0 issua
       headers:{Authorization:'Bearer synthetic-forged','Content-Type':'application/json'}});
     assert.equal(malformed.status,400);
   });
+  await check('LOGIN-DIAGNOSTICS','fixed categories reveal failure stage without raw errors, codes or identities',async()=>{
+    const missing=await fixture.request('A',{path:'/auth/callback',method:'POST',body:'code=synthetic-private-code&state=synthetic-private-state',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'}});
+    assert.equal(missing.status,303);
+    let status=await fixture.request('A',{path:'/auth/status'});
+    assert.equal(status.json.last.stage,'transaction_cookie_missing');
+    const original=fixture.providers.A.complete;
+    fixture.providers.A.complete=async()=>{const e=new Error('synthetic-private-error');e.loginStage='synthetic-private-stage';throw e;};
+    let attempt;
+    try{attempt=await fixture.begin('A');await fixture.finish('A',attempt);}
+    finally{fixture.providers.A.complete=original;}
+    status=await fixture.request('A',{path:'/auth/status'});
+    assert.equal(status.json.last.stage,'session_creation');assert.equal(status.json.last.result,'FAIL');
+    assert.deepEqual(Object.keys(status.json).sort(),['callbacks','failures','last','product','started','successes']);
+    assert.deepEqual(Object.keys(status.json.last).sort(),['at','result','stage']);
+    for(const secret of ['synthetic-private-error','synthetic-private-stage','synthetic-private-code','synthetic-private-state',attempt.code,...attempt.jar.values(),fixture.configs.A.clientSecret]){
+      assert.equal(status.text.includes(secret),false);
+    }
+    await fixture.login('A','unknown');
+    assert.equal((await fixture.request('A',{path:'/auth/status'})).json.last.stage,'subject_allowlist');
+    await fixture.login('A','U1');
+    status=await fixture.request('A',{path:'/auth/status'});
+    assert.equal(status.json.last.stage,'authenticated');assert.equal(status.json.last.result,'PASS');
+  });
   await check('LOCAL-LOGOUT','logout A leaves B authenticated',async()=>{
     const r=await fixture.request('A',{path:'/logout',method:'POST',jar:jars.AU1,
       headers:{Origin:fixture.configs.A.origin,'X-CFT005-CSRF':sessionInfo.AU1.csrf}});
