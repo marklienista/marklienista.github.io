@@ -24,7 +24,7 @@ export class DriveFiles extends Drive{
     return r.blob();
   }
   async newWorkspace(space){
-    const root=await this.folder('Carômetro — '+space.school.name.slice(0,70));
+    const root=await this.folder('FotoCrachá — '+space.school.name.slice(0,70));
     const photos=await this.folder('Fotos',root.id);
     space.drive={folderId:root.id,photosFolderId:photos.id};
     const doc=await this.upload('carometro.json',root.id,new Blob([JSON.stringify(space)],{type:'application/json'}),'application/json');
@@ -40,12 +40,12 @@ export class DriveFiles extends Drive{
     const info=await this.info(manifestId);
     if(info.trashed)throw Error('Arquivo na lixeira.');
     const blob=await this.media(manifestId);
-    if(blob.size>5*1024*1024)throw Error('Carômetro muito grande.');
+    if(blob.size>5*1024*1024)throw Error('Arquivo de cadastro muito grande.');
     const state=JSON.parse(await blob.text());
     return {state,link:{manifestId,folderId:state.drive?.folderId||info.parents?.[0],version:String(info.version||''),canEdit:!!info.capabilities?.canEdit,canShare:!!info.capabilities?.canShare}};
   }
   async save(state,link){
-    if(!link?.canEdit)throw Error('Você não pode editar este carômetro.');
+    if(!link?.canEdit)throw Error('Você não pode editar este espaço.');
     const remote=await this.info(link.manifestId);
     if(!remote.capabilities?.canEdit)throw Error('Sua permissão de edição foi retirada.');
     if(String(remote.version)!==String(link.version))throw Object.assign(new Error('Há mudanças feitas por outra pessoa. Recarregue antes de salvar.'),{code:'CONFLICT'});
