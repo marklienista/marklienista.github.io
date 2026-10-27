@@ -1,4 +1,4 @@
-/* Carômetro | modelo puro 1.0 | dados fictícios até configuração do Drive */
+/* FotoCrachá | modelo puro v1, compatível com registros anteriores de carômetro */
 export const SCHEMA_VERSION = 1;
 const clean = v => String(v ?? '').trim().replace(/\s+/g, ' ');
 const norm = v => clean(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
@@ -23,25 +23,31 @@ export function validateSpace(raw) {
   if(raw.classes.length>500 || raw.students.length>20000 || raw.enrollments.length>200000) throw Error('Arquivo muito grande.');
   const s=clone(raw);
   s.school=s.school||{name:'Escola',logoFileId:null};
+  // Campo opcional: escolas já existentes seguem válidas, sem migração do Drive.
+  s.classes=s.classes.map(c=>({...c,teacher:clean(c.teacher).slice(0,120)}));
   s.settings={columns:4,showCodes:false,printTitle:'Carômetro',...(s.settings||{})};
   const cls=new Set(s.classes.map(c=>c.id));
   const sts=new Set(s.students.map(p=>p.id));
   if(s.enrollments.some(e=>!cls.has(e.classId)||!sts.has(e.studentId))) throw Error('Arquivo com matrículas inconsistentes.');
   return s;
 }
-export function addClass(data,label,year) {
-  const s=clone(data), y=Number(year), n=clean(label);
+export function addClass(data,label,year,teacher='') {
+  const s=clone(data), y=Number(year), n=clean(label),t=clean(teacher);
   if(!n||n.length>100||!Number.isInteger(y)||y<1990||y>2120) throw Error('Turma ou ano inválido.');
+  if(t.length>120)throw Error('Nome do professor acima de 120 caracteres.');
   if(s.classes.some(c=>c.year===y && norm(c.label)===norm(n))) throw Error('Essa turma já existe neste ano.');
-  s.classes.push({id:id(),year:y,label:n,archived:false});
+  s.classes.push({id:id(),year:y,label:n,teacher:t,archived:false});
   return touch(s);
 }
 function touch(s){s.updatedAt=new Date().toISOString();return s}
-export function renameClass(data,classId,newLabel) {
+export function renameClass(data,classId,newLabel,teacher) {
   const s=clone(data), c=s.classes.find(c=>c.id===classId), n=clean(newLabel);
   if(!c||!n||n.length>100)throw Error('Turma inválida.');
   if(s.classes.some(o=>o.id!==classId&&o.year===c.year&&norm(o.label)===norm(n)))throw Error('Turma já existente.');
-  c.label=n;return touch(s);
+  // A assinatura antiga continua válida para usos sem alteração de professor.
+  const t=teacher===undefined?clean(c.teacher):clean(teacher);
+  if(t.length>120)throw Error('Nome do professor acima de 120 caracteres.');
+  c.label=n;c.teacher=t;return touch(s);
 }
 export function addStudent(data,{name,code='',classId}) {
   const s=clone(data),n=clean(name),c=clean(code);
