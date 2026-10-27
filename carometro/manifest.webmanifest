@@ -1,7 +1,7 @@
 {
-  "name": "Carômetro — Laboratório",
-  "short_name": "Carômetro",
-  "description": "Organização de carômetros escolares com dados sob controle do usuário.",
+  "name": "FotoCrachá — Laboratório",
+  "short_name": "FotoCrachá",
+  "description": "Organize estudantes, crie carômetros e imprima crachás escolares com dados sob controle do responsável.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#faf9f5",
