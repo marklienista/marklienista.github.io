@@ -26,10 +26,11 @@ export async function createProvider(cfg,{fetchForTest}={}) {
       requiredClaims:['sub','azp','scope','iat','exp'],clockTolerance:0
     });
     // Explicit Auth0 default profile. The RFC 9068 profile requires a separate policy.
-    if(protectedHeader.typ!=='JWT'||'client_id' in payload||payload.azp!==cfg.clientId||
-      payload.azp===cfg.otherClientId||typeof payload.sub!=='string'||!subjects.has(payload.sub)||
+    if(protectedHeader.typ!=='JWT'||'client_id' in payload||typeof payload.sub!=='string'||!subjects.has(payload.sub)||
       typeof payload.scope!=='string'||!payload.scope.split(' ').includes(permission)||
       !Number.isInteger(payload.iat)||payload.iat>Math.floor(Date.now()/1000)) throw new Error('E_AUTH');
+    // This reason is used only by the data-free test probe, after cryptographic verification.
+    if(payload.azp!==cfg.clientId)throw new Error(payload.azp===cfg.otherClientId?'E_PRODUCT':'E_AUTH');
     return {subject:payload.sub,label:subjects.get(payload.sub),expiresAt:payload.exp};
   }
   return Object.freeze({

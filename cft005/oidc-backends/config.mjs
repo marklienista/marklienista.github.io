@@ -1,5 +1,7 @@
 export const ISSUER='https://dev-2lz845k6nrma2nhm.us.auth0.com/';
 export const AUDIENCE='https://cft005-synthetic-api.invalid';
+// Fixed test services only. Neither request input nor environment can select a token destination.
+export const PROOF_ORIGINS=Object.freeze({A:'https://cft005-bff-a-teste.onrender.com',B:'https://cft005-bff-b-teste.onrender.com'});
 
 export function loadConfig(env) {
   const fail=()=>{throw new Error('E_CONFIG');};
@@ -22,5 +24,6 @@ export function loadConfig(env) {
       new Set(Object.values(subjects)).size!==Object.keys(subjects).length) fail();
   return Object.freeze({product,issuer:ISSUER,audience:AUDIENCE,origin,
     clientId:ids[product==='A'?0:1],otherClientId:ids[product==='A'?1:0],
-    clientSecret:env.AUTH0_CLIENT_SECRET,subjects:Object.freeze({...subjects})});
+    clientSecret:env.AUTH0_CLIENT_SECRET,subjects:Object.freeze({...subjects}),
+    proofPeerOrigin:PROOF_ORIGINS[product==='A'?'B':'A']});
 }

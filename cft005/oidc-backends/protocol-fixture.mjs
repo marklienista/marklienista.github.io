@@ -1,7 +1,7 @@
 import {createServer,request as httpRequest} from 'node:http';
 import {randomBytes,createHash} from 'node:crypto';
 import {generateKeyPair,exportJWK,SignJWT} from 'jose';
-import {loadConfig,ISSUER,AUDIENCE} from './config.mjs';
+import {loadConfig,ISSUER,AUDIENCE,PROOF_ORIGINS} from './config.mjs';
 import {createProvider} from './provider.mjs';
 import {startBackend} from './backend.mjs';
 
@@ -75,7 +75,13 @@ export async function protocolFixture() {
           throw error;
         }
       }};
-      backends[product]=await startBackend(configs[product],providers[product]);
+      backends[product]=await startBackend(configs[product],providers[product],{fetchProofForTest:async(url,options)=>{
+        const target=new URL(url);
+        const destination=Object.keys(PROOF_ORIGINS).find(p=>PROOF_ORIGINS[p]===target.origin);
+        if(!destination||target.search||target.hash)throw new Error('fixture_proof_destination');
+        const r=await request(destination,{path:target.pathname,method:options.method,headers:options.headers,body:options.body});
+        return new Response(r.text,{status:r.status,headers:{'Content-Type':'application/json'}});
+      }});
     }
   }catch(error){issuerServer.closeAllConnections();issuerServer.close();throw error;}
   const request=async(product,{path='/',method='GET',jar=new Map(),body='',headers={}}={})=>new Promise((resolve,reject)=>{

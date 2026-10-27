@@ -138,6 +138,30 @@ test('two confidential BFFs against LOCAL protocol fixture; NOT real Auth0 issua
       assert.equal(r.json.record.value,`updated-${user}-${product}`);
     }
   });
+  for(const [product,user]of [['A','U1'],['B','U2']])await check('PROOF-'+product,'real HTTP runner, signed foreign-client refusal and sanitized receipt (LOCAL issuer)',async()=>{
+    const r=await fixture.request(product,{path:'/proof/run',method:'POST',jar:jars[product+user],
+      headers:{Origin:fixture.configs[product].origin,'X-CFT005-CSRF':sessionInfo[product+user].csrf}});
+    assert.equal(r.status,200);assert.equal(r.json.result,'PASS');assert.equal(r.json.cases.length,11);
+    assert.equal(r.json.cases.filter(c=>c.bindingVerified===true).length,2);
+    assert.equal(r.json.cases.every(c=>c.result==='PASS'),true);
+    const publicResult=await fixture.request(product,{path:'/proof/results'});
+    assert.equal(publicResult.status,200);assert.equal(publicResult.json.receipts.length,1);
+    assert.deepEqual(publicResult.json.receipts[0],r.json);
+    for(const secret of [sessionInfo[product+user].csrf,...jars[product+user].values(),fixture.configs[product].clientSecret,'auth0|synthetic-u1','auth0|synthetic-u2']){
+      assert.equal(publicResult.text.includes(secret),false);
+    }
+  });
+  await check('PROOF-BOUNDARIES','anonymous or forged requests cannot run proof or obtain data from token probe',async()=>{
+    assert.equal((await fixture.request('A',{path:'/proof/run',method:'POST'})).status,401);
+    assert.equal((await fixture.request('A',{path:'/proof/run',method:'POST',jar:jars.AU1})).status,403);
+    assert.equal((await fixture.request('A',{path:'/proof/token-policy'})).status,405);
+    const rejected=await fixture.request('A',{path:'/proof/token-policy',method:'POST',body:'{"permission":"records:read"}',
+      headers:{Authorization:'Bearer synthetic-forged','Content-Type':'application/json'}});
+    assert.equal(rejected.status,401);assert.deepEqual(rejected.json,{error:'unauthorized'});
+    const malformed=await fixture.request('A',{path:'/proof/token-policy',method:'POST',body:'{"permission":"records:read","destination":"https://untrusted.invalid"}',
+      headers:{Authorization:'Bearer synthetic-forged','Content-Type':'application/json'}});
+    assert.equal(malformed.status,400);
+  });
   await check('LOCAL-LOGOUT','logout A leaves B authenticated',async()=>{
     const r=await fixture.request('A',{path:'/logout',method:'POST',jar:jars.AU1,
       headers:{Origin:fixture.configs.A.origin,'X-CFT005-CSRF':sessionInfo.AU1.csrf}});

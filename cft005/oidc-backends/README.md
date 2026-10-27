@@ -1,8 +1,20 @@
 # CFT-005 — Integração de dois backends confidenciais
 
-**EMISSÃO REAL DE LOGIN A/B: BLOCKED. API sintética e clientes confidenciais A/B criados e verificados. IDs públicos e dois subjects autorizados instalados no Render; somente os Client Secrets ainda pendentes. Nenhum backend LIVE. CFT-005 continua ABERTO.**
+**27/10/2026: A/B LIVE e health HTTP 200. Segredos inseridos pelo usuário nos campos protegidos. Login humano e bloqueio com JWT real: BLOCKED, aguardando execução no navegador. Runner sanitizado preparado e validado localmente. CFT-005 continua ABERTO.**
 
 O código de integração está preparado nesta branch; os resultados locais abaixo não comprovam emissão pelo Auth0. Esta pasta é independente de `oidc/` e `backend-proof/` e não substitui os aplicativos publicados.
+
+## Continuidade: bootstrap e prova executável — 27/10/2026
+
+O usuário confirmou o salvamento de A e B, sem transmitir os segredos ao agente. O deploy A `dep-dbghg02fngtc73dkb4j0` ficou LIVE em 21:31:20Z; B `dep-dbghimnb9u1s73c85img` em 21:36:46Z. Ambos usaram o commit `466ad11d4112f68d2e05b938bd1d4ea1e4868703`; `/health` retornou HTTP 200, ready=true e produto correto. Isso confirma configuração e discovery, não validade do segredo no token endpoint.
+
+O botão **Executar prova de isolamento** requer uma sessão obtida por login, Origin próprio e CSRF. O backend usa a sessão em memória para testar por HTTP leitura/escrita próprias (200), de outro usuário (404) e de outro produto (403). Somente o registro sintético do próprio usuário recebe um valor sintético fixo. Confere também a preservação do outro registro.
+
+Em seguida, o backend envia o access token, somente por HTTPS, ao endpoint fixo `/proof/token-policy` do outro serviço de teste. Não há destino selecionável por entrada HTTP ou variável de ambiente. O receptor usa a mesma função `authorize` das rotas de dados: assinatura RS256, emissor, audience, expiração, subject autorizado, perfil e escopo são conferidos antes de rejeitar `azp` do outro cliente. São duas recusas HTTP 401, para records:read e records:write. A razão sanitizada `other_client_after_signature_verification` distingue esse bloqueio de JWT inválido. A sonda não lê/escreve registros, não cria sessão e não oferece troca de token; as rotas de dados continuam recusando bearer. O teste remoto comprova a política criptográfica do receptor, enquanto as verificações HTTP locais exercitam as rotas de dados com sessão.
+
+`GET /proof/results` publica no máximo oito recibos em memória, contendo somente horários, produto, rótulo U1/U2 e códigos/veredictos. Não contém registro, subject, e-mail, token, cookie, CSRF ou segredo. Apenas uma sessão válida pode gerar um recibo. O processo não registra requisições ou erros brutos. Conforme [documentação Render](https://render.com/docs/logging), o explorador de logs HTTP é recurso Pro; não foi ativado nem contratado. O callback continua `form_post`, mantendo código OAuth fora da URL. Não foi feita inspeção de logs brutos de autenticação; esta verificação não garante políticas internas de retenção dos provedores.
+
+Regressão do runner: **49/49 cenários locais PASS** (50 testes incluindo o agrupador). São fixtures OIDC, sem emissão real. Os três casos novos verificam o runner em A/B, recusas após assinatura, limites de autenticação e ausência de credenciais nos recibos. Os resultados desta seção substituem apenas o estado atual; as seções datadas abaixo preservam o histórico.
 
 ## Estado comprovado em 26/10/2026
 
@@ -62,7 +74,7 @@ O callback POST mantém o código OAuth fora da URL. Respostas não refletem par
 
 ## Testes executados: PASS local, emissão real bloqueada
 
-`node --test integration.test.mjs`: **46/46 cenários locais PASS** (47 testes contando o agrupador). Duas instâncias HTTP de backend e um emissor de protocolo local foram usados no mesmo processo, com RS256, JWKS, endpoints HTTP e troca de código reais do protocolo. O emissor e todas as identidades são fixtures; não são o Auth0.
+`node --test integration.test.mjs`: **49/49 cenários locais PASS** (50 testes contando o agrupador). Duas instâncias HTTP de backend e um emissor de protocolo local foram usados no mesmo processo, com RS256, JWKS, endpoints HTTP e troca de código reais do protocolo. O emissor e todas as identidades são fixtures; não são o Auth0.
 
 Foram verificados login e escrita/leitura próprias U1/U2 em A/B; recusa de outro usuário/produto; cliente, audience, issuer, assinatura, nonce e escopo incorretos; PKCE inválido; state incorreto antes da troca; replay de callback; código A apresentado ao cliente B; cookies de sessão/transação copiados entre instâncias; bearer do navegador; CSRF; alteração de proprietário no corpo; callback com código em query; rota genérica de dados; preservação dos quatro registros; logout A sem encerrar B e logout durante indisponibilidade do provedor. Configuração vazia ou clientes iguais falha de forma fechada.
 
@@ -78,7 +90,7 @@ Durante a integração local, o emissor de teste inicialmente recusou Basic porq
 4. **API criada e verificada:** identifier `https://cft005-synthetic-api.invalid`, RS256, access_token e somente `records:read` e `records:write`. TTL global preservado; API de dados reais não reutilizada.
 5. Definir as variáveis da tabela abaixo no ambiente protegido. Cada segredo vai somente ao seu backend. Selecionar subjects somente de contas sintéticas autorizadas; aceitar no máximo U1/U2. Se só uma conta estiver disponível, provar emissão dessa conta e manter as provas entre duas pessoas BLOCKED.
 6. Verificar `/health` e então entrar manualmente nas duas origens com conta sintética autorizada. Health apenas confirma bootstrap/configuração pública, não registro do cliente ou emissão. Registrar somente resultado, produto, rótulo U1/U2 e status de acesso; jamais copiar tokens, códigos ou cookies para evidências.
-7. Comprovar emissão do tenant e repetir acessos negativos com o token do cliente A contra a política do backend B, e vice-versa, dentro de um runner em memória sem saída de credenciais. A emissão local da fixture não satisfaz esse gate. Repetir sessão, persistência, logout e matriz S01–S14 no navegador disponível.
+7. Entrar em A e B com a mesma identidade U1 autorizada e clicar **Executar prova de isolamento** em cada serviço. O agente consulta somente `/proof/results` para consolidar a prova. Repetir com U2 em sessão de navegador separada. A emissão local da fixture não satisfaz esse gate. Repetir sessão, persistência, logout e matriz S01–S14 no navegador disponível.
 
 | Variável | Origem/uso |
 |---|---|
@@ -92,8 +104,8 @@ Durante a integração local, o emissor de teste inicialmente recusou Basic porq
 
 ## Limites e próximo passo
 
-Há provisionamento e build dos dois serviços de teste e emissão administrativa Auth0 validada; não há backend LIVE, emissão de login A/B, login com contas reais de teste ou teste de navegador nesta rodada. A revisão dos logs Render ocorreu antes de qualquer credencial ou fluxo real, limitada ao build e à recusa de inicialização. A política de logs da hospedagem para autenticação ainda exige verificação. Os testes de assinatura e protocolo locais não removem o FAIL de S12 na arquitetura publicada. Sessões/dados em memória são adequados apenas à prova de instância única, sem disponibilidade, durabilidade ou logout central. Não são uma solução de produção ou substituto de políticas mínimas de banco; as rotas dos aplicativos existentes continuam fora desta mudança.
+Há dois serviços LIVE, health PASS e emissão administrativa validada. Ainda não há emissão humana A/B ou prova remota com JWT de usuário. Os testes locais não removem o FAIL de S12 na arquitetura publicada. Sessões/dados/recibos em memória são adequados apenas à prova de instância única, sem disponibilidade, durabilidade ou logout central. As rotas dos aplicativos existentes continuam fora desta mudança. Os recibos públicos são evidência sanitizada de teste, não um sistema de auditoria durável ou com atestação externa.
 
-**Único próximo passo:** inserir diretamente o Client Secret de cada cliente novo em `AUTH0_CLIENT_SECRET` do serviço correspondente (usar Save only se disponível) e avisar que ambos foram salvos. O mapeamento U1/U2 já está instalado. Após isso, implantar e comprovar emissão real de login A/B e acessos cruzados. Não enviar segredos por chat.
+**Único próximo passo:** executar login nas duas origens com U1 e clicar **Executar prova de isolamento** em ambas; conferir os recibos e repetir a rodada com U2. Não enviar segredos por chat. A participação humana no login é necessária enquanto o controle autenticado do Chrome permanecer interrompido.
 
 Referências: [openid-client](https://github.com/panva/openid-client), [Auth0: clientes confidenciais](https://auth0.com/docs/get-started/applications/confidential-and-public-applications), [Render: variáveis e segredos](https://render.com/docs/configure-environment-variables).

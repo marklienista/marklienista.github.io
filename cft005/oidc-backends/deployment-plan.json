@@ -1,7 +1,7 @@
 {
-  "status": "AUTH0_OBJECTS_CREATED_CLIENT_SECRET_INSTALLATION_PENDING",
+  "status": "BOTH_BACKENDS_HEALTH_PASS_REAL_LOGIN_PENDING",
   "applied": true,
-  "runtimeReady": false,
+  "runtimeReady": true,
   "realAuth0Issuance": "BLOCKED",
   "workspace": {
     "name": "My Workspace",
@@ -21,10 +21,11 @@
     "clientIdA": "iWciRxJTG4XPVlp2ajnwSbaasHlAFyfP",
     "clientIdB": "U2tmH2LoKGdU3soq5jfY6hht6ucNfibm",
     "publicClientIdsInstalled": true,
-    "protectedSecretInstallationConfirmed": false,
+    "protectedSecretInstallationConfirmed": true,
     "authorizedTestIdentities": 2,
     "subjectsResolved": true,
-    "subjectMapInstalledOnBothBackends": true
+    "subjectMapInstalledOnBothBackends": true,
+    "protectedSecretInstallationSource": "USER_CONFIRMED_DIRECT_RENDER_ENTRY_NO_SECRET_READ"
   },
   "repository": "https://github.com/marklienista/marklienista.github.io",
   "branch": "cft005-oidc-dominios",
@@ -39,8 +40,13 @@
       "plan": "free",
       "region": "virginia",
       "autoDeploy": "no",
-      "latestDeployId": "dep-dbgfifou01pc73fagvf0",
-      "latestDeployStatus": "update_failed"
+      "latestDeployId": "dep-dbghg02fngtc73dkb4j0",
+      "latestDeployStatus": "live",
+      "health": {
+        "status": 200,
+        "ready": true,
+        "product": "A"
+      }
     },
     {
       "name": "cft005-bff-b-teste",
@@ -52,8 +58,13 @@
       "plan": "free",
       "region": "virginia",
       "autoDeploy": "no",
-      "latestDeployId": "dep-dbgfihek1f9s73e60je0",
-      "latestDeployStatus": "update_failed"
+      "latestDeployId": "dep-dbghimnb9u1s73c85img",
+      "latestDeployStatus": "live",
+      "health": {
+        "status": 200,
+        "ready": true,
+        "product": "B"
+      }
     }
   ],
   "provisioningEvidence": {
@@ -81,5 +92,14 @@
   ],
   "secretHandling": "Set the unique client secret directly in each service's secret environment. Never commit, log or send it in chat.",
   "originHandling": "Use only service URLs actually returned by Render after creation, with exact /auth/callback registration; no predicted callback URLs.",
-  "costConstraint": "Free only; stop if unavailable. Do not change existing services or enable billing."
+  "costConstraint": "Free only; stop if unavailable. Do not change existing services or enable billing.",
+  "currentBootstrapEvidence": {
+    "date": "2026-10-27",
+    "sourceCommit": "466ad11d4112f68d2e05b938bd1d4ea1e4868703",
+    "successfulHostedBackends": 2,
+    "realHumanLogin": "BLOCKED_NOT_EXECUTED",
+    "realCrossClientTokenProof": "BLOCKED_NOT_EXECUTED",
+    "existingServicesModified": false
+  },
+  "nextStep": "Deploy the proof runner to the two test services, then human login U1 in both origins and run the proof; repeat with U2. No credentials in outputs."
 }
