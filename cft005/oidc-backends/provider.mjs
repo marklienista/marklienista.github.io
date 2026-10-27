@@ -1,7 +1,23 @@
 import * as oidc from 'openid-client';
 import {createRemoteJWKSet,jwtVerify,customFetch} from 'jose';
 
-function loginFailure(stage){const error=new Error('E_LOGIN');error.loginStage=stage;return error;}
+function loginFailure(stage,cause){
+  const error=new Error('E_LOGIN');error.loginStage=stage;
+  if(stage==='provider_denied'){
+    const phase=cause instanceof oidc.ResponseBodyError?'token_endpoint':cause instanceof oidc.AuthorizationResponseError?'authorization_response':'unknown';
+    const description=typeof cause?.error_description==='string'?cause.error_description.toLowerCase().slice(0,2048):'';
+    let reason='unspecified';
+    if(description.trim()==='unauthorized')reason='unauthorized';
+    else if(/client.grant|not authorized to access.*resource server/.test(description))reason='api_client_grant';
+    else if(description.includes('service not found'))reason='api_identifier';
+    else if(/connection.*(disabled|not enabled)|no connections enabled/.test(description))reason='client_connection';
+    else if(/user.*blocked/.test(description))reason='account_blocked';
+    else if(description.includes('consent'))reason='consent';
+    else if(/email.*verif/.test(description))reason='email_policy';
+    error.loginDetail={phase,reason};
+  }
+  return error;
+}
 function exchangeFailure(error){
   // Only fixed categories. Never retain/return provider messages, descriptions, claims or responses.
   if(error?.error==='invalid_client')return 'client_authentication';
@@ -56,7 +72,7 @@ export async function createProvider(cfg,{fetchForTest}={}) {
       let tokens;
       try{tokens=await oidc.authorizationCodeGrant(client,request,{
         pkceCodeVerifier:transaction.verifier,expectedState:transaction.state,expectedNonce:transaction.nonce,idTokenExpected:true
-      });}catch(error){throw loginFailure(exchangeFailure(error));}
+      });}catch(error){throw loginFailure(exchangeFailure(error),error);}
       // Independently verify both JWT signatures, including the ID Token.
       let id;
       try{({payload:id}=await jwtVerify(tokens.id_token,jwks,{algorithms:['RS256'],issuer:cfg.issuer,

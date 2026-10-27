@@ -49,6 +49,7 @@ export async function protocolFixture() {
       stats.refusedExchanges++;return send(400,{error:'invalid_grant'});
     }
     const now=Math.floor(Date.now()/1000);
+    if(code.tokenEndpointDenial)return send(403,{error:'access_denied',error_description:'Unauthorized'});
     const subject=code.user==='U1'?'auth0|synthetic-u1':code.user==='U2'?'auth0|synthetic-u2':'auth0|unapproved-fixture';
     const sign=(payload,badSignature=false)=>new SignJWT(payload).setProtectedHeader({alg:'RS256',kid:publicJwk.kid,typ:'JWT'}).sign(badSignature?untrustedKey.privateKey:key.privateKey);
     const id_token=await sign({iss:ISSUER,sub:subject,aud:client.id,iat:now,exp:now+300,
@@ -99,12 +100,12 @@ export async function protocolFixture() {
       });
     });req.on('error',reject);req.end(body);
   });
-  async function begin(product,jar=new Map(),{user='U1',badNonce=false,badIdSignature=false,badAccessSignature=false,badChallenge=false,accessClaims={}}={}) {
+  async function begin(product,jar=new Map(),{user='U1',badNonce=false,badIdSignature=false,badAccessSignature=false,badChallenge=false,tokenEndpointDenial=false,accessClaims={}}={}) {
     const response=await request(product,{path:'/auth/login',jar});
     const url=new URL(response.headers.location);
     const code=randomBytes(24).toString('base64url');
     codes.set(code,{clientId:url.searchParams.get('client_id'),challenge:badChallenge?'wrong-challenge':url.searchParams.get('code_challenge'),
-      nonce:url.searchParams.get('nonce'),user,badNonce,badIdSignature,badAccessSignature,accessClaims});
+      nonce:url.searchParams.get('nonce'),user,badNonce,badIdSignature,badAccessSignature,tokenEndpointDenial,accessClaims});
     return {response,url,code,jar,form:new URLSearchParams({code,state:url.searchParams.get('state')})};
   }
   async function finish(product,transaction,{jar=transaction.jar,form=transaction.form}={}) {

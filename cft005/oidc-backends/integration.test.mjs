@@ -186,6 +186,20 @@ test('two confidential BFFs against LOCAL protocol fixture; NOT real Auth0 issua
     status=await fixture.request('A',{path:'/auth/status'});
     assert.equal(status.json.last.stage,'authenticated');assert.equal(status.json.last.result,'PASS');
   });
+  await check('DENIAL-PHASES','authorization denial and token-endpoint refusal have separate sanitized categories',async()=>{
+    const tx=await fixture.begin('A');
+    tx.form.delete('code');tx.form.set('error','access_denied');tx.form.set('error_description','synthetic-private-provider-detail');
+    const before=fixture.stats.codeRequests;
+    await fixture.finish('A',tx);
+    assert.equal(fixture.stats.codeRequests,before);
+    let r=await fixture.request('A',{path:'/auth/status'});
+    assert.equal(r.json.last.stage,'provider_denied');assert.equal(r.json.last.phase,'authorization_response');
+    assert.equal(r.json.last.reason,'unspecified');assert.equal(r.text.includes('synthetic-private-provider-detail'),false);
+    await fixture.login('A','U1',{tokenEndpointDenial:true});
+    r=await fixture.request('A',{path:'/auth/status'});
+    assert.equal(r.json.last.stage,'provider_denied');assert.equal(r.json.last.phase,'token_endpoint');
+    assert.equal(r.json.last.reason,'unauthorized');assert.equal(r.json.last.result,'FAIL');
+  });
   await check('LOCAL-LOGOUT','logout A leaves B authenticated',async()=>{
     const r=await fixture.request('A',{path:'/logout',method:'POST',jar:jars.AU1,
       headers:{Origin:fixture.configs.A.origin,'X-CFT005-CSRF':sessionInfo.AU1.csrf}});

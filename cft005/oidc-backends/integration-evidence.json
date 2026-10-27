@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "scope": "LOCAL-OIDC-PROTOCOL-FIXTURE-NOT-AUTH0",
-  "generatedAt": "2026-10-27T21:54:07.766Z",
+  "generatedAt": "2026-10-27T22:04:16.002Z",
   "node": "v24.19.0",
   "realAuth0Issuance": "BLOCKED",
   "deployedBackends": 0,
@@ -10,17 +10,17 @@
   "serversClosed": true,
   "sourceHashEncoding": "UTF-8 LF",
   "sourceSha256": {
-    "backend.mjs": "1f8994649805407116eb3429e8c5e4bb32774ff12a80c79fbe77c2c0cd36dc84",
-    "provider.mjs": "ef241d61e85a570251c1f21f97f4d722ad7eed0076f561c7d9278e14ce950387",
+    "backend.mjs": "3d2459b0c82b5cd57a968ae08493539e92f080f37b2796fd121bdec33ed459d4",
+    "provider.mjs": "b9e75faede1eb2d77c8122d9a8d4e6a660344153b4f9bf62e787b40d8bd871e2",
     "config.mjs": "d5dbfa9edd8864d4bb72d0d0a7277408f7f8fdf085b2abf7ff51b376d9f2d4a5",
     "start.mjs": "6d7ef81116226e4fdda30167c74e7c1df970c68d721055b08c8e892df0c6618a",
-    "protocol-fixture.mjs": "ff0fdbf3441950ca24c946592489876911cedb64feaebbb41067ed82114a798d",
-    "integration.test.mjs": "58a71bd334ec1eed81ab430d021bea2ed7d63cc18a8ad8dab2f2f4421c07294f",
+    "protocol-fixture.mjs": "4744e623ff786dfb814cf1feaf18d44f808a265c7ee7e7e307b068a7c313aaad",
+    "integration.test.mjs": "c209c3e88fc41e7c3c54ca11d570356b708798d7f766c541fedbe65dde57c7c7",
     "package.json": "4e7948cfee36dea0be8b7b9fef8a0b0a89d93079f1ed2492ed23504df56964d9",
     "pnpm-lock.yaml": "d25486695bbe03f26b4d8bd034c3c3b55eefa325769f5d0066f43f676fc3a3d1"
   },
-  "total": 50,
-  "passed": 50,
+  "total": 51,
+  "passed": 51,
   "failed": 0,
   "cases": [
     {
@@ -256,6 +256,11 @@
     {
       "id": "LOGIN-DIAGNOSTICS",
       "label": "fixed categories reveal failure stage without raw errors, codes or identities",
+      "result": "PASS"
+    },
+    {
+      "id": "DENIAL-PHASES",
+      "label": "authorization denial and token-endpoint refusal have separate sanitized categories",
       "result": "PASS"
     },
     {
