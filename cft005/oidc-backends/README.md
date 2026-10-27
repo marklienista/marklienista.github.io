@@ -16,6 +16,8 @@ Em seguida, o backend envia o access token, somente por HTTPS, ao endpoint fixo 
 
 Regressão do runner: **49/49 cenários locais PASS** (50 testes incluindo o agrupador). São fixtures OIDC, sem emissão real. Os três casos novos verificam o runner em A/B, recusas após assinatura, limites de autenticação e ausência de credenciais nos recibos. Os resultados desta seção substituem apenas o estado atual; as seções datadas abaixo preservam o histórico.
 
+O runner foi implantado em A (`dep-dbghl8bl550s738dqm1g`) e B (`dep-dbghl9ek1f9s738qeaag`), ambos LIVE às 21:42:18Z, commit `376b814a34dff3d7669b43e8fbd0191cf5e00968`. [runtime-gate-evidence.json](runtime-gate-evidence.json) registra **16/16 verificações HTTPS públicas PASS**: saúde, página/runner disponível, recusa anônima de sessão/dados/execução, recusa de bearer forjado nas rotas e na sonda. Os recibos estavam vazios. Isso não comprova login ou bloqueio de token válido de outro cliente.
+
 ## Estado comprovado em 26/10/2026
 
 - Descoberta pública do tenant existente: HTTP 200; suporta S256, `form_post`, `client_secret_basic` e RS256. É metadado público, não autenticação nem registro dos dois clientes.

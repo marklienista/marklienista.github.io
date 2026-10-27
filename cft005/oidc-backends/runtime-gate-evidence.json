@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "scope": "PUBLIC-UNAUTHENTICATED-GATES-NOT-REAL-LOGIN",
+  "observedAt": "2026-10-27T21:42:50.900Z",
+  "sourceCommit": "376b814a34dff3d7669b43e8fbd0191cf5e00968",
+  "deployA": "dep-dbghl8bl550s738dqm1g",
+  "deployB": "dep-dbghl9ek1f9s738qeaag",
+  "realHumanLogin": "BLOCKED_AWAITING_BROWSER",
+  "realCrossClientTokenProof": "BLOCKED_AWAITING_BROWSER",
+  "realDataAccessed": false,
+  "cases": [
+    {
+      "product": "A",
+      "id": "HEALTH",
+      "expected": 200,
+      "actual": 200,
+      "result": "PASS",
+      "ready": true,
+      "productMatches": true
+    },
+    {
+      "product": "A",
+      "id": "NO-SESSION",
+      "expected": 401,
+      "actual": 401,
+      "result": "PASS"
+    },
+    {
+      "product": "A",
+      "id": "NO-RECORD",
+      "expected": 401,
+      "actual": 401,
+      "result": "PASS"
+    },
+    {
+      "product": "A",
+      "id": "NO-PROOF-RUN",
+      "expected": 401,
+      "actual": 401,
+      "result": "PASS"
+    },
+    {
+      "product": "A",
+      "id": "BEARER-REJECTED",
+      "expected": 401,
+      "actual": 401,
+      "result": "PASS"
+    },
+    {
+      "product": "A",
+      "id": "FORGED-PROBE",
+      "expected": 401,
+      "actual": 401,
+      "result": "PASS"
+    },
+    {
+      "product": "A",
+      "id": "PUBLIC-RECEIPTS",
+      "expected": 200,
+      "actual": 200,
+      "result": "PASS",
+      "receiptCount": 0
+    },
+    {
+      "product": "A",
+      "id": "PAGE",
+      "expected": 200,
+      "actual": 200,
+      "result": "PASS",
+      "proofButtonPresent": true
+    },
+    {
+      "product": "B",
+      "id": "HEALTH",
+      "expected": 200,
+      "actual": 200,
+      "result": "PASS",
+      "ready": true,
+      "productMatches": true
+    },
+    {
+      "product": "B",
+      "id": "NO-SESSION",
+      "expected": 401,
+      "actual": 401,
+      "result": "PASS"
+    },
+    {
+      "product": "B",
+      "id": "NO-RECORD",
+      "expected": 401,
+      "actual": 401,
+      "result": "PASS"
+    },
+    {
+      "product": "B",
+      "id": "NO-PROOF-RUN",
+      "expected": 401,
+      "actual": 401,
+      "result": "PASS"
+    },
+    {
+      "product": "B",
+      "id": "BEARER-REJECTED",
+      "expected": 401,
+      "actual": 401,
+      "result": "PASS"
+    },
+    {
+      "product": "B",
+      "id": "FORGED-PROBE",
+      "expected": 401,
+      "actual": 401,
+      "result": "PASS"
+    },
+    {
+      "product": "B",
+      "id": "PUBLIC-RECEIPTS",
+      "expected": 200,
+      "actual": 200,
+      "result": "PASS",
+      "receiptCount": 0
+    },
+    {
+      "product": "B",
+      "id": "PAGE",
+      "expected": 200,
+      "actual": 200,
+      "result": "PASS",
+      "proofButtonPresent": true
+    }
+  ]
+}

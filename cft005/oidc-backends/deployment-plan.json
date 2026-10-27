@@ -40,7 +40,7 @@
       "plan": "free",
       "region": "virginia",
       "autoDeploy": "no",
-      "latestDeployId": "dep-dbghg02fngtc73dkb4j0",
+      "latestDeployId": "dep-dbghl8bl550s738dqm1g",
       "latestDeployStatus": "live",
       "health": {
         "status": 200,
@@ -58,7 +58,7 @@
       "plan": "free",
       "region": "virginia",
       "autoDeploy": "no",
-      "latestDeployId": "dep-dbghimnb9u1s73c85img",
+      "latestDeployId": "dep-dbghl9ek1f9s738qeaag",
       "latestDeployStatus": "live",
       "health": {
         "status": 200,
@@ -95,11 +95,24 @@
   "costConstraint": "Free only; stop if unavailable. Do not change existing services or enable billing.",
   "currentBootstrapEvidence": {
     "date": "2026-10-27",
-    "sourceCommit": "466ad11d4112f68d2e05b938bd1d4ea1e4868703",
+    "sourceCommit": "376b814a34dff3d7669b43e8fbd0191cf5e00968",
     "successfulHostedBackends": 2,
     "realHumanLogin": "BLOCKED_NOT_EXECUTED",
     "realCrossClientTokenProof": "BLOCKED_NOT_EXECUTED",
-    "existingServicesModified": false
+    "existingServicesModified": false,
+    "unauthenticatedHttpChecks": {
+      "passed": 16,
+      "total": 16,
+      "evidence": "runtime-gate-evidence.json"
+    }
   },
-  "nextStep": "Deploy the proof runner to the two test services, then human login U1 in both origins and run the proof; repeat with U2. No credentials in outputs."
+  "nextStep": "Human login U1 in both origins and run the proof; inspect sanitized receipts, then repeat with U2. No credentials in outputs.",
+  "proofRunner": {
+    "deployedOnBoth": true,
+    "receiptPath": "/proof/results",
+    "trigger": "POST /proof/run with authenticated session and CSRF",
+    "peerPath": "/proof/token-policy",
+    "tokenDestinations": "FIXED_TEST_ORIGINS_ONLY",
+    "realTokenExecution": "BLOCKED_AWAITING_BROWSER"
+  }
 }
