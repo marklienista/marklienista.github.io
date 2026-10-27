@@ -1,5 +1,5 @@
 /*
-  Configuração PÚBLICA do aplicativo Carômetro, não de cada professor.
+  Configuração PÚBLICA do aplicativo FotoCrachá, não de cada professor.
   O responsável técnico registra UMA ÚNICA VEZ no Google Cloud:
   - um OAuth 2.0 Client ID do tipo Web application;
   - origem JavaScript autorizada https://carometro-teste.onrender.com;
