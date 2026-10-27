@@ -46,9 +46,15 @@
       "status": "PASS"
     },
     {
-      "test": "Protected runtime credentials and authorized subjects",
+      "test": "Install authorized subject map in protected environments A/B",
+      "status": "PASS",
+      "identityCount": 2,
+      "identifiersInEvidence": false
+    },
+    {
+      "test": "Install client secrets in protected environments A/B",
       "status": "BLOCKED",
-      "reason": "Client secrets must be entered directly in protected Render fields; subject identifiers pending."
+      "reason": "Browser control unavailable; secret-as-output transfer rejected; no Render credential available in Make for direct protected transfer."
     },
     {
       "test": "Real human login A/B, sessions and crossed access",
@@ -71,20 +77,21 @@
     "auth0ObjectsCreated": 3,
     "renderDeployTriggered": true,
     "authorizedTestIdentityCount": 2,
-    "subjectsResolved": false
+    "subjectsResolved": true,
+    "subjectMapInstalledOnBothBackends": true
   },
   "renderDeploys": [
     {
       "product": "A",
-      "id": "dep-dbgfclg473hc73dsnek0",
+      "id": "dep-dbgfifou01pc73fagvf0",
       "status": "update_failed",
-      "fixedFailureMessageConfirmed": true
+      "sourceCommit": "0b85633e439af49eec50a65d569522c5e2ce0cd7"
     },
     {
       "product": "B",
-      "id": "dep-dbgfcmom7kps73d8kung",
+      "id": "dep-dbgfihek1f9s73e60je0",
       "status": "update_failed",
-      "fixedFailureMessageConfirmed": true
+      "sourceCommit": "0b85633e439af49eec50a65d569522c5e2ce0cd7"
     }
   ]
 }

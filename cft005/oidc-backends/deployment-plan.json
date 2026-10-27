@@ -1,23 +1,83 @@
 {
-  "status": "AUTH0_OBJECTS_CREATED_PROTECTED_RUNTIME_INSTALLATION_PENDING",
+  "status": "AUTH0_OBJECTS_CREATED_CLIENT_SECRET_INSTALLATION_PENDING",
   "applied": true,
   "runtimeReady": false,
   "realAuth0Issuance": "BLOCKED",
-  "workspace": {"name": "My Workspace", "id": "tea-dattm47lk1mc73cu74bg", "account": "Primary", "confirmedByUser": true},
-  "auth0Connection": {"provider": "Make HTTP Basic", "team": "Marcelo's space", "teamId": 2908515, "status": "ADMIN_VALIDATION_PASS_HTTP_200", "clientsRegistered": true, "objectCreation": "THREE_APPROVED_OBJECTS_CREATED_HTTP_201", "configurationAndResults": "auth0-provisioning-request.json", "apiId": "6ae0f4bbb64763b9b470a321", "clientIdA": "iWciRxJTG4XPVlp2ajnwSbaasHlAFyfP", "clientIdB": "U2tmH2LoKGdU3soq5jfY6hht6ucNfibm", "publicClientIdsInstalled": true, "protectedSecretInstallationConfirmed": false, "authorizedTestIdentities": 2, "subjectsResolved": false},
+  "workspace": {
+    "name": "My Workspace",
+    "id": "tea-dattm47lk1mc73cu74bg",
+    "account": "Primary",
+    "confirmedByUser": true
+  },
+  "auth0Connection": {
+    "provider": "Make HTTP Basic",
+    "team": "Marcelo's space",
+    "teamId": 2908515,
+    "status": "ADMIN_VALIDATION_PASS_HTTP_200",
+    "clientsRegistered": true,
+    "objectCreation": "THREE_APPROVED_OBJECTS_CREATED_HTTP_201",
+    "configurationAndResults": "auth0-provisioning-request.json",
+    "apiId": "6ae0f4bbb64763b9b470a321",
+    "clientIdA": "iWciRxJTG4XPVlp2ajnwSbaasHlAFyfP",
+    "clientIdB": "U2tmH2LoKGdU3soq5jfY6hht6ucNfibm",
+    "publicClientIdsInstalled": true,
+    "protectedSecretInstallationConfirmed": false,
+    "authorizedTestIdentities": 2,
+    "subjectsResolved": true,
+    "subjectMapInstalledOnBothBackends": true
+  },
   "repository": "https://github.com/marklienista/marklienista.github.io",
   "branch": "cft005-oidc-dominios",
   "services": [
-    {"name": "cft005-bff-a-teste", "id": "srv-dbftdpvf3r2c73bflvjg", "origin": "https://cft005-bff-a-teste.onrender.com", "callback": "https://cft005-bff-a-teste.onrender.com/auth/callback", "product": "A", "runtime": "node", "plan": "free", "region": "virginia", "autoDeploy": "no", "latestDeployId": "dep-dbgfclg473hc73dsnek0", "latestDeployStatus": "update_failed"},
-    {"name": "cft005-bff-b-teste", "id": "srv-dbftdt3l550s739sao1g", "origin": "https://cft005-bff-b-teste.onrender.com", "callback": "https://cft005-bff-b-teste.onrender.com/auth/callback", "product": "B", "runtime": "node", "plan": "free", "region": "virginia", "autoDeploy": "no", "latestDeployId": "dep-dbgfcmom7kps73d8kung", "latestDeployStatus": "update_failed"}
+    {
+      "name": "cft005-bff-a-teste",
+      "id": "srv-dbftdpvf3r2c73bflvjg",
+      "origin": "https://cft005-bff-a-teste.onrender.com",
+      "callback": "https://cft005-bff-a-teste.onrender.com/auth/callback",
+      "product": "A",
+      "runtime": "node",
+      "plan": "free",
+      "region": "virginia",
+      "autoDeploy": "no",
+      "latestDeployId": "dep-dbgfifou01pc73fagvf0",
+      "latestDeployStatus": "update_failed"
+    },
+    {
+      "name": "cft005-bff-b-teste",
+      "id": "srv-dbftdt3l550s739sao1g",
+      "origin": "https://cft005-bff-b-teste.onrender.com",
+      "callback": "https://cft005-bff-b-teste.onrender.com/auth/callback",
+      "product": "B",
+      "runtime": "node",
+      "plan": "free",
+      "region": "virginia",
+      "autoDeploy": "no",
+      "latestDeployId": "dep-dbgfihek1f9s73e60je0",
+      "latestDeployStatus": "update_failed"
+    }
   ],
-  "provisioningEvidence": {"date": "2026-10-26", "sourceCommit": "65c6816e98b0b4d1bfb26e368abf5bf1e411257c", "build": "PASS", "startup": "FAIL_CLOSED_MISSING_AUTH0_CONFIGURATION", "auth0CredentialsInstalled": false, "syntheticSubjectsInstalled": false, "successfulHostedBackends": 0, "existingServicesModified": false},
+  "provisioningEvidence": {
+    "date": "2026-10-26",
+    "sourceCommit": "65c6816e98b0b4d1bfb26e368abf5bf1e411257c",
+    "build": "PASS",
+    "startup": "FAIL_CLOSED_MISSING_AUTH0_CONFIGURATION",
+    "auth0CredentialsInstalled": false,
+    "syntheticSubjectsInstalled": false,
+    "successfulHostedBackends": 0,
+    "existingServicesModified": false
+  },
   "buildCommand": "npx --yes pnpm@11.25.0 --dir cft005/oidc-backends install --frozen-lockfile --ignore-scripts",
   "startCommand": "node cft005/oidc-backends/start.mjs",
   "healthPath": "/health",
   "requiredEnvironmentKeys": [
-    "PRODUCT", "PUBLIC_ORIGIN", "AUTH0_ISSUER", "AUTH0_AUDIENCE", "AUTH0_CLIENT_ID_A",
-    "AUTH0_CLIENT_ID_B", "AUTH0_CLIENT_SECRET", "SYNTHETIC_SUBJECTS_JSON"
+    "PRODUCT",
+    "PUBLIC_ORIGIN",
+    "AUTH0_ISSUER",
+    "AUTH0_AUDIENCE",
+    "AUTH0_CLIENT_ID_A",
+    "AUTH0_CLIENT_ID_B",
+    "AUTH0_CLIENT_SECRET",
+    "SYNTHETIC_SUBJECTS_JSON"
   ],
   "secretHandling": "Set the unique client secret directly in each service's secret environment. Never commit, log or send it in chat.",
   "originHandling": "Use only service URLs actually returned by Render after creation, with exact /auth/callback registration; no predicted callback URLs.",
