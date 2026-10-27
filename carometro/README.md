@@ -1,39 +1,45 @@
-# Carômetro — integração Google Drive (laboratório 0.9)
+# FotoCrachá — carômetros e crachás (laboratório 0.10)
 
-Aplicação de testes: https://carometro-teste.onrender.com  
-Fonte atual: GitHub `marklienista/marklienista.github.io`, branch isolada `carometro-lab-002`, diretório `carometro/`.  
-Condutor: https://docs.google.com/document/d/1JSY62EjOjDT73UchbGdGqq3VdD5zs4eQ2UU6PRnb92k/edit
+Aplicação de testes: https://carometro-teste.onrender.com
+Fonte única de código: GitHub `marklienista/marklienista.github.io`, branch isolada `carometro-lab-002`, diretório `carometro/`.
+Condutor do projeto (mesmo documento anterior): https://docs.google.com/document/d/1JSY62EjOjDT73UchbGdGqq3VdD5zs4eQ2UU6PRnb92k/edit
 
-## Experiência para a pessoa que utiliza
+## Nome público e continuidade dos dados
 
-A tela **Configurações** exibe somente **nome da escola e logotipo**. A pessoa clica em **Conectar ao Google Drive**, escolhe sua conta na janela do Google e autoriza o escopo limitado `drive.file`. Não precisa de Client ID, chave de API, projeto Google Cloud ou acesso ao painel técnico.
+Nome público aprovado em 27/10/2026: **FotoCrachá**. `Carômetro` continua sendo o nome de **um dos formatos impressos**. O domínio de laboratório `carometro-teste.onrender.com`, o nome do serviço Render, a pasta do código, o ID do projeto Google Cloud e o nome interno `carometro.json` não foram trocados: preservar esses identificadores mantém a descoberta e leitura dos arquivos anteriormente gravados. Novos espaços criam a pasta `FotoCrachá — [escola]` no Drive; pastas antigas `Carômetro — [escola]` não são movidas ou renomeadas.
 
-## Configuração única do aplicativo — responsável técnico
+O nome exibido na **tela de consentimento Google OAuth** pertence ao Google Cloud Auth Platform e pode ainda estar como Carômetro. Alterá-lo é uma ação administrativa separada no Google Cloud; a mudança no site não o altera automaticamente.
 
-**Estado em 23/10/2026:** Marcelo forneceu um Client ID OAuth Web público e o número de projeto `784125401141`, que foram registrados na configuração técnica `config.js`. O botão está habilitado para solicitar acesso por janela Google (escolha de conta), mas **a autorização real ainda não foi comprovada**: a configuração de origem, audiência, usuários de teste, escopo e Drive API no Google Cloud não é verificável nesta sessão. A Google Picker API key ainda não foi fornecida; portanto a seleção assistida de arquivos compartilhados continua indisponível. Não cadastrar imagens ou informações reais de estudantes neste estágio.
+## Como funciona
 
-1. Em https://console.cloud.google.com/ selecione ou crie um **projeto de teste** com nome Carômetro. Não contratar plano sem avaliação.
-2. Em **APIs e serviços → Biblioteca**, habilite **Google Drive API**. Para o seletor de arquivo compartilhado, habilite também **Google Picker API**.
-3. Em **Google Auth Platform → Branding/Audience**, configure o aplicativo **Carômetro**, audiência **External** (se usar Gmail comum), contato responsável e usuários de teste adultos, mantendo o projeto em **Testing** durante a homologação.
-4. Em **Google Auth Platform → Data Access**, inclua o escopo `https://www.googleapis.com/auth/drive.file`, sem habilitar escopos amplos `drive` ou `drive.readonly`.
-5. Em **Google Auth Platform → Clients**, crie um **OAuth 2.0 Client ID** do tipo **Web application**, com **Authorized JavaScript origins** exatamente `https://carometro-teste.onrender.com`. O modelo de token JavaScript não exige redirect URI no aplicativo.
-6. **Concluído no código:** os campos `googleOAuthClientId` e `googleCloudProjectNumber` do arquivo **`carometro/config.js`** já receberam os valores públicos. Não enviar nem incluir `client_secret` no frontend. Confira no Google Cloud se o client pertence mesmo a esse projeto e se a origem autorizada está exata.
-7. Se desejar habilitar **Google Picker** para convidados, crie uma API key pública e restrinja por **HTTP referrers** e à **Google Picker API**. A documentação do Google também exige incluir `https://docs.google.com/*` ao restringir sites porque o seletor roda em iframe. Essa chave ainda não foi fornecida. Depois, coloque-a no `googlePickerApiKey` do mesmo arquivo, sem usá-la para autenticar dados privados; o código do Picker já passa `setAppId(googleCloudProjectNumber)` exigido pelo escopo `drive.file`.
-8. Publique exclusivamente o serviço Render **`carometro-teste`**, com autoDeploy desligado. Teste primeiro login da conta Google cadastrada como testadora, depois criação de pasta, fotos fictícias, reabertura e convite de uma segunda conta adulta. Com Picker API key configurada, teste escolha de arquivos, permissões de leitura/edição/retirada e isolamento entre contas. Um deploy sem erro não valida OAuth.
+O responsável conecta sua própria conta Google com **Conectar ao Google Drive**, escolhe a conta no popup e autoriza o escopo restrito `drive.file`. Não informa IDs ou chaves. Cadastros e fotografias podem ser armazenados em uma pasta do Drive do responsável. O app não tem sistema próprio de reconhecimento facial e não envia imagens a IA. Somente usar dados fictícios até homologar privacidade e colaboração.
 
-Não copiar tokens OAuth do ChatGPT Google Drive, de outros aplicativos nem secrets do Supabase. O Google autoriza cada usuário, e o navegador mantém o access token apenas em memória.
+- **Turmas:** nome, ano e nome opcional do **professor(a) da turma**, cadastrado/alterado em **Editar turma**. O professor fica associado à turma daquele ano, não ao estudante. Ao promover estudantes, uma nova turma do ano seguinte começa sem professor pré-definido. Os dados são gravados no mesmo manifesto que nomes, turmas e fotos.
+- **Carômetro:** impressão existente em grade de fotografias, com nome da escola e logotipo quando cadastrado. O professor(a) aparece no cabeçalho quando há somente uma turma, ou ao lado de cada estudante quando houver várias. A exibição de matrícula/RA continua opcional apenas neste formato.
+- **Crachás:** em **Imprimir → O que deseja imprimir? → Crachás**, escolher selecionados/turma/ano inteiro, **Com fotografia** ou **Apenas nome**, e opcionalmente digitar informações adicionais. Imprime 8 cartões de **86 × 54 mm** por folha A4, organizados em 2 colunas × 4 linhas, com marca de recorte; inclui nome, turma, professor cadastrado e logo se existente. Nunca imprime a matrícula/RA nos crachás.
+- **Informações adicionais:** um único texto opcional, com no máximo 120 caracteres, repetido no lote de crachás (ex.: nome do passeio, contato institucional). É **transitório na tela**: não há campo no modelo, não vai para Google Drive, não fica em `localStorage`, não mantém versões, não aparece nos carômetros e é limpo ao criar novo espaço ou recarregar a página. Evite dados pessoais dos estudantes.
+- **PDF:** o app prepara a grade no navegador; **Imprimir / Salvar PDF** abre a janela de impressão local. Recomendações: papel **A4 retrato**, **escala 100% / tamanho real**, sem cabeçalhos ou rodapés do navegador. Confira uma régua no primeiro teste físico; impressoras podem impor margens/escala próprias. Não existe armazenamento separado de PDFs.
+
+## Modelo e migração
+
+`schema_version: 1` permanece intocado. O atributo opcional `classes[].teacher` é preenchido com string vazia ao abrir carômetros antigos. Não é necessário migrar o banco, criar outra pasta, duplicar documentos nem fazer backup extra. Novos nomes de pasta não alteram o nome interno do manifesto. Todos os textos são montados como nós DOM com `textContent`, sem injetar HTML escrito por usuários. Fotos continuam em URLs temporárias do navegador até upload.
+
+## Integração Google Cloud
+
+Projeto Google Cloud número `784125401141`; Client ID OAuth Web público já está centralizado em `config.js`. Origem JavaScript autorizada de laboratório: `https://carometro-teste.onrender.com`. Scope `https://www.googleapis.com/auth/drive.file`. Marcelo confirmou em 25/10/2026 que uma conta conseguiu conectar após cadastrar usuários de teste; isso **não prova ainda** salvar/reabrir arquivos nem compartilhar fotografias. A chave pública **restrita** do Google Picker ainda está pendente; selecionar arquivos de convidados não foi homologado. Não inserir `client_secret` nem tokens de usuários no repositório.
+
+## Testes necessários antes de dados reais
+
+1. Abrir no navegador com conta Google de adulto autorizada no modo Testing, criar turma e professor, salvar, recarregar e reabrir; verificar professor e cadastros.
+2. Com alunos fictícios, comparar carômetro antigo com a nova impressão, conferir professor no cabeçalho ou nos cartões.
+3. Gerar PDF de crachás **com foto** e **apenas nome**, com 1, 8 e 9 estudantes, conferindo quebra de página, resolução, nomes longos, corte e medidas. Oito crachás por A4 é a intenção do layout; sem impressão real/inspeção visual não se declara homologado.
+4. Digitar nota adicional, imprimir e recarregar a página; confirmar que o campo não permaneceu salvo no Drive, e que a nota não aparece no carômetro.
+5. Somente depois habilitar Picker e validar compartilhamento real entre duas contas adultas, acesso, revogação e fotos.
 
 ## Limites
 
-- **Conta Marcelo Santos** e o SSO da arquitetura A (CFT-005) não se tornam automáticos ao autenticar no Google Drive.
-- O escopo `drive.file` permite usar arquivos do app e selecionados no Google Picker, não ler o Drive inteiro.
-- Pasta compartilhada não equivale automaticamente a acesso via API de todos os arquivos por cada colaborador: exige teste integrado por usuário.
-- Não marcar essa integração como homologada antes da prova real em duas contas e fotos fictícias.
-- A versão publicada é técnica, não lançamento.
-
-## Referências oficiais
-
-- OAuth Web client: https://developers.google.com/workspace/guides/create-credentials
-- Modelo de token: https://developers.google.com/identity/oauth2/web/guides/use-token-model
-- Escopo Drive `drive.file`: https://developers.google.com/workspace/drive/api/guides/api-specific-auth
-- Google Picker: https://developers.google.com/workspace/drive/picker/guides/web-picker
+- **FotoCrachá não foi lançado**; o Render é uma publicação técnica de teste.
+- A **conta compartilhada** do ecossistema autoral e o SSO não são substituídos nem comprovados pelo login do Google Drive.
+- Compartilhar pasta não garante sozinho o acesso de convidados a todos os arquivos pelo escopo `drive.file`.
+- Não usar dados/fotos de crianças reais antes das autorizações institucionais e dos testes de permissão/privacidade.
+- A identidade visual B e a assinatura «Criado por Marcelo Santos» foram mantidas, sem alterar Apertaquem, Som da Turma, MeEmpresta ou ApertaLetra.
