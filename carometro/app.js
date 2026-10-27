@@ -3,10 +3,10 @@ import {prepareGoogleIdentity} from './drive.js';
 import {addClass,renameClass,addStudent,editStudent,moveStudent,markStudentInactive,setPhoto,classStudents,studentClass,planPromotion,applyPromotion,mapPilotRows,comparePilot,applyPilot,parseDelimited,exportCsv,normalize} from './model.js';
 import {readPilotFile} from './xlsx.js';
 import {pickManifest} from './picker.js';
-import {renderClassBar,renderStudentCards,renderPrintSheet,notify,presentModal,closeModal,fillSelect} from './view.js';
+import {renderClassBar,renderStudentCards,renderPrintSheet,renderBadgeSheet,notify,presentModal,closeModal,fillSelect} from './view.js';
 const $=id=>document.getElementById(id), S=new Session();
 let pilot=[],promotionPlan=[];
-const run=async fn=>{try{return await fn()}catch(e){console.error('Carômetro',e);notify(e?.message||'Não foi possível concluir.','error');return null}};
+const run=async fn=>{try{return await fn()}catch(e){console.error('FotoCrachá',e);notify(e?.message||'Não foi possível concluir.','error');return null}};
 function classesForYear(){return S.space.classes.filter(c=>c.year===Number(S.year)&&!c.archived)}
 function years(){
   const found=new Set(S.space.classes.map(c=>c.year));found.add(Number(S.year));
@@ -19,7 +19,7 @@ function selectedCurrentStudents(){
 }
 function report(text,kind){notify(text,kind)}
 function render(){
-  $('spaceTitle').textContent=S.space.school.name||'Carômetro sem nome';
+  $('spaceTitle').textContent=S.space.school.name||'Escola sem nome';
   const mode=S.isCloud()?(S.isLinked()?'Google Drive · '+(S.drive.email||'conta autorizada'):'Google conectado · ainda não salvo'):(S.config.clientId?'Demonstração temporária · Google Drive desconectado':'Demonstração temporária · integração Google em preparação');
   $('modeText').textContent=mode+(S.dirty?' · alterações não salvas':'');
   $('connectBtn').textContent=S.isCloud()?'Desconectar Google Drive':'Conectar ao Google Drive';
@@ -40,6 +40,7 @@ function render(){
   const c=currentClass();
   $('currentClassTitle').textContent=c?.label||'Nenhuma turma neste ano';
   $('currentClassMeta').textContent=String(S.year)+' · TURMA';
+  $('currentClassTeacher').textContent=c?.teacher?'Professor(a): '+c.teacher:'Professor(a) não informado(a) · use Editar turma';
   $('studentCount').textContent=c?classStudents(S.space,c.id).length+' estudantes · '+selectedCurrentStudents().length+' selecionados no ano':'Crie uma turma para começar.';
   $('renameClassBtn').disabled=!c||!S.editable();
   $('addStudentBtn').disabled=!c||!S.editable();
@@ -74,8 +75,9 @@ function bindNavigation(){
 }
 function openClass(edit=false){
   if(edit&&!currentClass())return;
-  $('classModalTitle').textContent=edit?'Renomear turma':'Nova turma';
+  $('classModalTitle').textContent=edit?'Editar turma':'Nova turma';
   $('className').value=edit?currentClass().label:'';
+  $('classTeacher').value=edit?(currentClass().teacher||''):'';
   $('classYear').value=String(edit?currentClass().year:S.year);
   $('classYear').disabled=edit;
   $('classForm').dataset.mode=edit?'edit':'new';
@@ -101,7 +103,7 @@ function initForms(){
   $('addStudentBtn').onclick=()=>openStudent(null);
   $('classForm').onsubmit=e=>run(async()=>{
     e.preventDefault();const mode=$('classForm').dataset.mode;
-    const changed=mode==='edit'?renameClass(S.space,S.classId,$('className').value):addClass(S.space,$('className').value,Number($('classYear').value));
+    const changed=mode==='edit'?renameClass(S.space,S.classId,$('className').value,$('classTeacher').value):addClass(S.space,$('className').value,Number($('classYear').value),$('classTeacher').value);
     S.update(changed);
     if(mode!=='edit'){S.year=Number($('classYear').value);S.classId=changed.classes.at(-1)?.id}
     closeModal('classDialog');render();report('Turma atualizada.');
@@ -122,7 +124,7 @@ function initForms(){
   $('newSpaceBtn').onclick=()=>presentModal('newSpaceDialog');
   $('newSpaceForm').onsubmit=e=>run(async()=>{
     e.preventDefault();if(S.dirty&&S.isLinked()&&!confirm('Existem alterações não salvas no Drive. Criar outro carômetro mesmo assim?'))return;
-    S.startSpace($('newSpaceName').value);closeModal('newSpaceDialog');report('Espaço criado. Crie uma turma e depois conecte o Drive para salvar.');
+    S.startSpace($('newSpaceName').value);$('badgeExtra').value='';closeModal('newSpaceDialog');report('Espaço criado. Cadastre uma turma e salve no Drive quando estiver pronto.');
   });
   $('settingsForm').onsubmit=e=>run(async()=>{
     e.preventDefault();
@@ -227,15 +229,35 @@ function initSharing(){
     report(r.failed?'Registro aberto; algumas fotografias não foram autorizadas pelo Drive.':'Registro aberto do Drive.');
   });
 }
+function updatePrintOptions(){
+  const badges=$('printFormat').value==='badges';
+  $('badgeOptions').hidden=!badges;
+  $('carometroOptions').hidden=badges;
+}
 function initPrint(){
-  $('printSelectedBtn').onclick=()=>{document.querySelector('[data-view=impressao]').click();$('printSource').value='selected';previewPrint(true)};
+  $('printSelectedBtn').onclick=()=>{
+    $('printSource').value='selected';
+    previewPrint(true);
+  };
+  $('printFormat').onchange=()=>{updatePrintOptions();previewPrint(false)};
+  $('printSource').onchange=()=>previewPrint(false);
+  $('printColumns').onchange=()=>previewPrint(false);
+  $('printCodes').onchange=()=>previewPrint(false);
+  $('badgePhotoMode').onchange=()=>previewPrint(false);
+  $('badgeExtra').onchange=()=>previewPrint(false);
   $('previewPrintBtn').onclick=()=>previewPrint(true);
-  $('printBtn').onclick=()=>{previewPrint(false);window.print()};
+  $('printBtn').onclick=()=>run(async()=>{
+    if(!previewPrint(false))return;
+    const images=[...document.querySelectorAll('#printSheet img')];
+    await Promise.all(images.map(img=>img.decode?.().catch(()=>{})||Promise.resolve()));
+    window.print();
+  });
   $('exportCsvBtn').onclick=()=>run(async()=>{
     if(!S.classId)throw Error('Escolha uma turma.');
     const content=exportCsv(S.space,S.classId);
-    download(new Blob([content],{type:'text/csv;charset=utf-8'}),'carometro-lista-'+S.year+'.csv');
+    download(new Blob([content],{type:'text/csv;charset=utf-8'}),'fotocracha-lista-'+S.year+'.csv');
   });
+  updatePrintOptions();
 }
 function download(blob,name){
   const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();
@@ -250,12 +272,28 @@ function printPeople(){
 }
 function previewPrint(visible=true){
   const people=printPeople();
-  const sheet=renderPrintSheet(S.space,people,S.photos,S.logoUrl,Number($('printColumns').value),$('printCodes').checked,S.year);
-  sheet.classList.toggle('preview',visible);
-  if(visible){
-    document.querySelector('[data-view=impressao]').click();
-    sheet.classList.add('preview');sheet.scrollIntoView({block:'start',behavior:'smooth'});
+  if(!people.length){
+    const sheet=document.getElementById('printSheet');
+    if(sheet){sheet.replaceChildren();sheet.classList.remove('preview')}
+    if(visible)report('Selecione estudantes da turma antes de preparar a impressão.','warning');
+    return false;
   }
+  if(visible){
+    const tab=document.querySelector('[data-view=impressao]');
+    if(tab.getAttribute('aria-current')!=='page')tab.click();
+  }
+  const badge=$('printFormat').value==='badges';
+  const sheet=badge
+    ? renderBadgeSheet(S.space,people,S.photos,S.logoUrl,S.year,{
+        withPhoto:$('badgePhotoMode').value==='photo',
+        extra:$('badgeExtra').value
+      })
+    : renderPrintSheet(S.space,people,S.photos,S.logoUrl,Number($('printColumns').value),$('printCodes').checked,S.year);
+  if(visible){
+    sheet.classList.add('preview');
+    sheet.scrollIntoView({block:'start',behavior:'smooth'});
+  }
+  return true;
 }
 function makeTag(kind){
   const t=document.createElement('span');t.className='tag'+(['review'].includes(kind)?' review':['same'].includes(kind)?'':' warn');
