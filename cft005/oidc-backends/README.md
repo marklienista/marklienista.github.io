@@ -1,6 +1,6 @@
 # CFT-005 — Integração de dois backends confidenciais
 
-**EMISSÃO REAL DE LOGIN A/B: BLOCKED. Acesso administrativo Auth0 validado; criação da API e dos clientes pendente de aprovação específica. Dois serviços de teste provisionados no Render, ainda sem inicialização válida. CFT-005 continua ABERTO.**
+**EMISSÃO REAL DE LOGIN A/B: BLOCKED. API sintética e clientes confidenciais A/B criados e verificados. IDs públicos instalados no Render; segredos protegidos e subjects ainda pendentes. Nenhum backend LIVE. CFT-005 continua ABERTO.**
 
 O código de integração está preparado nesta branch; os resultados locais abaixo não comprovam emissão pelo Auth0. Esta pasta é independente de `oidc/` e `backend-proof/` e não substitui os aplicativos publicados.
 
@@ -34,7 +34,19 @@ O conector Auth0 padrão do Make foi recusado com HTTP 403 porque sua validaçã
 
 Após o usuário salvar o cenário inteiro, a credencial protegida foi reconhecida. A solicitação administrativa `POST /oauth/token` passou com HTTP 200. A consulta `GET /api/v2/clients`, com lista explícita de campos sem segredo, também passou e confirmou ausência de `CFT-005 BFF A` e `CFT-005 BFF B`. `GET /api/v2/resource-servers`, filtrado pelo identificador exato da API sintética, passou e retornou zero resultados. As saídas continham somente status e metadados selecionados; nenhum access token, client secret ou registro de usuário foi retornado à conversa.
 
-A revisão automática rejeitou a preparação da chamada de criação da API por faltar aprovação explícita de sua configuração persistente e dos escopos exatos `records:read` e `records:write`. Nenhuma chamada de criação foi executada, nenhum cliente ou API foi criado e nenhum deploy Render foi disparado. [auth0-provisioning-request.json](auth0-provisioning-request.json) é uma proposta declarativa, não executada, com os três objetos exatos para revisão. [admin-validation-evidence.json](admin-validation-evidence.json) contém somente resultados sanitizados. O usuário indicou duas identidades autorizadas para a prova; seus endereços não integram estes arquivos e os subjects ainda não foram resolvidos. Dados de teste deverão permanecer exclusivamente sintéticos. A emissão administrativa não comprova login humano A/B ou isolamento por produto.
+A revisão automática inicialmente rejeitou o preparo da criação por faltar aprovação explícita de configuração e escopos. O usuário então aprovou exatamente os três objetos e `records:read`/`records:write`. Foram executadas somente essas três criações, todas HTTP 201, e conferidas por GET HTTP 200. [auth0-provisioning-request.json](auth0-provisioning-request.json) preserva os corpos aprovados e registra os IDs observados; não é um script de execução. [admin-validation-evidence.json](admin-validation-evidence.json) contém resultados sanitizados. A emissão administrativa não comprova login humano A/B ou isolamento por produto.
+
+| Objeto criado | Identificador público | Configuração verificada |
+|---|---|---|
+| CFT-005 Synthetic API | `6ae0f4bbb64763b9b470a321` | Audience sintética exata; RS256; access_token; somente records:read e records:write; offline access desativado |
+| CFT-005 BFF A | `iWciRxJTG4XPVlp2ajnwSbaasHlAFyfP` | Regular Web, OIDC, first-party, Authorization Code, Client Secret Basic, ID Token RS256, callback exclusiva A |
+| CFT-005 BFF B | `U2tmH2LoKGdU3soq5jfY6hht6ucNfibm` | Mesmas propriedades, ID distinto e callback exclusiva B |
+
+Ambos os clientes novos já têm as conexões de login Google e banco Auth0 habilitadas. Nenhuma conexão existente foi reconfigurada pelo agente. Os dois IDs públicos foram mesclados nos ambientes dos serviços de teste, preservando as outras variáveis. Essa escrita disparou deploys A `dep-dbgfclg473hc73dsnek0` e B `dep-dbgfcmom7kps73d8kung`, ambos `update_failed`; logs filtrados retornaram somente a mensagem fixa de indisponibilidade prevista para configuração incompleta. Não repetir deploys até concluir os campos protegidos.
+
+A revisão automática bloqueou uma proposta de transferência que declararia Client Secret como saída do Make, por risco de exposição nos resultados. Essa alteração não foi aplicada, nenhum segredo foi retornado e a rejeição não foi contornada. Os clientes foram criados com saídas limitadas a status e configuração pública. O Make foi devolvido a uma consulta GET da API sintética, sem chamada de criação pendente. A instalação dos segredos deve ocorrer diretamente nos campos protegidos do Render; não enviar valores por chat. O controle Windows/Chrome permanece interrompido por não conseguir determinar a URL atual com confiança.
+
+O usuário indicou duas identidades autorizadas para a prova; seus endereços não integram o repositório. Foram solicitados somente seus User IDs do Auth0 para compor `SYNTHETIC_SUBJECTS_JSON` no ambiente protegido, sem abrir leitura da lista de usuários pela integração. Subjects ainda não resolvidos. O Apertaquem e seus dados permanecem fora do escopo de alteração.
 
 `start.mjs` inicia uma única instância por serviço: `PRODUCT=A` ou `PRODUCT=B`. Cada instância recebe seu próprio segredo, guarda suas sessões e seus dados sintéticos somente em memória e não oferece Data API genérica. Não existe mecanismo que transforme um bearer recebido do navegador em autorização de produto.
 
@@ -60,10 +72,10 @@ Durante a integração local, o emissor de teste inicialmente recusou Basic porq
 
 ## Configuração exata necessária para a emissão real
 
-1. **Provisionamento realizado:** usar somente os dois serviços novos identificados acima, em `My Workspace`, plano free e AutoDeploy desligado. Autorizar a conexão Auth0 solicitada em `Marcelo's space` para prosseguir. Nenhum serviço existente será reconfigurado.
-2. No tenant já existente, criar somente dois aplicativos de teste `CFT-005 BFF A` e `CFT-005 BFF B`, tipo Regular Web Application, IDs distintos, Authorization Code e `client_secret_basic`. Usar a conexão central apropriada sem alterar clientes publicados. Não habilitar grants de senha, client credentials ou OAuth Server beta para substituir login humano.
-3. Registrar somente a callback exata de cada serviço retornada pelo Render, listada acima. Não usar wildcard ou callbacks cruzadas.
-4. Criar uma API sintética de teste com identifier `https://cft005-synthetic-api.invalid`, RS256 e perfil padrão Auth0, com escopos `records:read` e `records:write`. Não alterar o TTL global. Não reutilizar API de dados reais.
+1. **Provisionamento realizado:** usar somente os dois serviços novos identificados acima, em `My Workspace`, plano free e AutoDeploy desligado. Conexão administrativa protegida validada em `Marcelo's space`. Nenhum serviço existente será reconfigurado.
+2. **Clientes criados e verificados:** `CFT-005 BFF A` e `CFT-005 BFF B`, com os IDs públicos da tabela. Não recriar nem habilitar grants de senha, client credentials ou OAuth Server beta para substituir login humano.
+3. **Callbacks verificadas:** somente a origem de cada serviço mais `/auth/callback`, conforme tabela. Sem wildcard ou callback cruzada.
+4. **API criada e verificada:** identifier `https://cft005-synthetic-api.invalid`, RS256, access_token e somente `records:read` e `records:write`. TTL global preservado; API de dados reais não reutilizada.
 5. Definir as variáveis da tabela abaixo no ambiente protegido. Cada segredo vai somente ao seu backend. Selecionar subjects somente de contas sintéticas autorizadas; aceitar no máximo U1/U2. Se só uma conta estiver disponível, provar emissão dessa conta e manter as provas entre duas pessoas BLOCKED.
 6. Verificar `/health` e então entrar manualmente nas duas origens com conta sintética autorizada. Health apenas confirma bootstrap/configuração pública, não registro do cliente ou emissão. Registrar somente resultado, produto, rótulo U1/U2 e status de acesso; jamais copiar tokens, códigos ou cookies para evidências.
 7. Comprovar emissão do tenant e repetir acessos negativos com o token do cliente A contra a política do backend B, e vice-versa, dentro de um runner em memória sem saída de credenciais. A emissão local da fixture não satisfaz esse gate. Repetir sessão, persistência, logout e matriz S01–S14 no navegador disponível.
@@ -82,6 +94,6 @@ Durante a integração local, o emissor de teste inicialmente recusou Basic porq
 
 Há provisionamento e build dos dois serviços de teste e emissão administrativa Auth0 validada; não há backend LIVE, emissão de login A/B, login com contas reais de teste ou teste de navegador nesta rodada. A revisão dos logs Render ocorreu antes de qualquer credencial ou fluxo real, limitada ao build e à recusa de inicialização. A política de logs da hospedagem para autenticação ainda exige verificação. Os testes de assinatura e protocolo locais não removem o FAIL de S12 na arquitetura publicada. Sessões/dados em memória são adequados apenas à prova de instância única, sem disponibilidade, durabilidade ou logout central. Não são uma solução de produção ou substituto de políticas mínimas de banco; as rotas dos aplicativos existentes continuam fora desta mudança.
 
-**Único próximo passo:** aprovar a configuração exata dos três objetos novos em `auth0-provisioning-request.json`, cujo preparo foi bloqueado pela revisão automática. Depois, registrar somente esses objetos, transferir os segredos para o ambiente protegido e executar a emissão real de login A/B com as identidades autorizadas e registros sintéticos. Não enviar segredos por chat.
+**Único próximo passo:** completar a configuração protegida dos dois backends: inserir o Client Secret de cada cliente novo em `AUTH0_CLIENT_SECRET` do serviço correspondente (usar Save only se disponível) e fornecer os User IDs das duas identidades autorizadas para preencher `SYNTHETIC_SUBJECTS_JSON` sem registrar identificadores no repositório. Após isso, implantar e comprovar emissão real de login A/B e acessos cruzados. Não enviar segredos por chat.
 
 Referências: [openid-client](https://github.com/panva/openid-client), [Auth0: clientes confidenciais](https://auth0.com/docs/get-started/applications/confidential-and-public-applications), [Render: variáveis e segredos](https://render.com/docs/configure-environment-variables).

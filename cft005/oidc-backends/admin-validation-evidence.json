@@ -1,31 +1,57 @@
 {
   "date": "2026-10-27",
-  "scope": "Administrative Auth0 validation only; not human login A/B",
+  "scope": "Administrative issuance and approved Auth0 provisioning; not human login A/B",
   "results": [
     {
-      "test": "Auth0 client_credentials via protected Basic connection",
+      "test": "Administrative credential validation",
       "status": "PASS",
       "httpStatus": 200
     },
     {
-      "test": "Read client configuration with explicit non-secret fields",
+      "test": "Create exact synthetic API",
       "status": "PASS",
-      "httpStatus": 200,
-      "newBffClientsFound": 0
+      "httpStatus": 201,
+      "id": "6ae0f4bbb64763b9b470a321"
     },
     {
-      "test": "Read resource server filtered by synthetic identifier",
+      "test": "Verify API RS256/access_token/read-write scopes/no refresh",
       "status": "PASS",
-      "httpStatus": 200,
-      "matches": 0
+      "httpStatus": 200
     },
     {
-      "test": "Create resource server and two BFF clients",
+      "test": "Create exact BFF A",
+      "status": "PASS",
+      "httpStatus": 201,
+      "clientId": "iWciRxJTG4XPVlp2ajnwSbaasHlAFyfP"
+    },
+    {
+      "test": "Create exact BFF B",
+      "status": "PASS",
+      "httpStatus": 201,
+      "clientId": "U2tmH2LoKGdU3soq5jfY6hht6ucNfibm"
+    },
+    {
+      "test": "Verify distinct IDs, exclusive callbacks, code grant, confidential Basic and RS256",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "test": "Verify enabled login connections A/B",
+      "status": "PASS",
+      "httpStatus": 200,
+      "enabledConnectionCountPerClient": 2
+    },
+    {
+      "test": "Install common public client IDs on the two test services",
+      "status": "PASS"
+    },
+    {
+      "test": "Protected runtime credentials and authorized subjects",
       "status": "BLOCKED",
-      "reason": "Automatic approval review rejected exact persistent permissions/configuration; explicit approval required."
+      "reason": "Client secrets must be entered directly in protected Render fields; subject identifiers pending."
     },
     {
-      "test": "Real login token issuance for A/B and crossed access",
+      "test": "Real human login A/B, sessions and crossed access",
       "status": "BLOCKED"
     },
     {
@@ -36,12 +62,29 @@
   "handling": {
     "makeConfidentialSettingApplied": true,
     "makeIncompleteExecutionsStorage": false,
-    "returnedAccessTokens": false,
+    "accessTokensReturnedToConversation": false,
+    "clientSecretsReturned": false,
+    "secretOutputPatchRejectedAndNotApplied": true,
+    "protectedSecretInstallationConfirmed": false,
     "secretsInEvidence": false,
     "publishedAppsModified": false,
-    "auth0ObjectsCreated": false,
-    "renderDeployTriggered": false,
+    "auth0ObjectsCreated": 3,
+    "renderDeployTriggered": true,
     "authorizedTestIdentityCount": 2,
     "subjectsResolved": false
-  }
+  },
+  "renderDeploys": [
+    {
+      "product": "A",
+      "id": "dep-dbgfclg473hc73dsnek0",
+      "status": "update_failed",
+      "fixedFailureMessageConfirmed": true
+    },
+    {
+      "product": "B",
+      "id": "dep-dbgfcmom7kps73d8kung",
+      "status": "update_failed",
+      "fixedFailureMessageConfirmed": true
+    }
+  ]
 }

@@ -1,5 +1,5 @@
 {
-  "status": "NOT_APPLIED_AUTO_REVIEW_REJECTED",
+  "status": "APPLIED_THREE_EXPLICITLY_APPROVED_OBJECTS",
   "tenant": "https://dev-2lz845k6nrma2nhm.us.auth0.com/",
   "costConstraint": "Existing free allowance only; stop if payment or upgrade is required.",
   "operations": [
@@ -93,5 +93,31 @@
     "modifyApertaquem": false,
     "changeGlobalTtl": false,
     "oauthServerBeta": false
+  },
+  "approval": {
+    "date": "2026-10-27",
+    "scope": "User explicitly approved exactly these three objects and scopes in the existing free allowance."
+  },
+  "observed": {
+    "api": {
+      "id": "6ae0f4bbb64763b9b470a321",
+      "creationHttpStatus": 201,
+      "verificationHttpStatus": 200
+    },
+    "clients": [
+      {
+        "product": "A",
+        "id": "iWciRxJTG4XPVlp2ajnwSbaasHlAFyfP",
+        "creationHttpStatus": 201,
+        "verificationHttpStatus": 200
+      },
+      {
+        "product": "B",
+        "id": "U2tmH2LoKGdU3soq5jfY6hht6ucNfibm",
+        "creationHttpStatus": 201,
+        "verificationHttpStatus": 200
+      }
+    ],
+    "secretTransfer": "No client secret returned. Automatic review rejected secret-as-output transfer; direct entry in protected Render fields pending."
   }
 }
