@@ -153,6 +153,8 @@ textarea:focus-visible{outline:3px solid #174c9d;outline-offset:3px}
   #printSheet.preview[data-layout="badges"] .badge-page{max-width:100%}
 }
 @media print{
+  /* A área imprimível A4 é 188 mm de largura com @page margin 11mm. */
+  .container{padding:0!important;margin:0!important;width:100%!important;max-width:none!important}
   /* Duas colunas x quatro linhas: oito cartões de 86 x 54 mm em folha A4. */
   #printSheet[data-layout="badges"]{display:block!important;padding:0!important;margin:0!important;border:0!important;box-shadow:none!important}
   #printSheet[data-layout="badges"] .badge-page{width:100%;max-width:none;padding:0;margin:0;break-after:page;page-break-after:always}
