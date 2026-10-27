@@ -258,7 +258,7 @@ function initPrint(){
   $('badgeExtra').onchange=()=>previewPrint(false);
   $('previewPrintBtn').onclick=()=>previewPrint(true);
   $('printBtn').onclick=()=>run(async()=>{
-    if(!previewPrint(false))return;
+    if(!previewPrint(true))return;
     const images=[...document.querySelectorAll('#printSheet img')];
     await Promise.all(images.map(img=>img.decode?.().catch(()=>{})||Promise.resolve()));
     window.print();
