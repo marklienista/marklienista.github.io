@@ -1,10 +1,10 @@
 {
-  "status": "PROVISIONED_AUTH0_AUTHORIZATION_PENDING",
+  "status": "PROVISIONED_AUTH0_ADMIN_VALIDATED_OBJECT_CREATION_REVIEW_BLOCKED",
   "applied": true,
   "runtimeReady": false,
   "realAuth0Issuance": "BLOCKED",
   "workspace": {"name": "My Workspace", "id": "tea-dattm47lk1mc73cu74bg", "account": "Primary", "confirmedByUser": true},
-  "auth0Connection": {"provider": "Make", "team": "Marcelo's space", "teamId": 2908515, "status": "PENDING_USER_AUTHORIZATION", "clientsRegistered": false},
+  "auth0Connection": {"provider": "Make HTTP Basic", "team": "Marcelo's space", "teamId": 2908515, "status": "ADMIN_VALIDATION_PASS_HTTP_200", "clientsRegistered": false, "objectCreation": "BLOCKED_AUTO_REVIEW", "proposedConfiguration": "auth0-provisioning-request.json", "authorizedTestIdentities": 2, "subjectsResolved": false},
   "repository": "https://github.com/marklienista/marklienista.github.io",
   "branch": "cft005-oidc-dominios",
   "services": [

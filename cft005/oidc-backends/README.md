@@ -1,6 +1,6 @@
 # CFT-005 — Integração de dois backends confidenciais
 
-**EMISSÃO REAL AUTH0: BLOCKED. Dois serviços de teste provisionados no Render, ainda sem inicialização válida. CFT-005 continua ABERTO.**
+**EMISSÃO REAL DE LOGIN A/B: BLOCKED. Acesso administrativo Auth0 validado; criação da API e dos clientes pendente de aprovação específica. Dois serviços de teste provisionados no Render, ainda sem inicialização válida. CFT-005 continua ABERTO.**
 
 O código de integração está preparado nesta branch; os resultados locais abaixo não comprovam emissão pelo Auth0. Esta pasta é independente de `oidc/` e `backend-proof/` e não substitui os aplicativos publicados.
 
@@ -27,6 +27,14 @@ O build do commit `65c6816e98b0b4d1bfb26e368abf5bf1e411257c` passou nos dois ser
 A atualização de variáveis dispara deploy mesmo com AutoDeploy desligado. Não repetir deploys enquanto a configuração necessária estiver ausente. O link privado de autorização Make não integra este repositório nem as evidências públicas.
 
 ## Código preparado
+
+### Continuidade de 27/10/2026: acesso administrativo validado
+
+O conector Auth0 padrão do Make foi recusado com HTTP 403 porque sua validação tenta `GET /api/v2/users`, exigindo `read:users` ou `read:user_idp_tokens`. Essas permissões não foram solicitadas para contornar a falha. Foi preparado um cenário separado no espaço privado escolhido, com HTTP Basic em campo protegido, origem de destino restrita ao tenant, `confidential=true`, execuções incompletas desativadas e sem redirects. Os segredos permanecem fora de corpo literal, arquivos e saídas da prova.
+
+Após o usuário salvar o cenário inteiro, a credencial protegida foi reconhecida. A solicitação administrativa `POST /oauth/token` passou com HTTP 200. A consulta `GET /api/v2/clients`, com lista explícita de campos sem segredo, também passou e confirmou ausência de `CFT-005 BFF A` e `CFT-005 BFF B`. `GET /api/v2/resource-servers`, filtrado pelo identificador exato da API sintética, passou e retornou zero resultados. As saídas continham somente status e metadados selecionados; nenhum access token, client secret ou registro de usuário foi retornado à conversa.
+
+A revisão automática rejeitou a preparação da chamada de criação da API por faltar aprovação explícita de sua configuração persistente e dos escopos exatos `records:read` e `records:write`. Nenhuma chamada de criação foi executada, nenhum cliente ou API foi criado e nenhum deploy Render foi disparado. [auth0-provisioning-request.json](auth0-provisioning-request.json) é uma proposta declarativa, não executada, com os três objetos exatos para revisão. [admin-validation-evidence.json](admin-validation-evidence.json) contém somente resultados sanitizados. O usuário indicou duas identidades autorizadas para a prova; seus endereços não integram estes arquivos e os subjects ainda não foram resolvidos. Dados de teste deverão permanecer exclusivamente sintéticos. A emissão administrativa não comprova login humano A/B ou isolamento por produto.
 
 `start.mjs` inicia uma única instância por serviço: `PRODUCT=A` ou `PRODUCT=B`. Cada instância recebe seu próprio segredo, guarda suas sessões e seus dados sintéticos somente em memória e não oferece Data API genérica. Não existe mecanismo que transforme um bearer recebido do navegador em autorização de produto.
 
@@ -72,8 +80,8 @@ Durante a integração local, o emissor de teste inicialmente recusou Basic porq
 
 ## Limites e próximo passo
 
-Há provisionamento e build dos dois serviços de teste; não há backend LIVE, emissão Auth0, login com contas reais de teste ou teste de navegador nesta rodada. A revisão dos logs ocorreu antes de qualquer credencial ou fluxo real, limitada ao build e à recusa de inicialização. A política de logs para autenticação ainda exige verificação. Os testes de assinatura e protocolo locais não removem o FAIL de S12 na arquitetura publicada. Sessões/dados em memória são adequados apenas à prova de instância única, sem disponibilidade, durabilidade ou logout central. Não são uma solução de produção ou substituto de políticas mínimas de banco; as rotas dos aplicativos existentes continuam fora desta mudança.
+Há provisionamento e build dos dois serviços de teste e emissão administrativa Auth0 validada; não há backend LIVE, emissão de login A/B, login com contas reais de teste ou teste de navegador nesta rodada. A revisão dos logs Render ocorreu antes de qualquer credencial ou fluxo real, limitada ao build e à recusa de inicialização. A política de logs da hospedagem para autenticação ainda exige verificação. Os testes de assinatura e protocolo locais não removem o FAIL de S12 na arquitetura publicada. Sessões/dados em memória são adequados apenas à prova de instância única, sem disponibilidade, durabilidade ou logout central. Não são uma solução de produção ou substituto de políticas mínimas de banco; as rotas dos aplicativos existentes continuam fora desta mudança.
 
-**Único próximo passo:** autorizar a conexão Auth0 solicitada no Make, em `Marcelo's space`. Isso permitirá verificar o tenant, registrar os dois clientes de teste, instalar seus segredos no ambiente protegido e executar emissão real. Não enviar segredos por chat.
+**Único próximo passo:** aprovar a configuração exata dos três objetos novos em `auth0-provisioning-request.json`, cujo preparo foi bloqueado pela revisão automática. Depois, registrar somente esses objetos, transferir os segredos para o ambiente protegido e executar a emissão real de login A/B com as identidades autorizadas e registros sintéticos. Não enviar segredos por chat.
 
 Referências: [openid-client](https://github.com/panva/openid-client), [Auth0: clientes confidenciais](https://auth0.com/docs/get-started/applications/confidential-and-public-applications), [Render: variáveis e segredos](https://render.com/docs/configure-environment-variables).

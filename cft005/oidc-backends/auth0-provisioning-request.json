@@ -1,0 +1,97 @@
+{
+  "status": "NOT_APPLIED_AUTO_REVIEW_REJECTED",
+  "tenant": "https://dev-2lz845k6nrma2nhm.us.auth0.com/",
+  "costConstraint": "Existing free allowance only; stop if payment or upgrade is required.",
+  "operations": [
+    {
+      "method": "POST",
+      "path": "/api/v2/resource-servers",
+      "body": {
+        "name": "CFT-005 Synthetic API",
+        "identifier": "https://cft005-synthetic-api.invalid",
+        "signing_alg": "RS256",
+        "token_dialect": "access_token",
+        "scopes": [
+          {
+            "value": "records:read",
+            "description": "Read synthetic CFT-005 records only"
+          },
+          {
+            "value": "records:write",
+            "description": "Write synthetic CFT-005 records only"
+          }
+        ],
+        "allow_offline_access": false,
+        "skip_consent_for_verifiable_first_party_clients": true
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/clients",
+      "body": {
+        "name": "CFT-005 BFF A",
+        "description": "Synthetic CFT-005 proof backend A only",
+        "app_type": "regular_web",
+        "oidc_conformant": true,
+        "is_first_party": true,
+        "callbacks": [
+          "https://cft005-bff-a-teste.onrender.com/auth/callback"
+        ],
+        "allowed_logout_urls": [
+          "https://cft005-bff-a-teste.onrender.com/"
+        ],
+        "web_origins": [],
+        "grant_types": [
+          "authorization_code"
+        ],
+        "token_endpoint_auth_method": "client_secret_basic",
+        "jwt_configuration": {
+          "alg": "RS256"
+        },
+        "client_metadata": {
+          "cft005_synthetic": "true",
+          "product": "A"
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/clients",
+      "body": {
+        "name": "CFT-005 BFF B",
+        "description": "Synthetic CFT-005 proof backend B only",
+        "app_type": "regular_web",
+        "oidc_conformant": true,
+        "is_first_party": true,
+        "callbacks": [
+          "https://cft005-bff-b-teste.onrender.com/auth/callback"
+        ],
+        "allowed_logout_urls": [
+          "https://cft005-bff-b-teste.onrender.com/"
+        ],
+        "web_origins": [],
+        "grant_types": [
+          "authorization_code"
+        ],
+        "token_endpoint_auth_method": "client_secret_basic",
+        "jwt_configuration": {
+          "alg": "RS256"
+        },
+        "client_metadata": {
+          "cft005_synthetic": "true",
+          "product": "B"
+        }
+      }
+    }
+  ],
+  "secretHandling": "Auth0-generated client secrets may be transferred only in memory to the corresponding test backend's protected Render environment. Never include secret values in this file, output, logs, screenshots or documents.",
+  "limits": {
+    "modifyPublishedClients": false,
+    "modifyExistingApis": false,
+    "readUserLists": false,
+    "writeRealData": false,
+    "modifyApertaquem": false,
+    "changeGlobalTtl": false,
+    "oauthServerBeta": false
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-27",
+  "scope": "Administrative Auth0 validation only; not human login A/B",
+  "results": [
+    {
+      "test": "Auth0 client_credentials via protected Basic connection",
+      "status": "PASS",
+      "httpStatus": 200
+    },
+    {
+      "test": "Read client configuration with explicit non-secret fields",
+      "status": "PASS",
+      "httpStatus": 200,
+      "newBffClientsFound": 0
+    },
+    {
+      "test": "Read resource server filtered by synthetic identifier",
+      "status": "PASS",
+      "httpStatus": 200,
+      "matches": 0
+    },
+    {
+      "test": "Create resource server and two BFF clients",
+      "status": "BLOCKED",
+      "reason": "Automatic approval review rejected exact persistent permissions/configuration; explicit approval required."
+    },
+    {
+      "test": "Real login token issuance for A/B and crossed access",
+      "status": "BLOCKED"
+    },
+    {
+      "test": "S12 isolation in currently published architecture",
+      "status": "FAIL"
+    }
+  ],
+  "handling": {
+    "makeConfidentialSettingApplied": true,
+    "makeIncompleteExecutionsStorage": false,
+    "returnedAccessTokens": false,
+    "secretsInEvidence": false,
+    "publishedAppsModified": false,
+    "auth0ObjectsCreated": false,
+    "renderDeployTriggered": false,
+    "authorizedTestIdentityCount": 2,
+    "subjectsResolved": false
+  }
+}
