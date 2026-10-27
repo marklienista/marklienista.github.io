@@ -18,6 +18,17 @@ function selectedCurrentStudents(){
   return S.space.students.filter(p=>S.selected.has(p.id)&&current.has(p.id));
 }
 function report(text,kind){notify(text,kind)}
+// Informações temporárias de crachá não acompanham uma mudança de escola/conta.
+function resetTemporaryPrint(){
+  $('badgeExtra').value='';
+  const sheet=document.getElementById('printSheet');
+  sheet?.remove();
+}
+async function loadSpace(manifestId){
+  const result=await S.load(manifestId);
+  resetTemporaryPrint();
+  return result;
+}
 function render(){
   $('spaceTitle').textContent=S.space.school.name||'Escola sem nome';
   const mode=S.isCloud()?(S.isLinked()?'Google Drive · '+(S.drive.email||'conta autorizada'):'Google conectado · ainda não salvo'):(S.config.clientId?'Demonstração temporária · Google Drive desconectado':'Demonstração temporária · integração Google em preparação');
@@ -124,7 +135,7 @@ function initForms(){
   $('newSpaceBtn').onclick=()=>presentModal('newSpaceDialog');
   $('newSpaceForm').onsubmit=e=>run(async()=>{
     e.preventDefault();if(S.dirty&&S.isLinked()&&!confirm('Existem alterações não salvas no Drive. Criar outro carômetro mesmo assim?'))return;
-    S.startSpace($('newSpaceName').value);$('badgeExtra').value='';closeModal('newSpaceDialog');report('Espaço criado. Cadastre uma turma e salve no Drive quando estiver pronto.');
+    S.startSpace($('newSpaceName').value);resetTemporaryPrint();closeModal('newSpaceDialog');report('Espaço criado. Cadastre uma turma e salve no Drive quando estiver pronto.');
   });
   $('settingsForm').onsubmit=e=>run(async()=>{
     e.preventDefault();
@@ -218,14 +229,14 @@ function initSharing(){
     const id=await pickManifest(S.drive.token,S.config.pickerKey,S.config.projectNumber);
     if(!id)return;
     if(S.dirty&&!confirm('Descartar alterações ainda não salvas neste carômetro?'))return;
-    const r=await S.load(id);
+    const r=await loadSpace(id);
     report(r.failed?'Carômetro aberto, mas '+r.failed+' imagens não puderam ser acessadas pelo convidado.':'Carômetro compartilhado aberto.');
   });
   $('loadIdBtn').onclick=()=>run(async()=>{
     if(!S.isCloud())throw Error('Conecte o Drive.');
     const id=prompt('Cole o ID do arquivo carometro.json');if(!id)return;
     if(S.dirty&&!confirm('Descartar mudanças não salvas?'))return;
-    const r=await S.load(id.trim());
+    const r=await loadSpace(id.trim());
     report(r.failed?'Registro aberto; algumas fotografias não foram autorizadas pelo Drive.':'Registro aberto do Drive.');
   });
 }
@@ -343,7 +354,7 @@ function initGoogle(){
       const previousDrive=S.drive;
       previousDrive.disconnect();
       S.localSpaces.clear();
-      S.startSpace('Escola Exemplo');
+      S.startSpace('Escola Exemplo');resetTemporaryPrint();
       S.drive=null;S.dirty=false;render();
       const button=$('openExistingBtn');if(button)button.remove();
       report('Conta Google desconectada deste navegador. Para entrar com outra conta, use Conectar ao Google Drive.');
@@ -359,7 +370,7 @@ function initGoogle(){
     const id=new URL(location.href).searchParams.get('space');
     if(id){
       if(S.dirty&&!confirm('Descartar alterações locais para abrir o convite?'))return;
-      try{const r=await S.load(id);report(r.failed?'Convite aberto, mas imagens requerem autorização por arquivo.':'Carômetro compartilhado aberto.')}
+      try{const r=await loadSpace(id);report(r.failed?'Convite aberto, mas imagens requerem autorização por arquivo.':'Carômetro compartilhado aberto.')}
       catch(e){report('O acesso ao arquivo compartilhado não foi comprovado. Use o Google Picker ou confirme a permissão: '+e.message,'warning')}
     } else {
       let existing=[];
@@ -377,7 +388,7 @@ function initGoogle(){
           if(!choice)return;
           const item=files[Number(choice)-1];if(!item)throw Error('Número inválido.');
           if(S.dirty&&!confirm('Descartar mudanças locais não salvas?'))return;
-          const result=await S.load(item.id);report(result.failed?'Aberto; '+result.failed+' fotos sem acesso.':'Carômetro recuperado do Google Drive.');
+          const result=await loadSpace(item.id);report(result.failed?'Aberto; '+result.failed+' fotos sem acesso.':'Carômetro recuperado do Google Drive.');
         });
         $('connectBtn').after(button);
       }
