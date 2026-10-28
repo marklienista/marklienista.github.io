@@ -1,8 +1,8 @@
-import {Session} from './session.js?v=0.11.1';
+import {Session} from './session.js?v=0.11.2';
 import {prepareGoogleIdentity} from './drive.js?v=0.11';
 import {addClass,renameClass,addStudent,editStudent,moveStudent,markStudentInactive,setPhoto,classStudents,studentClass,planPromotion,applyPromotion,mapPilotRows,comparePilot,applyPilot,parseDelimited,exportCsv,normalize} from './model.js?v=0.11';
 import {readPilotFile} from './xlsx.js?v=0.11';
-import {pickManifest} from './picker.js?v=0.11.1';
+import {pickManifest} from './picker.js?v=0.11.2';
 import {renderClassBar,renderStudentCards,renderPrintSheet,renderBadgeSheet,notify,presentModal,closeModal,fillSelect} from './view.js?v=0.11';
 const $=id=>document.getElementById(id), S=new Session();
 let pilot=[],promotionPlan=[];
