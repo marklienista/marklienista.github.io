@@ -4,6 +4,12 @@
 
 O código de integração está preparado nesta branch; os resultados locais abaixo não comprovam emissão pelo Auth0. Esta pasta é independente de `oidc/` e `backend-proof/` e não substitui os aplicativos publicados.
 
+## Interrupção antes de autenticar — 28/10/2026, 09:17 BRT
+
+O usuário confirmou que viu a tela Auth0, fechou a janela antes de autenticar e abriu a página inicial A em novo contexto anônimo, sem sessão. Entre as observações, A passou de três para cinco aberturas de entrada, mas permaneceu com cinco callbacks e um sucesso; o último evento foi `PENDING/redirect_started` às 12:17:13.266Z. O recibo U1 anterior permaneceu inalterado. **PASS para abandono antes da autenticação**, por relato da interface e contadores corroborantes. [login-abandonment-evidence.json](login-abandonment-evidence.json) preserva os limites.
+
+Não foi recebido um callback de recusa do provedor nesta etapa. Não se atribui PASS a manipulação PKCE no navegador, limpeza imediata da transação ao fechar a janela, logout central ou toda a matriz original S08. A transação possui prazo local de cinco minutos; fechar a janela não promete exclusão imediata no servidor. Próxima observação: persistência do A no contexto habitual e vencimento de sua sessão local, após 09:27 BRT, sem nova entrada. O limite local de quinze minutos não é expiração do JWT Auth0 nem refresh Supabase. Nenhum executável ou configuração foi alterado.
+
 ## Logout B e reentrada A sem nova senha — 28/10/2026, 09:10 BRT
 
 O usuário confirmou B sem sessão após sair apenas dali e A autenticado sem nova senha, com execução da prova. O servidor registrou login B às 12:10:32.796Z e recibo B/U1 **11/11 PASS** às 12:10:35.808Z; em seguida, login A às 12:10:43.987Z e recibo A/U1 **11/11 PASS** às 12:10:59.447Z. [session-reentry-evidence.json](session-reentry-evidence.json) preserva os dois recibos e os limites. O estado B após logout e a ausência de nova senha são relatos da interface; não houve leitura de cookies ou auditoria de evento de logout no servidor. A troca de código e a prova A corroboram a nova entrada funcional.
@@ -168,6 +174,6 @@ Durante a integração local, o emissor de teste inicialmente recusou Basic porq
 
 Há dois serviços LIVE, emissão humana A/B com U1, prova criptográfica remota bidirecional e logout local A/continuidade B PASS. Falta login positivo U2 e a rodada completa de sessões. Esses resultados não removem o FAIL de S12 na arquitetura publicada. Sessões/dados/recibos em memória são adequados apenas à prova de instância única, sem disponibilidade, durabilidade ou logout central. As rotas dos aplicativos existentes continuam fora desta mudança. Os recibos públicos são evidência sanitizada de teste, não um sistema de auditoria durável ou com atestação externa.
 
-**Único próximo passo:** em nova janela anônima, abrir a entrada A e interromper na tela Auth0 antes de autenticar; depois abrir a página inicial A em novo contexto anônimo e conferir ausência de sessão. U2 permanece BLOCKED sem criar ou redefinir conta. Não enviar segredos por chat. A participação humana no login é necessária enquanto o controle autenticado do Chrome permanecer interrompido.
+**Único próximo passo:** no contexto habitual A, conferir U1/prova antes de 09:27 BRT de 28/10 e atualizar a página inicial após esse horário, sem nova entrada, para observar o vencimento da sessão local. U2 permanece BLOCKED sem criar ou redefinir conta. Não enviar segredos por chat. A participação humana no login é necessária enquanto o controle autenticado do Chrome permanecer interrompido.
 
 Referências: [openid-client](https://github.com/panva/openid-client), [Auth0: clientes confidenciais](https://auth0.com/docs/get-started/applications/confidential-and-public-applications), [Render: variáveis e segredos](https://render.com/docs/configure-environment-variables).

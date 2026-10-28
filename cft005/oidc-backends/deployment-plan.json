@@ -106,7 +106,7 @@
       "evidence": "runtime-gate-evidence.json"
     }
   },
-  "nextStep": "In a fresh private context, open A login, abandon at the Auth0 login page before authenticating, then reopen A home in a fresh private context and report no local session.",
+  "nextStep": "In the existing normal-browser A context, verify U1/proof persistence; after 2026-10-28 12:27 UTC (09:27 BRT), reload A home without login and report whether the local session has expired.",
   "proofRunner": {
     "deployedOnBoth": true,
     "receiptPath": "/proof/results",
@@ -137,6 +137,17 @@
       "evidence": "anonymous-callback-evidence.json",
       "realProviderCancellation": "NOT_PROVED"
     },
-    "sessionReentryEvidence": "session-reentry-evidence.json"
+    "sessionReentryEvidence": "session-reentry-evidence.json",
+    "loginAbandonment": {
+      "result": "PASS_BEFORE_AUTHENTICATION_USER_REPORT_AND_COUNTER_CORROBORATION",
+      "file": "login-abandonment-evidence.json",
+      "providerDenialCallback": "NOT_PROVED"
+    },
+    "localSessionExpiry": {
+      "result": "AWAITING_OBSERVATION",
+      "loginAt": "2026-10-28T12:10:43.987Z",
+      "verifyAfter": "2026-10-28T12:27:00.000Z",
+      "limit": "Tests BFF local maximum fifteen-minute session, not Auth0 JWT expiry or Supabase refresh."
+    }
   }
 }

@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "date": "2026-10-28",
+  "scope": "HOSTED_LOGIN_ABANDONED_BEFORE_AUTHENTICATION",
+  "implementationCommit": "b0839202423600018b8bd08fc364b5ab090ec899",
+  "userReport": {
+    "sawAuth0LoginPage": true,
+    "closedBeforeAuthenticating": true,
+    "freshPrivateAHome": "NO_LOCAL_SESSION"
+  },
+  "aDiagnosticBefore": {
+    "product": "A",
+    "started": 3,
+    "callbacks": 5,
+    "successes": 1,
+    "failures": 4,
+    "last": {
+      "at": "2026-10-28T12:10:43.987Z",
+      "result": "PASS",
+      "stage": "authenticated"
+    }
+  },
+  "aDiagnosticAfter": {
+    "product": "A",
+    "started": 5,
+    "callbacks": 5,
+    "successes": 1,
+    "failures": 4,
+    "last": {
+      "at": "2026-10-28T12:17:13.266Z",
+      "result": "PENDING",
+      "stage": "redirect_started"
+    }
+  },
+  "corroboration": {
+    "newLoginStarts": 2,
+    "newCallbacks": 0,
+    "newSuccessfulLogins": 0,
+    "existingReceiptUnchanged": true
+  },
+  "verdict": "PASS_FOR_ABANDONMENT_BEFORE_AUTHENTICATION",
+  "limits": [
+    "Auth0 page visibility, closing the private context and no local session are user UI reports; public counters corroborate no new callback/success, not browser identity.",
+    "Public counters are shared by the instance and are not a durable per-browser audit.",
+    "No actual provider access_denied callback, browser PKCE manipulation, transaction-cookie cleanup inspection or central logout tested.",
+    "The server transaction has a local five-minute lifetime; immediate deletion after closing a browser window was not asserted.",
+    "No token, OAuth code, subject, cookie, CSRF, secret, email or record contents captured."
+  ]
+}
