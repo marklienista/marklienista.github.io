@@ -163,3 +163,47 @@ textarea:focus-visible{outline:3px solid #174c9d;outline-offset:3px}
   #printSheet[data-layout="badges"] .badge-grid{grid-template-columns:repeat(2,86mm)!important;grid-template-rows:repeat(4,54mm);grid-auto-rows:54mm;gap:7mm;justify-content:center}
   #printSheet[data-layout="badges"] .badge-item{width:86mm!important;height:54mm!important;box-shadow:none}
 }
+
+
+/* FotoCrachá 0.11 — portão de acesso, espaços do Drive e feedback persistente. */
+#entryGate[hidden],#workspaceApp[hidden],#entryDisconnected[hidden],#entryChoose[hidden],
+#retrySaveBtn[hidden],#reloadRemoteBtn[hidden],#settingsBtn[hidden]{display:none!important}
+.entry-gate{max-width:930px;margin:30px auto 70px}
+.entry-panel{padding:clamp(20px,4vw,42px)}
+.entry-panel h1{font-size:clamp(26px,4vw,40px);margin:19px 0 15px;letter-spacing:-1px;color:var(--deep)}
+.entry-lead{max-width:710px;font-size:17px;line-height:1.58}
+.entry-connect{font-size:17px;min-height:54px;margin:13px 0 20px;padding:14px 24px}
+.privacy-notes{border-top:1px solid var(--line);margin-top:17px;padding-top:16px;display:grid;gap:7px}
+.privacy-notes p{margin:0;font-size:14px;line-height:1.58;color:#3c493b}
+.privacy-notes strong{color:var(--deep)}
+.entry-footnote{margin:24px 0 0;color:var(--muted);font-size:12px;line-height:1.6}
+.chooser-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:20px 0}
+.spaces-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:10px;margin:17px 0}
+.space-choice{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;text-align:left;gap:6px;
+    min-height:78px;padding:13px 16px;color:var(--deep);background:#f0f4ee;border:1px solid #b6cbb8}
+.space-choice:hover,.space-choice:focus-visible{background:#e3efdf;border-color:var(--leaf)}
+.space-choice strong{font-size:14px;line-height:1.35;max-width:100%;overflow-wrap:anywhere}
+.space-choice small{font-size:11px;color:var(--muted);font-weight:400}
+.folder-access{display:flex;gap:12px;align-items:flex-end;margin:24px 0 16px}
+.folder-access label{flex:1 1 100%}
+.folder-access input{width:100%}
+.folder-access button{flex:1 1 190px}
+.folder-access p{flex:1 1 100%}
+.save-status{margin:11px 0 0;font-size:14px;line-height:1.45;font-weight:700;color:var(--deep)}
+.save-status.save-pending{color:#7a5c20}
+.save-status.save-error{color:#9c321c;max-width:540px}
+.save-recovery{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+.save-recovery button{min-height:36px;padding:7px 12px;font-size:12px}
+@media(max-width:680px){
+  .entry-gate{margin:10px auto 45px}
+  .entry-panel{padding:20px 17px}
+  .entry-connect{width:100%}
+  .chooser-actions{display:grid;grid-template-columns:1fr}
+  .folder-access{display:grid}
+  .folder-access button{width:100%}
+  .workspace-head .head-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
+  .workspace-head .head-actions button{min-width:0;white-space:normal;width:100%;min-height:44px}
+}
+@media print{
+  #entryGate,#entryGate *,#alerts,.save-status,.save-recovery{display:none!important}
+}
