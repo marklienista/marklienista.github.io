@@ -2,6 +2,8 @@
 
 ## Estado comprovado em 28/10/2026
 
+Preparação posterior: o [contrato de homologação por produto v1](../homologacao/CONTRATO-HOMOLOGACAO-POR-PRODUTO.md) escolhe BFF por produto com recurso persistente privado, papel exclusivo de banco e RLS de proprietário. O [roteiro](../homologacao/ROTEIRO-TESTES.md) prepara 24 casos integrados; todos continuam BLOCKED, sem novo destino provisionado ou coordenador de revogação implementado. O avaliador de recibos passou 22 verificações locais, que não são testes reais de segurança. Back-channel Auth0 Enterprise não será contratado; a alternativa proposta revoga somente as sessões do conjunto HML e precisa de implementação/prova separada do encerramento SSO. O S12 publicado permanece FAIL.
+
 O candidato foi integrado em dois backends isolados hospedados, com clientes confidenciais Auth0 distintos e emissão real. U1 e U2 Google autorizadas passaram nas quatro combinações pessoa/produto: **44/44 controles reais PASS**. A prova está em [two-user-real-evidence.json](../oidc-backends/two-user-real-evidence.json). As avaliações de 26/10 abaixo são histórico e desenho; os recursos publicados continuam fora da prova e **S12 permanece FAIL na arquitetura publicada**.
 
 O backend de cada produto valida a assinatura RS256 pelo JWKS do emissor fixo, audience da API sintética, perfil JWT previsto, expiração, escopo, subject exato autorizado e `azp` do seu cliente. O subject U2 Google foi confirmado no painel Auth0 e alterado somente no mapeamento protegido dos dois serviços de teste. O e-mail não participa da autorização e não houve vínculo de identidades. O perfil atual rejeita `client_id` e tipos inesperados; usar RFC 9068 exigiria outra política explícita.

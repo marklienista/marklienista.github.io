@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-28",
+  "contractVersion": "CFT005-HML-1",
+  "kind": "PREPARATION_ONLY",
+  "baseCommit": "a7f6ad78d329b346f42b9d7a39c5bfa30cd6cf20",
+  "integrationCasesExecuted": 0,
+  "fixtures": [
+    "HML-A-U1",
+    "HML-A-U2",
+    "HML-B-U1",
+    "HML-B-U2"
+  ],
+  "preparedCases": 24,
+  "report": {
+    "contractVersion": "CFT005-HML-1",
+    "runId": "HML-20261028-PREP",
+    "scope": "synthetic-only",
+    "state": "BLOCKED",
+    "counts": {
+      "PASS": 0,
+      "FAIL": 0,
+      "BLOCKED": 24
+    },
+    "cases": [
+      {
+        "id": "H01",
+        "gate": "S02",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H02",
+        "gate": "S02",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H03",
+        "gate": "S11",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H04",
+        "gate": "S11",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H05",
+        "gate": "S11",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H06",
+        "gate": "S11",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H07",
+        "gate": "S12",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H08",
+        "gate": "S12",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H09",
+        "gate": "S12",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H10",
+        "gate": "S12",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H11",
+        "gate": "S12",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H12",
+        "gate": "S11/S12",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H13",
+        "gate": "S11",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H14",
+        "gate": "S13",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H15",
+        "gate": "S13",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H16",
+        "gate": "S13",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H17",
+        "gate": "S13",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H18",
+        "gate": "S13",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H19",
+        "gate": "S13",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H20",
+        "gate": "S14",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H21",
+        "gate": "S14",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H22",
+        "gate": "S14",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H23",
+        "gate": "S14",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      },
+      {
+        "id": "H24",
+        "gate": "S12/S13",
+        "state": "BLOCKED",
+        "reason": "PREREQUISITE_MISSING"
+      }
+    ],
+    "publishedHomologation": "NOT_GRANTED",
+    "limit": "Executor observations only; no independent attestation or promotion of S01-S14"
+  },
+  "localEvaluatorTests": {
+    "pass": 22,
+    "fail": 0,
+    "scope": "Receipt evaluator fixtures only; no live security test"
+  },
+  "mutations": {
+    "publishedApps": 0,
+    "apertaquem": 0,
+    "realRecords": 0,
+    "globalTtl": 0,
+    "deployedServices": 0,
+    "databaseObjects": 0,
+    "auth0Objects": 0
+  },
+  "files": [
+    {
+      "path": "CONTRATO-HOMOLOGACAO-POR-PRODUTO.md",
+      "sha256": "d7ca76fdb8b55202e98b5f93abc0c2456649e69fa3614b392c603aa24f6f5cfc"
+    },
+    {
+      "path": "ROTEIRO-TESTES.md",
+      "sha256": "62800eb5f0007d6c74dfc84edefa40a15e802a1a58f2c0ed861e954fd397a530"
+    },
+    {
+      "path": "plan.mjs",
+      "sha256": "c7370fe637d77c767d67d590e71ff47533f3375dea3db91383e5c165b63a2369"
+    },
+    {
+      "path": "evaluate.mjs",
+      "sha256": "53ee9b9010029902658ed78ae83a063c0786a6dea45407905da7c040a66b0feb"
+    },
+    {
+      "path": "evaluate.test.mjs",
+      "sha256": "ab6444c93f2a5222e20595aa1daa1a64c9f9b67f842a89475c8ebf48342e172e"
+    },
+    {
+      "path": "receipt.prepared.json",
+      "sha256": "9bd1824def5aec22ed56d680b6d74c2f12d37641c194c05823b522b92d455e61"
+    }
+  ],
+  "limits": [
+    "New persistent target not provisioned",
+    "Session revocation coordinator not implemented",
+    "Independent browser profiles not exercised in this preparation",
+    "Shared Auth0 SSO logout not executed",
+    "No production homologation granted"
+  ],
+  "preparedReceiptCliExitCode": 2
+}

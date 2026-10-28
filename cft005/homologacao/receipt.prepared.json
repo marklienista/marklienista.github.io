@@ -1,0 +1,22 @@
+{
+  "contractVersion": "CFT005-HML-1",
+  "runId": "HML-20261028-PREP",
+  "mode": "real",
+  "scope": "synthetic-only",
+  "safeguards": {
+    "publishedAppsUnchanged": true,
+    "apertaquemUnchanged": true,
+    "realDataUntouched": true,
+    "globalTtlUnchanged": true
+  },
+  "prerequisites": {
+    "isolatedTarget": false,
+    "separateProfiles": false,
+    "database": false,
+    "surfaceInventory": false,
+    "sessionLedger": false,
+    "isolatedSso": false,
+    "securityInventory": false
+  },
+  "observations": []
+}
