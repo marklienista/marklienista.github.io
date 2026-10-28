@@ -405,22 +405,50 @@ function initPromotion(){
 async function loadPermissions(){
   const root=$('permissionsList');root.replaceChildren();
   if(!S.isCloud()||!S.link?.folderId)return;
-  if(!S.link.canShare){root.textContent='Apenas o responsável pode gerenciar os convites.';return}
   try{
     const all=await S.drive.permissions(S.link.folderId);
-    all.filter(p=>p.type==='user').forEach(p=>{
+    const broad=all.filter(p=>p.type==='anyone'||p.type==='domain');
+    if(broad.length){
+      const warning=document.createElement('p');warning.className='alert warning';
+      warning.textContent='Atenção: o Google Drive informa uma permissão ampla ('+
+        broad.map(p=>p.type==='anyone'?'qualquer pessoa com o link':'domínio inteiro').join(', ')+
+        '). Revise imediatamente o acesso à pasta no próprio Google Drive antes de usar imagens reais de estudantes.';
+      root.append(warning);
+    }
+    const users=all.filter(p=>p.type==='user');
+    if(!users.length){
+      const none=document.createElement('p');none.className='sub';
+      none.textContent='Nenhuma permissão individual apareceu nesta consulta. Gerencie o acesso diretamente pelo Google Drive.';
+      root.append(none);
+    }
+    for(const p of users){
       const row=document.createElement('div');row.className='permission';
-      const label=document.createElement('span');label.textContent=(p.emailAddress||'Conta Google')+' · '+(p.role==='writer'?'Pode editar':p.role==='owner'?'Responsável':'Pode visualizar');
+      const label=document.createElement('span');
+      label.textContent=(p.emailAddress||'Conta Google')+' · '+
+        (p.role==='writer'?'Pode editar':p.role==='owner'?'Responsável':'Pode visualizar');
       row.append(label);
-      if(p.role!=='owner'){
-        const remove=document.createElement('button');remove.className='light';remove.textContent='Remover';remove.type='button';
-        remove.onclick=()=>run(async()=>{if(!confirm('Retirar esta permissão no Drive?'))return;await S.drive.revoke(S.link.folderId,p.id);await loadPermissions()});row.append(remove);
+      if(S.link.canShare&&p.role!=='owner'){
+        const remove=document.createElement('button');
+        remove.className='light';remove.textContent='Remover';remove.type='button';
+        remove.onclick=()=>run(async()=>{
+          if(!confirm('Retirar de '+(p.emailAddress||'esta pessoa')+' a permissão da pasta no Google Drive?'))return;
+          await S.drive.revoke(S.link.folderId,p.id);
+          await loadPermissions();
+        });
+        row.append(remove);
       }
       root.append(row);
-    });
-  }catch(e){root.textContent='Permissões indisponíveis: '+e.message}
+    }
+    if(!S.link.canShare){
+      const note=document.createElement('p');note.className='sub';
+      note.textContent='As permissões de compartilhamento são gerenciadas pelo responsável da pasta no Google Drive.';
+      root.append(note);
+    }
+  }catch(error){root.textContent='Permissões indisponíveis: '+error.message+
+    '. Abra a pasta no Google Drive para conferir os acessos.'}
 }
 function initSharing(){
+  $('refreshPermissionsBtn').onclick=()=>run(loadPermissions);
   $('manageFolderBtn').onclick=()=>run(async()=>showGoogleFolder());
   $('openDriveFolderBtn').onclick=()=>run(async()=>showGoogleFolder());
   $('copyFolderBtn').onclick=()=>run(clipboardFolder);
