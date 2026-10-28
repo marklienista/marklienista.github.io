@@ -1,4 +1,4 @@
-import {makeLifecycleProbe} from './lifecycle.mjs';
+import {makeLifecycleProbe} from './lifecycle.mjs?v=20261028b';
 const status=document.getElementById('status'),audit=document.getElementById('audit');
 const capture=document.getElementById('capture'),check=document.getElementById('check'),revoke=document.getElementById('revoke'),localOnly=document.getElementById('local-only');
 let probe,busy=false,timer;
