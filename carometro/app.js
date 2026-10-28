@@ -49,6 +49,7 @@ function saveStatus(){
     node.textContent='Preparando pasta no Google Drive…';
   }
   $('retrySaveBtn').hidden=!saveError||saveError.code==='CONFLICT';
+  $('reauthorizeBtn').hidden=!saveError||saveError.code==='CONFLICT';
   $('reloadRemoteBtn').hidden=!saveError||saveError.code!=='CONFLICT'||!S.isLinked();
 }
 function render(){
@@ -611,6 +612,12 @@ function initGoogle(){
     if(!saveError||saveError.code==='CONFLICT')return;
     saveError=null;savePhase='pending';
     if(await saveNow())report('Alterações confirmadas no Google Drive.','info');
+  });
+  $('reauthorizeBtn').onclick=()=>run(async()=>{
+    if(savePending)await savePending;
+    // Mantém o espaço e as alterações em memória; só descarta o token OAuth antigo.
+    S.drive?.disconnect();
+    await connectGoogle();
   });
   $('reloadRemoteBtn').onclick=()=>run(async()=>{
     if(!S.link?.manifestId)throw Error('O cadastro no Google Drive não está associado a esta página.');
