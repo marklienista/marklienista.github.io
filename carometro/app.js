@@ -228,10 +228,10 @@ async function refreshSpaces(){
 /* A chave é pública, mas a importação versionada evita que um módulo antigo
    do navegador deixe a autorização de arquivo desabilitada após um deploy. */
 async function ensurePickerConfig(){
-  if(/^AIza[\\w-]{30,}$/.test(String(S.config.pickerKey||'')))return S.config.pickerKey;
+  if(/^AIza[A-Za-z0-9_-]{30,}$/.test(String(S.config.pickerKey||'')))return S.config.pickerKey;
   const {CLOUD_CONFIG}=await import('./config.js?v=0.11.2');
   const key=String(CLOUD_CONFIG.googlePickerApiKey||'');
-  if(!/^AIza[\\w-]{30,}$/.test(key)){
+  if(!/^AIza[A-Za-z0-9_-]{30,}$/.test(key)){
     throw Error('O Google Picker não foi carregado nesta sessão. Atualize a página com Ctrl+Shift+R e tente novamente.');
   }
   S.config.pickerKey=key;
