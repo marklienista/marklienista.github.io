@@ -1,7 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {completeNegativeLogin} from './negative.mjs';
+import {completeNegativeLogin,beginNegativeLogin} from './negative.mjs';
 const cfg={callbackUrl:'https://b.test/callback.html',allowedCallbacks:['https://b.test/callback.html'],provider:'custom:conta-central',supabaseUrl:'https://example.supabase.co',publishableKey:'sb_publishable_FIXTURE'};
+test('interruption prompt applies only to the explicitly selected negative flow',async()=>{
+  const requests=[];const sdk={createClient:()=>({auth:{signInWithOAuth:async r=>{requests.push(r);return {};}}})};
+  await beginNegativeLogin(sdk,cfg);await beginNegativeLogin(sdk,cfg,{forceLogin:true});
+  assert.equal(requests[0].options.queryParams,undefined);assert.deepEqual(requests[1].options.queryParams,{prompt:'login'});
+});
 test('negative PKCE requires the server mismatch category and keeps primary storage separate',async()=>{
   globalThis.location={search:''};
   for(const [error,expected]of [[{status:400,code:'bad_code_verifier'},'PASS'],[{status:400,code:'validation_failed'},'BLOCKED'],[null,'FAIL']]){

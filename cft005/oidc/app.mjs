@@ -28,6 +28,7 @@ async function run(){
   const callbackUrl=new URL('./callback.html',location.href).href;
   const settings=assertConfig({...cfg,callbackUrl});
   if (!window.supabase?.createClient) throw new Error('sdk_unavailable');
+  if(!isCallback&&typeof sessionStorage!=='undefined')sessionStorage.removeItem('cft005.oidc.negative-mode');
   if(isCallback&&sessionStorage.getItem('cft005.oidc.negative-mode')==='pkce-mismatch'){
     sessionStorage.removeItem('cft005.oidc.negative-mode');
     const {completeNegativeLogin}=await import('./negative.mjs');

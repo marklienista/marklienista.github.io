@@ -9,9 +9,9 @@ function client(sdk,config){
   const storage={getItem:key=>key.endsWith('-code-verifier')?JSON.stringify('CFT005_SYNTHETIC_WRONG_VERIFIER_012345678901234567890123456789'):null,setItem:()=>{},removeItem:()=>{}};
   return sdk.createClient(url.origin,config.publishableKey,{auth:{flowType:'pkce',persistSession:true,autoRefreshToken:false,detectSessionInUrl:false,storageKey:'cft005.oidc.negative',storage}});
 }
-export async function beginNegativeLogin(sdk,config){
+export async function beginNegativeLogin(sdk,config,{forceLogin=false}={}){
   const probe=client(sdk,config);
-  const {error}=await probe.auth.signInWithOAuth({provider:config.provider,options:{redirectTo:config.callbackUrl,scopes:'openid email profile'}});
+  const {error}=await probe.auth.signInWithOAuth({provider:config.provider,options:{redirectTo:config.callbackUrl,scopes:'openid email profile',...(forceLogin?{queryParams:{prompt:'login'}}:{})}});
   if(error)throw Error('negative_begin_failed');
 }
 export async function completeNegativeLogin(sdk,config,href){
