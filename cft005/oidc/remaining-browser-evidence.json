@@ -139,6 +139,26 @@
       "verified": true,
       "sameIdentityAsU1": true,
       "passwordEntryRequired": false
+    },
+    {
+      "case": "B_BEFORE_A_NATURAL_EXPIRY",
+      "at": "2026-10-28T18:48:39.209Z",
+      "verified": true,
+      "sameIdentityAsU1": true,
+      "newLoginStarted": false
+    },
+    {
+      "case": "A_NO_SESSION_AFTER_ISSUED_REFRESH_REVOCATION",
+      "at": "2026-10-28T19:09:21.700Z",
+      "verified": false,
+      "identityCleared": true
+    },
+    {
+      "case": "A_RECOVERY_AFTER_ISSUED_REFRESH_REJECTION",
+      "at": "2026-10-28T19:13:35.302Z",
+      "verified": true,
+      "sameIdentityAsU1": true,
+      "passwordEntryRequired": false
     }
   ]
 }

@@ -364,5 +364,67 @@
     "The HTML callback probe was rejected by the Render WAF before application execution",
     "No raw authentication logs collected; internal provider retention not independently attested",
     "No application records or published products inspected or modified"
-  ]
+  ],
+  "lifecycleSupplement": {
+    "sourceCommit": "f0e9ed3390cb9282195b07dce6ea094fee1dc201",
+    "versionedFileVerification": [
+      {
+        "side": "a",
+        "path": "lifecycle.html",
+        "version": "20261028b",
+        "status": 200,
+        "match": true,
+        "sha256": "05c2e1729cf2b844d26d91aa2381aa6416fa0ebdf537f958e4b48af795953a5b"
+      },
+      {
+        "side": "a",
+        "path": "lifecycle-app.mjs",
+        "version": "20261028b",
+        "status": 200,
+        "match": true,
+        "sha256": "2a1f674753a1066c9a8659104638457a7365617c9cb401ed82eb2c2eb6ce4791"
+      },
+      {
+        "side": "a",
+        "path": "lifecycle.mjs",
+        "version": "20261028b",
+        "status": 200,
+        "match": true,
+        "sha256": "daabd84f5c5ee76a4e9c7ed60e1cc827cfc36c21cef1b684c5671a911865259c"
+      },
+      {
+        "side": "b",
+        "path": "lifecycle.html",
+        "version": "20261028b",
+        "status": 200,
+        "match": true,
+        "sha256": "05c2e1729cf2b844d26d91aa2381aa6416fa0ebdf537f958e4b48af795953a5b"
+      },
+      {
+        "side": "b",
+        "path": "lifecycle-app.mjs",
+        "version": "20261028b",
+        "status": 200,
+        "match": true,
+        "sha256": "2a1f674753a1066c9a8659104638457a7365617c9cb401ed82eb2c2eb6ce4791"
+      },
+      {
+        "side": "b",
+        "path": "lifecycle.mjs",
+        "version": "20261028b",
+        "status": 200,
+        "match": true,
+        "sha256": "daabd84f5c5ee76a4e9c7ed60e1cc827cfc36c21cef1b684c5671a911865259c"
+      }
+    ],
+    "fixtureTests": {
+      "pass": 35,
+      "fail": 0
+    },
+    "notes": [
+      "Initial publication gates found mixed cached files; versioned entry and modules verified before new experiments",
+      "JWT expiry diagnostic accepts only 401/403 with recognized JWT code and expiry signal",
+      "Local revocation checks that the captured session has not changed before signing it out; scope always local"
+    ]
+  }
 }

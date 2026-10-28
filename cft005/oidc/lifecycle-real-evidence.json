@@ -1,39 +1,340 @@
 {
-  "schemaVersion": 1,
-  "sourceCommit": "b3f3643b5282b2ba4a8d442f5cb7b9f69374668c",
-  "scope": "Original SPA A U1; natural expiry; no global TTL or clock changes",
-  "observations": [
+  "schemaVersion": 2,
+  "date": "2026-10-28",
+  "scope": "Original isolated SPA test sessions only; no global TTL or clock change",
+  "experiments": [
     {
-      "phase": "WAITING_FOR_NATURAL_EXPIRY",
-      "capturedAt": "2026-10-28T18:02:57.478Z",
-      "expiresAt": "2026-10-28T18:54:24.000Z",
-      "checkAfter": "2026-10-28T18:55:39.000Z",
-      "verifiedBeforeExpiry": true,
-      "autoRefreshDisabledForThisTestClient": true,
-      "expiry": null,
-      "revocation": null
+      "client": "A",
+      "kind": "natural-expiry-initial-classifier",
+      "sourceCommit": "b3f3643b5282b2ba4a8d442f5cb7b9f69374668c",
+      "observations": [
+        {
+          "phase": "WAITING_FOR_NATURAL_EXPIRY",
+          "capturedAt": "2026-10-28T18:02:57.478Z",
+          "expiresAt": "2026-10-28T18:54:24.000Z",
+          "checkAfter": "2026-10-28T18:55:39.000Z",
+          "verifiedBeforeExpiry": true,
+          "autoRefreshDisabledForThisTestClient": true,
+          "expiry": null,
+          "revocation": null
+        },
+        {
+          "phase": "EXPIRY_CHECKED",
+          "capturedAt": "2026-10-28T18:02:57.478Z",
+          "expiresAt": "2026-10-28T18:54:24.000Z",
+          "checkAfter": "2026-10-28T18:55:39.000Z",
+          "verifiedBeforeExpiry": true,
+          "autoRefreshDisabledForThisTestClient": true,
+          "expiry": {
+            "result": "BLOCKED",
+            "checkedAt": "2026-10-28T18:55:40.089Z",
+            "oldAccessRejected": true,
+            "oldAccessExpired": false,
+            "httpStatus": 403,
+            "refreshSucceeded": true,
+            "identityPreserved": true,
+            "accessCredentialChanged": true,
+            "refreshCredentialChanged": true
+          },
+          "revocation": null
+        }
+      ],
+      "result": "BLOCKED",
+      "limit": "Old access refused with 403; renewal and identity preservation passed. Initial classifier only accepted 401 and semantic error category was not captured. Attempt not retroactively promoted."
     },
     {
-      "phase": "EXPIRY_CHECKED",
-      "capturedAt": "2026-10-28T18:02:57.478Z",
-      "expiresAt": "2026-10-28T18:54:24.000Z",
-      "checkAfter": "2026-10-28T18:55:39.000Z",
-      "verifiedBeforeExpiry": true,
-      "autoRefreshDisabledForThisTestClient": true,
-      "expiry": {
-        "result": "BLOCKED",
-        "checkedAt": "2026-10-28T18:55:40.089Z",
-        "oldAccessRejected": true,
-        "oldAccessExpired": false,
-        "httpStatus": 403,
-        "refreshSucceeded": true,
-        "identityPreserved": true,
-        "accessCredentialChanged": true,
-        "refreshCredentialChanged": true
-      },
-      "revocation": null
+      "client": "A",
+      "kind": "issued-refresh-local-revocation",
+      "sourceCommit": "f0e9ed3390cb9282195b07dce6ea094fee1dc201",
+      "observations": [
+        {
+          "phase": "READY_FOR_LOCAL_REVOCATION",
+          "capturedAt": "2026-10-28T19:07:37.248Z",
+          "expiresAt": "2026-10-28T19:55:39.000Z",
+          "checkAfter": "2026-10-28T19:56:54.000Z",
+          "verifiedBeforeExpiry": true,
+          "autoRefreshDisabledForThisTestClient": true,
+          "expiry": null,
+          "revocation": null
+        },
+        {
+          "phase": "LOCAL_REVOCATION_CHECKED",
+          "capturedAt": "2026-10-28T19:07:37.248Z",
+          "expiresAt": "2026-10-28T19:55:39.000Z",
+          "checkAfter": "2026-10-28T19:56:54.000Z",
+          "verifiedBeforeExpiry": true,
+          "autoRefreshDisabledForThisTestClient": true,
+          "expiry": null,
+          "revocation": {
+            "result": "PASS",
+            "checkedAt": "2026-10-28T19:07:45.919Z",
+            "scope": "local",
+            "issuedRefreshRejected": true,
+            "expectedRevocationError": true,
+            "httpStatus": 400,
+            "localSessionAbsent": true
+          }
+        }
+      ],
+      "result": "PASS",
+      "limit": "Local session only; this does not prove central logout or expiry"
+    },
+    {
+      "client": "B",
+      "kind": "natural-expiry-corrected-classifier",
+      "sourceCommit": "f0e9ed3390cb9282195b07dce6ea094fee1dc201",
+      "observations": [
+        {
+          "phase": "WAITING_FOR_NATURAL_EXPIRY",
+          "capturedAt": "2026-10-28T19:07:37.248Z",
+          "expiresAt": "2026-10-28T19:29:13.000Z",
+          "checkAfter": "2026-10-28T19:30:28.000Z",
+          "verifiedBeforeExpiry": true,
+          "autoRefreshDisabledForThisTestClient": true,
+          "expiry": null,
+          "revocation": null
+        }
+      ],
+      "result": "BLOCKED",
+      "limit": "Waiting until the recorded checkAfter time; do not reload this tab"
     }
   ],
-  "result": "BLOCKED",
-  "limit": "Old access rejected with HTTP 403, renewal and identity preservation passed; initial classifier accepted only 401 and did not expose the semantic error category. Do not retroactively promote this attempt."
+  "limits": [
+    "Credentials retained only in private test controller memory and normal SDK session storage; no credential values or account identifiers in this file",
+    "B remains frozen without automatic renewal; no additional normal B tab should remain open",
+    "The 403 classifier requires recognized JWT category and expiry signal; generic 403 cannot pass"
+  ],
+  "deploys": {
+    "A": {
+      "id": "dep-dbh4f1u7bikc73eo576g",
+      "sourceCommit": "f0e9ed3390cb9282195b07dce6ea094fee1dc201",
+      "status": "live"
+    },
+    "B": {
+      "id": "dep-dbh4f2sipgvc73doj3qg",
+      "sourceCommit": "f0e9ed3390cb9282195b07dce6ea094fee1dc201",
+      "status": "live"
+    }
+  },
+  "publicVersionedFiles": [
+    {
+      "side": "a",
+      "path": "lifecycle.html",
+      "version": "20261028b",
+      "status": 200,
+      "match": true,
+      "sha256": "05c2e1729cf2b844d26d91aa2381aa6416fa0ebdf537f958e4b48af795953a5b"
+    },
+    {
+      "side": "a",
+      "path": "lifecycle-app.mjs",
+      "version": "20261028b",
+      "status": 200,
+      "match": true,
+      "sha256": "2a1f674753a1066c9a8659104638457a7365617c9cb401ed82eb2c2eb6ce4791"
+    },
+    {
+      "side": "a",
+      "path": "lifecycle.mjs",
+      "version": "20261028b",
+      "status": 200,
+      "match": true,
+      "sha256": "daabd84f5c5ee76a4e9c7ed60e1cc827cfc36c21cef1b684c5671a911865259c"
+    },
+    {
+      "side": "b",
+      "path": "lifecycle.html",
+      "version": "20261028b",
+      "status": 200,
+      "match": true,
+      "sha256": "05c2e1729cf2b844d26d91aa2381aa6416fa0ebdf537f958e4b48af795953a5b"
+    },
+    {
+      "side": "b",
+      "path": "lifecycle-app.mjs",
+      "version": "20261028b",
+      "status": 200,
+      "match": true,
+      "sha256": "2a1f674753a1066c9a8659104638457a7365617c9cb401ed82eb2c2eb6ce4791"
+    },
+    {
+      "side": "b",
+      "path": "lifecycle.mjs",
+      "version": "20261028b",
+      "status": 200,
+      "match": true,
+      "sha256": "daabd84f5c5ee76a4e9c7ed60e1cc827cfc36c21cef1b684c5671a911865259c"
+    }
+  ],
+  "fixtureTests": {
+    "pass": 35,
+    "fail": 0
+  },
+  "classifierReference": "https://github.com/supabase/auth/blob/master/internal/api/auth.go",
+  "distributionLimit": "Unversioned URLs briefly mixed old/new cached files despite LIVE metadata; initial failed file gates retained in local tool observations. Explicit public version 20261028b verified against all six deployed files before tests.",
+  "publicationAttempts": {
+    "unversionedInitial": [
+      {
+        "side": "a",
+        "path": "lifecycle.html",
+        "status": 200,
+        "match": false,
+        "sha256": "a47839cf2e06aebf8148f37b57d44e6ab31eb561862a1e934182947f184ce1a5"
+      },
+      {
+        "side": "a",
+        "path": "lifecycle-app.mjs",
+        "status": 200,
+        "match": true,
+        "sha256": "24a958b58045674d99ea16860fd6a0485d9e14ecded2457b165a4242d745b60b"
+      },
+      {
+        "side": "a",
+        "path": "lifecycle.mjs",
+        "status": 200,
+        "match": true,
+        "sha256": "daabd84f5c5ee76a4e9c7ed60e1cc827cfc36c21cef1b684c5671a911865259c"
+      },
+      {
+        "side": "b",
+        "path": "lifecycle.html",
+        "status": 200,
+        "match": true,
+        "sha256": "0a6320402e9b69078e50a09c96e3c0b1fdef2a85a54352857101b6a006222a26"
+      },
+      {
+        "side": "b",
+        "path": "lifecycle-app.mjs",
+        "status": 200,
+        "match": false,
+        "sha256": "0923ee38a5f19a7078b02582e52b43124c231ffdef53fb630a4f13194e530187"
+      },
+      {
+        "side": "b",
+        "path": "lifecycle.mjs",
+        "status": 200,
+        "match": false,
+        "sha256": "e676c1b7df9b841b2859c615eb346be117216d3b86786ce6fb619a90c7f545e0"
+      }
+    ],
+    "unversionedRetry": [
+      {
+        "side": "a",
+        "path": "lifecycle.html",
+        "status": 200,
+        "match": false,
+        "sha256": "a47839cf2e06aebf8148f37b57d44e6ab31eb561862a1e934182947f184ce1a5",
+        "date": "Wed, 28 Oct 2026 19:03:53 GMT",
+        "age": "66",
+        "cache": "HIT"
+      },
+      {
+        "side": "a",
+        "path": "lifecycle-app.mjs",
+        "status": 200,
+        "match": true,
+        "sha256": "24a958b58045674d99ea16860fd6a0485d9e14ecded2457b165a4242d745b60b",
+        "date": "Wed, 28 Oct 2026 19:03:53 GMT",
+        "age": "66",
+        "cache": "HIT"
+      },
+      {
+        "side": "a",
+        "path": "lifecycle.mjs",
+        "status": 200,
+        "match": true,
+        "sha256": "daabd84f5c5ee76a4e9c7ed60e1cc827cfc36c21cef1b684c5671a911865259c",
+        "date": "Wed, 28 Oct 2026 19:03:53 GMT",
+        "age": "65",
+        "cache": "HIT"
+      },
+      {
+        "side": "b",
+        "path": "lifecycle.html",
+        "status": 200,
+        "match": true,
+        "sha256": "0a6320402e9b69078e50a09c96e3c0b1fdef2a85a54352857101b6a006222a26",
+        "date": "Wed, 28 Oct 2026 19:03:53 GMT",
+        "age": "65",
+        "cache": "HIT"
+      },
+      {
+        "side": "b",
+        "path": "lifecycle-app.mjs",
+        "status": 200,
+        "match": false,
+        "sha256": "0923ee38a5f19a7078b02582e52b43124c231ffdef53fb630a4f13194e530187",
+        "date": "Wed, 28 Oct 2026 19:03:53 GMT",
+        "age": "65",
+        "cache": "HIT"
+      },
+      {
+        "side": "b",
+        "path": "lifecycle.mjs",
+        "status": 200,
+        "match": false,
+        "sha256": "e676c1b7df9b841b2859c615eb346be117216d3b86786ce6fb619a90c7f545e0",
+        "date": "Wed, 28 Oct 2026 19:03:53 GMT",
+        "age": "65",
+        "cache": "HIT"
+      }
+    ],
+    "versionedAccepted": [
+      {
+        "side": "a",
+        "path": "lifecycle.html",
+        "version": "20261028b",
+        "status": 200,
+        "match": true,
+        "sha256": "05c2e1729cf2b844d26d91aa2381aa6416fa0ebdf537f958e4b48af795953a5b"
+      },
+      {
+        "side": "a",
+        "path": "lifecycle-app.mjs",
+        "version": "20261028b",
+        "status": 200,
+        "match": true,
+        "sha256": "2a1f674753a1066c9a8659104638457a7365617c9cb401ed82eb2c2eb6ce4791"
+      },
+      {
+        "side": "a",
+        "path": "lifecycle.mjs",
+        "version": "20261028b",
+        "status": 200,
+        "match": true,
+        "sha256": "daabd84f5c5ee76a4e9c7ed60e1cc827cfc36c21cef1b684c5671a911865259c"
+      },
+      {
+        "side": "b",
+        "path": "lifecycle.html",
+        "version": "20261028b",
+        "status": 200,
+        "match": true,
+        "sha256": "05c2e1729cf2b844d26d91aa2381aa6416fa0ebdf537f958e4b48af795953a5b"
+      },
+      {
+        "side": "b",
+        "path": "lifecycle-app.mjs",
+        "version": "20261028b",
+        "status": 200,
+        "match": true,
+        "sha256": "2a1f674753a1066c9a8659104638457a7365617c9cb401ed82eb2c2eb6ce4791"
+      },
+      {
+        "side": "b",
+        "path": "lifecycle.mjs",
+        "version": "20261028b",
+        "status": 200,
+        "match": true,
+        "sha256": "daabd84f5c5ee76a4e9c7ed60e1cc827cfc36c21cef1b684c5671a911865259c"
+      }
+    ]
+  },
+  "continuation": {
+    "automationId": "cft-005-conferir-repeti-o-da-expira-o",
+    "sameConversation": true,
+    "expectedWindowBrt": "2026-10-28 around 16:32",
+    "deadlineBrt": "2026-10-28 16:30:28",
+    "stopAfterResult": true
+  }
 }
