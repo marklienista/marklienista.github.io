@@ -1,8 +1,14 @@
 # CFT-005 — Integração de dois backends confidenciais
 
-**27/10/2026: login real A/B com U1 PASS; prova de cada backend 11/11 PASS. JWT real A→B e B→A recusado após assinatura/azp para leitura/escrita. Logout local A e continuidade B PASS; U2 pendente. CFT-005 ABERTO.**
+**28/10/2026: login real A/B com U1 PASS; prova de cada backend 11/11 PASS. JWT real A→B e B→A recusado após assinatura/azp para leitura/escrita. Logout local A e continuidade B PASS. U2 BLOCKED por credencial da identidade prevista indisponível. CFT-005 ABERTO.**
 
 O código de integração está preparado nesta branch; os resultados locais abaixo não comprovam emissão pelo Auth0. Esta pasta é independente de `oidc/` e `backend-proof/` e não substitui os aplicativos publicados.
+
+## Continuidade sem U2 e retornos inválidos — 28/10/2026
+
+O usuário confirmou não ter senha Auth0 para a identidade U2 configurada. Login positivo U2 e separação recíproca entre duas identidades ficam **BLOCKED** por indisponibilidade da credencial autorizada. A tentativa Google recusada foi preservada. Nenhuma conta foi criada, redefinida, vinculada ou adicionada à autorização; os PASS históricos U1 não mudam.
+
+Às 09:07 BRT, **8/8 verificações HTTPS anônimas PASS** nos dois backends: GET no callback e POST com tipo incorreto retornaram 400; POST de erro sem transação retornou 303 para `/`, sem cookie de sessão; `/session` continuou 401. [anonymous-callback-evidence.json](anonymous-callback-evidence.json) contém somente resultados sanitizados. Não houve transação OIDC, código OAuth, token, cookie de usuário ou chamada ao provedor. As sondas geram eventos de falha no diagnóstico compartilhado; não confundir esses eventos com novo erro humano. Isso comprova as barreiras testadas, sem comprovar cancelamento real no Auth0, PKCE no navegador ou a matriz SPA original completa. Não houve mudança de executável ou deploy.
 
 ## Tentativa U2 recusada — 28/10/2026, 08:43 BRT
 
@@ -156,6 +162,6 @@ Durante a integração local, o emissor de teste inicialmente recusou Basic porq
 
 Há dois serviços LIVE, emissão humana A/B com U1, prova criptográfica remota bidirecional e logout local A/continuidade B PASS. Falta login positivo U2 e a rodada completa de sessões. Esses resultados não removem o FAIL de S12 na arquitetura publicada. Sessões/dados/recibos em memória são adequados apenas à prova de instância única, sem disponibilidade, durabilidade ou logout central. As rotas dos aplicativos existentes continuam fora desta mudança. Os recibos públicos são evidência sanitizada de teste, não um sistema de auditoria durável ou com atestação externa.
 
-**Único próximo passo:** tentar U2 pelo formulário Auth0 de e-mail/senha no A, em nova janela anônima, e executar a prova se aparecer Produto A · U2. Se essa identidade não estiver acessível, manter a rodada U2 BLOCKED sem criar ou redefinir conta. Não enviar segredos por chat. A participação humana no login é necessária enquanto o controle autenticado do Chrome permanecer interrompido.
+**Único próximo passo:** com U1, sair apenas do B e reentrar no A, informar se foi pedida senha e executar a prova A. U2 permanece BLOCKED sem criar ou redefinir conta. Não enviar segredos por chat. A participação humana no login é necessária enquanto o controle autenticado do Chrome permanecer interrompido.
 
 Referências: [openid-client](https://github.com/panva/openid-client), [Auth0: clientes confidenciais](https://auth0.com/docs/get-started/applications/confidential-and-public-applications), [Render: variáveis e segredos](https://render.com/docs/configure-environment-variables).

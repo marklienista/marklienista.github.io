@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "date": "2026-10-28",
+  "scope": "HOSTED_ANONYMOUS_CALLBACK_GATES",
+  "sourceCommit": "b0839202423600018b8bd08fc364b5ab090ec899",
+  "cases": [
+    {
+      "product": "A",
+      "id": "CALLBACK-GET-REJECTED",
+      "at": "2026-10-28T12:07:07.321Z",
+      "expected": 400,
+      "actual": 400,
+      "error": "form_post_required",
+      "sessionCookieIssued": false,
+      "result": "PASS"
+    },
+    {
+      "product": "A",
+      "id": "CALLBACK-WRONG-CONTENT-TYPE",
+      "at": "2026-10-28T12:07:07.889Z",
+      "expected": 400,
+      "actual": 400,
+      "error": "form_post_required",
+      "sessionCookieIssued": false,
+      "result": "PASS"
+    },
+    {
+      "product": "A",
+      "id": "CALLBACK-WITHOUT-TRANSACTION",
+      "at": "2026-10-28T12:07:08.185Z",
+      "expected": 303,
+      "actual": 303,
+      "error": "login_failed",
+      "sessionCookieIssued": false,
+      "redirect": "/",
+      "result": "PASS"
+    },
+    {
+      "product": "A",
+      "id": "NO-LOCAL-SESSION",
+      "at": "2026-10-28T12:07:08.350Z",
+      "expected": 401,
+      "actual": 401,
+      "error": "session_required",
+      "sessionCookieIssued": false,
+      "result": "PASS"
+    },
+    {
+      "product": "B",
+      "id": "CALLBACK-GET-REJECTED",
+      "at": "2026-10-28T12:07:08.514Z",
+      "expected": 400,
+      "actual": 400,
+      "error": "form_post_required",
+      "sessionCookieIssued": false,
+      "result": "PASS"
+    },
+    {
+      "product": "B",
+      "id": "CALLBACK-WRONG-CONTENT-TYPE",
+      "at": "2026-10-28T12:07:21.145Z",
+      "expected": 400,
+      "actual": 400,
+      "error": "form_post_required",
+      "sessionCookieIssued": false,
+      "result": "PASS"
+    },
+    {
+      "product": "B",
+      "id": "CALLBACK-WITHOUT-TRANSACTION",
+      "at": "2026-10-28T12:07:21.349Z",
+      "expected": 303,
+      "actual": 303,
+      "error": "login_failed",
+      "sessionCookieIssued": false,
+      "redirect": "/",
+      "result": "PASS"
+    },
+    {
+      "product": "B",
+      "id": "NO-LOCAL-SESSION",
+      "at": "2026-10-28T12:07:21.533Z",
+      "expected": 401,
+      "actual": 401,
+      "error": "session_required",
+      "sessionCookieIssued": false,
+      "result": "PASS"
+    }
+  ],
+  "limits": [
+    "No user session, password, token, OAuth code, state, nonce or private identifier sent or captured.",
+    "Only fixed unauthenticated requests; no real provider cancellation, PKCE challenge or issued-token expiry tested.",
+    "Shared sanitized login diagnostics receive failure events from these negative probes.",
+    "No published applications, provider settings, users or data modified."
+  ]
+}

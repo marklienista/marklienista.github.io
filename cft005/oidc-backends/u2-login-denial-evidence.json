@@ -31,8 +31,8 @@
   },
   "verdicts": {
     "allowlistRejection": "PASS",
-    "positiveU2Login": "BLOCKED",
-    "reciprocalUserIsolation": "BLOCKED"
+    "positiveU2Login": "BLOCKED_AUTHORIZED_IDENTITY_UNAVAILABLE",
+    "reciprocalUserIsolation": "BLOCKED_AUTHORIZED_IDENTITY_UNAVAILABLE"
   },
   "loginMethod": "GOOGLE_SOCIAL_CONFIRMED_BY_USER",
   "configuredU2LoginMethod": "AUTH0_DATABASE_EMAIL_PASSWORD",
@@ -44,5 +44,7 @@
     "Empty in-memory receipts do not invalidate earlier receipts preserved in Git.",
     "No positive U2 login proved. No conclusion about SSO password prompt from this reply."
   ],
-  "nextStep": "Try the existing authorized Auth0 email/password identity as U2 in A, in a fresh private browser context. If unavailable, keep U2 BLOCKED without creating or resetting an account."
+  "nextStep": "Continue tests with U1; do not create, reset, link or replace an identity to bypass the unavailable U2 credential.",
+  "authorizedDatabaseCredentialAvailable": false,
+  "availabilityEvidence": "User reported no Auth0 password for the configured U2 identity."
 }

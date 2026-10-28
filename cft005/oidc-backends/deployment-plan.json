@@ -106,7 +106,7 @@
       "evidence": "runtime-gate-evidence.json"
     }
   },
-  "nextStep": "Try the existing authorized Auth0 email/password identity as U2 in A, in a fresh private browser context. If unavailable, keep U2 BLOCKED without creating or resetting an account.",
+  "nextStep": "With U1, log out locally from B and reenter A; report whether a password is requested, then run the A proof.",
   "proofRunner": {
     "deployedOnBoth": true,
     "receiptPath": "/proof/results",
@@ -121,7 +121,7 @@
     "aLogin": "PASS",
     "bLogin": "PASS",
     "remoteClientBinding": "BIDIRECTIONAL_PASS_U1",
-    "secondIdentityPositiveLogin": "BLOCKED_GOOGLE_USED_INSTEAD_OF_CONFIGURED_AUTH0_DATABASE_IDENTITY",
+    "secondIdentityPositiveLogin": "BLOCKED_AUTHORIZED_IDENTITY_UNAVAILABLE",
     "existingServicesModified": false,
     "aToBTokenPolicy": "PASS",
     "bToATokenPolicy": "PASS",
@@ -130,6 +130,12 @@
     "independentSessionLogout": "PASS_A_LOCAL_LOGOUT_B_CONTINUITY",
     "reentryA": "PASS_FUNCTIONAL_PASSWORD_PROMPT_NOT_REPORTED",
     "browserSessionPersistenceB": "PASS_WITHIN_RUNNING_BROWSER",
-    "u2AttemptEvidence": "u2-login-denial-evidence.json"
+    "u2AttemptEvidence": "u2-login-denial-evidence.json",
+    "anonymousCallbackGates": {
+      "passed": 8,
+      "total": 8,
+      "evidence": "anonymous-callback-evidence.json",
+      "realProviderCancellation": "NOT_PROVED"
+    }
   }
 }
