@@ -6,7 +6,7 @@ import {pickManifest} from './picker.js?v=0.11';
 import {renderClassBar,renderStudentCards,renderPrintSheet,renderBadgeSheet,notify,presentModal,closeModal,fillSelect} from './view.js?v=0.11';
 const $=id=>document.getElementById(id), S=new Session();
 let pilot=[],promotionPlan=[];
-const run=async fn=>{try{return await fn()}catch(e){console.error('FotoCrachá',e);notify(e?.message||'Não foi possível concluir.','error');return null}};
+const run=async fn=>{try{return await fn()}catch(e){console.error('FotoCrachá',e);notify(e?.message||'Não foi possível concluir.','error');render();return null}};
 function classesForYear(){return S.space.classes.filter(c=>c.year===Number(S.year)&&!c.archived)}
 function years(){
   const found=new Set(S.space.classes.map(c=>c.year));found.add(Number(S.year));
@@ -75,6 +75,7 @@ function render(){
   $('spaceTitle').textContent=S.space.school.name||'Escola sem nome';
   $('modeText').textContent=(S.isLinked()?'Google Drive · '+(S.drive.email||'conta autorizada'):'Criando pasta no Google Drive…')+
     (S.link&&!S.link.canEdit?' · acesso para leitura':'');
+  $('connectBtn').textContent=S.isCloud()?'Trocar conta Google':'Reconectar ao Google Drive';
   $('newSpaceBtn').disabled=!!savePending;
   $('openDriveFolderBtn').disabled=!S.link?.folderId;
   $('inviteBtn').disabled=!S.link?.canShare;
@@ -129,7 +130,7 @@ async function saveNow(){
   if(saveError)return false;
   if(!S.isCloud()){
     saveError=Error('A sessão Google expirou. Reconecte para salvar as alterações.');
-    savePhase='error';saveStatus();return false;
+    savePhase='error';render();return false;
   }
   savePhase='saving';saveStatus();
   const work=(async()=>{
@@ -141,8 +142,14 @@ async function saveNow(){
       rememberSpaceLink(link.manifestId);
       return true;
     }catch(error){
-      saveError=error;savePhase='error';
-      report('Salvamento automático interrompido: '+(error.message||'Erro desconhecido.'),'error');
+      if(error?.status===401){
+        S.drive?.disconnect();
+        const expired=Error('O Google encerrou a autorização de acesso. Reconecte a conta para concluir o salvamento.');
+        expired.code='AUTH';saveError=expired;
+      }else saveError=error;
+      savePhase='error';
+      report('Salvamento automático interrompido: '+(saveError.message||'Erro desconhecido.'),'error');
+      render();
       return false;
     }finally{
       savePending=null;
@@ -597,7 +604,7 @@ function initPilot(){
 }
 function initGoogle(){
   $('entryConnectBtn').onclick=()=>run(connectGoogle);
-  $('connectBtn').onclick=()=>run(disconnectGoogle);
+  $('connectBtn').onclick=()=>run(async()=>S.isCloud()?disconnectGoogle():connectGoogle());
   $('changeAccountBtn').onclick=()=>run(disconnectGoogle);
   $('switchSpaceBtn').onclick=()=>run(switchSpace);
   $('retrySaveBtn').onclick=()=>run(async()=>{
@@ -626,6 +633,7 @@ function start(){
     history.replaceState(null,'',address.href);
   }
   S.onUpdate=()=>{render();queueAutosave()};
+  window.addEventListener('focus',()=>{if(S.hasSpace()&&!S.isCloud())render()});
   bindNavigation();initForms();initCapture();initPromotion();initPilot();initPrint();initSharing();initGoogle();
   render();
   if(S.config.clientId){
