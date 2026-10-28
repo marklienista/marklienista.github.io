@@ -28,6 +28,14 @@ async function run(){
   const callbackUrl=new URL('./callback.html',location.href).href;
   const settings=assertConfig({...cfg,callbackUrl});
   if (!window.supabase?.createClient) throw new Error('sdk_unavailable');
+  if(isCallback&&sessionStorage.getItem('cft005.oidc.negative-mode')==='pkce-mismatch'){
+    sessionStorage.removeItem('cft005.oidc.negative-mode');
+    const {completeNegativeLogin}=await import('./negative.mjs');
+    const result=await completeNegativeLogin(window.supabase,settings,callbackHref);
+    message(result.result==='PASS'?'Retorno real com PKCE incorreto recusado pelo servidor.':'Ensaio de PKCE não aprovado.');
+    const output=document.createElement('pre');output.setAttribute('aria-label','Resultados sanitizados');output.textContent=JSON.stringify(result,null,2);document.body.append(output);
+    return;
+  }
   const client=makeClient(window.supabase,settings);
   if(isCallback){
     await completeLogin(client,settings,callbackHref);
