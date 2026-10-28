@@ -88,14 +88,20 @@ export class DriveFiles extends Drive{
     const id=driveItemId(input);
     let meta;
     try{meta=await this.info(id)}catch(e){
-      if(e.status===403||e.status===404)throw Error('O Google não autorizou o FotoCrachá a abrir essa pasta ou arquivo. A permissão de compartilhamento não basta: o convidado precisa selecionar carometro.json pelo Google Picker. A configuração desse seletor ainda depende de uma chave pública.');
+      if(e.status===403||e.status===404){
+        const error=new Error('O Google Drive não autorizou o aplicativo a ler este item nesta conta. Se a pasta foi compartilhada com você, selecione o arquivo carometro.json no Google Picker.');
+        error.code='PICKER_REQUIRED';throw error;
+      }
       throw e;
     }
     if(meta.trashed)throw Error('O item indicado está na lixeira.');
     if(meta.mimeType==='application/vnd.google-apps.folder'){
       let manifests;
       try{manifests=await this.listManifests(id)}catch(e){
-        if(e.status===403||e.status===404)throw Error('Não foi possível ler o conteúdo da pasta pelo aplicativo. Se ela foi compartilhada por outra pessoa, autorize carometro.json no Google Picker.');
+        if(e.status===403||e.status===404){
+          const error=new Error('A pasta está compartilhada, mas o aplicativo ainda precisa de autorização para ler carometro.json. Selecione esse arquivo no Google Picker.');
+          error.code='PICKER_REQUIRED';throw error;
+        }
         throw e;
       }
       if(!manifests.length)throw Error('Nenhum arquivo carometro.json autorizado foi encontrado nessa pasta. Verifique se escolheu a pasta correta ou autorize o arquivo no Google Picker.');
