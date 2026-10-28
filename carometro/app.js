@@ -58,7 +58,7 @@ function render(){
   $('entryGate').hidden=workspaceVisible;
   $('entryDisconnected').hidden=connected;
   $('entryChoose').hidden=!connected;
-  $('settingsBtn').hidden=!workspaceVisible;
+  $('settingsBtn').hidden=!workspaceVisible||!S.editable();
   if(!connected){
     $('entryConnectBtn').textContent=hasSpace?'Reconectar ao Google Drive':'Conectar ao Google Drive';
     $('entryTitle').textContent=hasSpace?'Reconecte seu Google Drive para proteger as alterações':'Conecte seu Google Drive para começar';
@@ -94,6 +94,7 @@ function render(){
   $('newClassBtn').disabled=!S.editable();
   $('captureModeBtn').disabled=!c||!S.editable();
   if(c)renderStudentCards(S.space,c.id,S.photos,S.selected,$('searchStudents').value,$('onlyMissing').checked,{
+    canEdit:S.editable(),
     onSelect:(id,checked)=>{if(checked)S.selected.add(id);else S.selected.delete(id);render()},
     onPhoto:(id,file)=>run(async()=>{await S.photo(id,file);report('Fotografia preparada. O FotoCrachá vai salvá-la automaticamente no Google Drive.','info')}),
     onEdit:openStudent,
