@@ -22,14 +22,20 @@
     }
   },
   "bLogin": {
-    "result": "BLOCKED_NOT_EXECUTED",
+    "result": "FAIL",
     "diagnostic": {
       "product": "B",
-      "started": 0,
-      "callbacks": 0,
+      "started": 3,
+      "callbacks": 2,
       "successes": 0,
-      "failures": 0,
-      "last": null
+      "failures": 2,
+      "last": {
+        "at": "2026-10-28T01:21:27.727Z",
+        "result": "FAIL",
+        "stage": "provider_denied",
+        "phase": "token_endpoint",
+        "reason": "unauthorized"
+      }
     }
   },
   "proofAttempts": [
@@ -93,6 +99,83 @@
       ],
       "finishedAt": "2026-10-28T01:15:27.528Z",
       "result": "BLOCKED"
+    },
+    {
+      "startedAt": "2026-10-28T01:21:16.290Z",
+      "product": "A",
+      "user": "U1",
+      "cases": [
+        {
+          "id": "OWN-TOKEN-records:read",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-TOKEN-records:write",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-READ",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-WRITE",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-READ",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-WRITE",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-READ",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-WRITE",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "PEER-TOKEN-records:read",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "PEER-TOKEN-records:write",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "OTHER-USER-UNCHANGED",
+          "expected": true,
+          "actual": true,
+          "result": "PASS"
+        }
+      ],
+      "finishedAt": "2026-10-28T01:21:16.978Z",
+      "result": "PASS"
     }
   ],
   "peerAvailabilityAfterAttempt": [
@@ -115,12 +198,24 @@
     }
   ],
   "limits": [
-    "First A proof passed eight local checks; remote token policy not completed.",
-    "B login and reverse-direction token refusal not yet proved.",
+    "A/U1 retry passed all 11 checks; first blocked attempt preserved.",
+    "B own login failed at token endpoint with sanitized unauthorized; B-to-A real token proof pending.",
     "Second identity positive login and bidirectional data separation pending.",
     "No JWT, OAuth code, subject, cookie, CSRF, secret or record contents captured.",
     "Shared published Supabase architecture S12 remains FAIL; CFT-005 OPEN."
   ],
   "existingAppsModified": false,
-  "realDataAccessed": false
+  "realDataAccessed": false,
+  "aToBTokenPolicy": {
+    "result": "PASS",
+    "syntheticLabel": "U1",
+    "observedAt": "2026-10-28T01:21:16.978Z",
+    "permissions": [
+      "records:read",
+      "records:write"
+    ],
+    "expectedHttpStatus": 401,
+    "observedHttpStatus": 401,
+    "signatureAndOtherClientBindingVerified": true
+  }
 }

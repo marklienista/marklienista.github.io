@@ -1,8 +1,8 @@
 {
-  "status": "REAL_A_U1_LOGIN_PASS_REMOTE_PROOF_BLOCKED_B_PENDING",
+  "status": "A_U1_AND_A_TO_B_TOKEN_POLICY_PASS_B_LOGIN_FAIL",
   "applied": true,
   "runtimeReady": true,
-  "realAuth0Issuance": "A_U1_PASS_B_NOT_EXECUTED",
+  "realAuth0Issuance": "A_U1_PASS_B_FAIL",
   "workspace": {
     "name": "My Workspace",
     "id": "tea-dattm47lk1mc73cu74bg",
@@ -106,7 +106,7 @@
       "evidence": "runtime-gate-evidence.json"
     }
   },
-  "nextStep": "Repeat A proof with B responding, then login and run proof on B with U1. Keep current A session. Then test U2 and independent sessions.",
+  "nextStep": "User reinstalls B exclusive client secret in protected Render field; deploy B and repeat B U1 login/proof. Then U2 and independent sessions.",
   "proofRunner": {
     "deployedOnBoth": true,
     "receiptPath": "/proof/results",
@@ -119,10 +119,12 @@
     "sourceCommit": "b0839202423600018b8bd08fc364b5ab090ec899",
     "file": "real-login-evidence.json",
     "aLogin": "PASS",
-    "bLogin": "BLOCKED",
-    "aLocalProofPassed": 8,
-    "remoteClientBinding": "BLOCKED",
+    "bLogin": "FAIL_TOKEN_ENDPOINT_UNAUTHORIZED",
+    "aLocalProofPassed": 11,
+    "remoteClientBinding": "A_TO_B_PASS_REVERSE_PENDING",
     "secondIdentityPositiveLogin": "BLOCKED",
-    "existingServicesModified": false
+    "existingServicesModified": false,
+    "aToBTokenPolicy": "PASS",
+    "bToATokenPolicy": "BLOCKED"
   }
 }
