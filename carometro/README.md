@@ -1,45 +1,65 @@
-# FotoCrachá — carômetros e crachás (laboratório 0.10)
+# FotoCrachá — ambiente de testes 0.11 (Google Drive e gravação automática)
 
-Aplicação de testes: https://carometro-teste.onrender.com
-Fonte única de código: GitHub `marklienista/marklienista.github.io`, branch isolada `carometro-lab-002`, diretório `carometro/`.
-Condutor do projeto (mesmo documento anterior): https://docs.google.com/document/d/1JSY62EjOjDT73UchbGdGqq3VdD5zs4eQ2UU6PRnb92k/edit
+**Aplicativo:** https://carometro-teste.onrender.com
+**Código único:** GitHub `marklienista/marklienista.github.io`, branch `carometro-lab-002`, diretório `carometro/`.
+**Condutor vigente:** https://docs.google.com/document/d/1JSY62EjOjDT73UchbGdGqq3VdD5zs4eQ2UU6PRnb92k/edit
+**Nome público:** FotoCrachá; “Carômetro” continua sendo um tipo de impressão. Projeto ainda não lançado.
 
-## Nome público e continuidade dos dados
+## Primeira visita
 
-Nome público aprovado em 27/10/2026: **FotoCrachá**. `Carômetro` continua sendo o nome de **um dos formatos impressos**. O domínio de laboratório `carometro-teste.onrender.com`, o nome do serviço Render, a pasta do código, o ID do projeto Google Cloud e o nome interno `carometro.json` não foram trocados: preservar esses identificadores mantém a descoberta e leitura dos arquivos anteriormente gravados. Novos espaços criam a pasta `FotoCrachá — [escola]` no Drive; pastas antigas `Carômetro — [escola]` não são movidas ou renomeadas.
+- A primeira tela **não carrega nenhuma turma, aluno ou fotografia de exemplo**. Somente permite **Conectar ao Google Drive**, consultar Ajuda e ler os avisos de privacidade.
+- Após autorizar a conta Google, a pessoa escolhe um espaço existente listado no Drive, **cola o link da pasta ou do arquivo `carometro.json` já autorizado para o app**, ou cria um espaço novo, inicialmente vazio.
+- Nenhum espaço novo é criado automaticamente só por conectar. A escolha da escola é explícita e o app não apaga ou substitui pastas já existentes.
+- O identificador do espaço aberto é colocado no endereço da própria página, `?space=<file-id>`. O link **não concede acesso**: o Google exige que a conta seja autorizada na pasta/arquivo. Não há senha nem token gravado no endereço.
+- O vínculo de uma **futura conta básica comum** entre ferramentas não está implementado. OAuth do Google Drive continua separado e o token é transitório, guardado apenas na memória do navegador.
 
-O nome exibido na **tela de consentimento Google OAuth** pertence ao Google Cloud Auth Platform e pode ainda estar como Carômetro. Alterá-lo é uma ação administrativa separada no Google Cloud; a mudança no site não o altera automaticamente.
+## Salvamento automático
 
-## Como funciona
+- Alterações pelo aplicativo em turmas, professores, estudantes, fotografias, logo, importação e promoção são programadas para envio ao Drive após cerca de **1,2 segundo sem novas alterações**, em uma fila serializada por aba.
+- A interface mostra **“Salvando…”**, **“Tudo salvo no Google Drive”** ou **“Não foi salvo…”**. Não existe botão normal “Salvar”; erro exige intervenção e não dispara tentativas infinitas.
+- O primeiro salvamento agora **cria o registro final uma única vez** após carregar as fotografias. A versão anterior enviava um JSON e tentava imediatamente um segundo PATCH, podendo resultar no falso aviso de outra pessoa editando.
+- Para espaços já existentes, uma nova versão de metadados do Google não é tratada como edição humana: compara-se o **conteúdo do manifesto remoto com o conteúdo aberto originalmente**. Se o conteúdo de fato mudou, a gravação é interrompida, o original remoto é mantido e a pessoa pode escolher reabrir a versão atual, com confirmação expressa de descarte das edições não salvas nesta aba.
+- Mudanças feitas enquanto o upload estava em andamento ficam pendentes e são salvas em uma próxima operação; não se apagam essas mudanças ao receber resposta da gravação anterior.
+- Trocar espaço/conta tenta concluir alterações pendentes antes de liberar a mudança. Fechar a página com alterações não confirmadas aciona o aviso do navegador (dependente do navegador).
+- **Não há edição colaborativa em tempo real nem trava distribuída garantida.** A comparação entre consulta e atualização do Drive é de melhor esforço, não uma transação atômica. Orientar que uma pessoa edite de cada vez e reabra o espaço antes de iniciar outra rodada.
+- O FotoCrachá **não cria arquivos de backup ou versões próprias**. O Google Drive pode manter revisões do próprio arquivo como parte de seu funcionamento.
 
-O responsável conecta sua própria conta Google com **Conectar ao Google Drive**, escolhe a conta no popup e autoriza o escopo restrito `drive.file`. Não informa IDs ou chaves. Cadastros e fotografias podem ser armazenados em uma pasta do Drive do responsável. O app não tem sistema próprio de reconhecimento facial e não envia imagens a IA. Somente usar dados fictícios até homologar privacidade e colaboração.
+## Pastas e compartilhamento
 
-- **Turmas:** nome, ano e nome opcional do **professor(a) da turma**, cadastrado/alterado em **Editar turma**. O professor fica associado à turma daquele ano, não ao estudante. Ao promover estudantes, uma nova turma do ano seguinte começa sem professor pré-definido. Os dados são gravados no mesmo manifesto que nomes, turmas e fotos.
-- **Carômetro:** impressão existente em grade de fotografias, com nome da escola e logotipo quando cadastrado. O professor(a) aparece no cabeçalho quando há somente uma turma, ou ao lado de cada estudante quando houver várias. A exibição de matrícula/RA continua opcional apenas neste formato.
-- **Crachás:** em **Imprimir → O que deseja imprimir? → Crachás**, escolher selecionados/turma/ano inteiro, **Com fotografia** ou **Apenas nome**, e opcionalmente digitar informações adicionais. Imprime 8 cartões de **86 × 54 mm** por folha A4, organizados em 2 colunas × 4 linhas, com marca de recorte; inclui nome, turma, professor cadastrado e logo se existente. Nunca imprime a matrícula/RA nos crachás.
-- **Informações adicionais:** um único texto opcional, com no máximo 120 caracteres, repetido no lote de crachás (ex.: nome do passeio, contato institucional). É **transitório na tela**: não há campo no modelo, não vai para Google Drive, não fica em `localStorage`, não mantém versões, não aparece nos carômetros e é limpo ao criar novo espaço ou recarregar a página. Evite dados pessoais dos estudantes.
-- **PDF:** o app prepara a grade no navegador; **Imprimir / Salvar PDF** abre a janela de impressão local. Recomendações: papel **A4 retrato**, **escala 100% / tamanho real**, sem cabeçalhos ou rodapés do navegador. Confira uma régua no primeiro teste físico; impressoras podem impor margens/escala próprias. Não existe armazenamento separado de PDFs.
+- Novo espaço: pasta `FotoCrachá — [escola]`, subpasta `Fotos`, arquivo interno `carometro.json` (nome mantido por compatibilidade).
+- Espaços antigos com pasta `Carômetro — [escola]` permanecem onde estavam e são descobertos por `carometro.json`. Nenhum arquivo existente é renomeado automaticamente.
+- A pasta do Drive é a **fonte única de permissões** (Leitor ou Editor). A interface abre a pasta para gerenciar acessos no Google; pode convidar usuários por e-mail, mostrar permissões e revogá-las quando a conta tem direito. Se uma permissão `anyone` ou `domain` aparecer, o aplicativo alerta para revisar exposição indevida.
+- Colar o link de pasta/cadastro funciona somente se o OAuth limitado `drive.file` já permitir o acesso. Para a conta convidada, **compartilhar uma pasta não autoriza automaticamente a API a ler cada arquivo**. É necessário selecionar `carometro.json` pelo Google Picker; além disso, o acesso a fotografias filhas precisa ser validado por conta.
+- A **Google Picker API key pública restrita ainda não foi fornecida**, logo o botão Picker fica desabilitado e a experiência completa de convite/colaboração NÃO está homologada. Não substituir o scope `drive.file` por acesso irrestrito ao Drive como atalho.
+- A API do Drive pode indicar que um arquivo perdeu a permissão de edição; a aplicação deve bloquear gravação em vez de tentar sobrescrever ou conceder autorização por conta própria.
 
-## Modelo e migração
+## Privacidade e integridade
 
-`schema_version: 1` permanece intocado. O atributo opcional `classes[].teacher` é preenchido com string vazia ao abrir carômetros antigos. Não é necessário migrar o banco, criar outra pasta, duplicar documentos nem fazer backup extra. Novos nomes de pasta não alteram o nome interno do manifesto. Todos os textos são montados como nós DOM com `textContent`, sem injetar HTML escrito por usuários. Fotos continuam em URLs temporárias do navegador até upload.
+O FotoCrachá é uma aplicação web estática, sem banco próprio de estudantes: código servido pelo Render e processamento de nomes/fotografias no navegador, com armazenamento dos arquivos diretamente **na conta Google Drive escolhida**. Isso não significa que a infraestrutura do Google fique fora do tratamento de dados; o responsável pela conta e a instituição devem avaliar políticas internas, LGPD, autorizações e a necessidade da finalidade. Recomendar conta institucional ou privada com acesso restrito, senha forte e autenticação em duas etapas. Não usar fotografias e nomes de crianças reais antes de homologar as permissões e o tratamento.
+
+**Não alterar manualmente `carometro.json` nem mover, renomear ou apagar pastas e fotografias relacionadas.** Fazer as modificações dentro da aplicação, para manter a estrutura referencial íntegra. Crachás não imprimem RA/matrícula; nota adicional é transitória e não entra no manifesto. Não há reconhecimento facial.
+
+## Funcionalidades de impressão
+
+- Carômetro em grade por turma, ano ou selecionados, com professor opcional.
+- Crachás individuais (86 × 54 mm) com foto ou apenas nome: até oito por folha A4 retrato, com nome, turma, professor, escola, logo opcional e uma observação comum ao lote (até 120 caracteres) que **não é gravada em nenhum arquivo**.
+- **Imprimir / Salvar PDF** utiliza a impressão local do navegador (A4, escala de 100%, sem cabeçalhos/rodapés). As medidas finais dependem de prova visual e, quando possível, impressão física.
+
+## Condição atual, testes e próximo passo
+
+Publicação de código **não é lançamento nem validação do fluxo real**. A autenticação Google foi comprovada por Marcelo em uma conta de teste, mas a criação, salvamento, reabertura, alteração e compartilhamento do novo fluxo ainda precisam de prova no navegador autorizado.
+
+Testar somente com dados fictícios:
+1. conectar a conta, confirmar que **não aparecem alunos de exemplo** e que a escolha de espaço funciona;
+2. criar uma escola e uma turma fictícias; alterar professor e estudante; verificar mensagem **“Tudo salvo no Google Drive”**;
+3. atualizar a página, conectar novamente, reabrir o mesmo espaço e confirmar os registros; verificar pasta `FotoCrachá — [escola]` no Drive;
+4. testar carômetro/crachás com fotos fictícias e confirmar impressão;
+5. somente com Picker habilitado, testar convite real entre duas contas adultas, leitura/edição/revogação e fotos.
+
+Se surgir erro de salvamento, **não apagar ou editar manualmente o JSON**. Registrar mensagem completa; o novo fluxo interrompe tentativas após erro para evitar operações repetidas de resultado incerto.
 
 ## Integração Google Cloud
 
-Projeto Google Cloud número `784125401141`; Client ID OAuth Web público já está centralizado em `config.js`. Origem JavaScript autorizada de laboratório: `https://carometro-teste.onrender.com`. Scope `https://www.googleapis.com/auth/drive.file`. Marcelo confirmou em 25/10/2026 que uma conta conseguiu conectar após cadastrar usuários de teste; isso **não prova ainda** salvar/reabrir arquivos nem compartilhar fotografias. A chave pública **restrita** do Google Picker ainda está pendente; selecionar arquivos de convidados não foi homologado. Não inserir `client_secret` nem tokens de usuários no repositório.
+Projeto Google Cloud: `784125401141`. Client ID OAuth Web público centralizado em `config.js`, origem autorizada `https://carometro-teste.onrender.com`, scope mínimo `https://www.googleapis.com/auth/drive.file`. Manter configuração de testes e adultos autorizados; a Google Picker API key pública restrita continua pendente. Nunca incluir `client_secret`, tokens de acesso ou fotos reais no repositório.
 
-## Testes necessários antes de dados reais
-
-1. Abrir no navegador com conta Google de adulto autorizada no modo Testing, criar turma e professor, salvar, recarregar e reabrir; verificar professor e cadastros.
-2. Com alunos fictícios, comparar carômetro antigo com a nova impressão, conferir professor no cabeçalho ou nos cartões.
-3. Gerar PDF de crachás **com foto** e **apenas nome**, com 1, 8 e 9 estudantes, conferindo quebra de página, resolução, nomes longos, corte e medidas. Oito crachás por A4 é a intenção do layout; sem impressão real/inspeção visual não se declara homologado.
-4. Digitar nota adicional, imprimir e recarregar a página; confirmar que o campo não permaneceu salvo no Drive, e que a nota não aparece no carômetro.
-5. Somente depois habilitar Picker e validar compartilhamento real entre duas contas adultas, acesso, revogação e fotos.
-
-## Limites
-
-- **FotoCrachá não foi lançado**; o Render é uma publicação técnica de teste.
-- A **conta compartilhada** do ecossistema autoral e o SSO não são substituídos nem comprovados pelo login do Google Drive.
-- Compartilhar pasta não garante sozinho o acesso de convidados a todos os arquivos pelo escopo `drive.file`.
-- Não usar dados/fotos de crianças reais antes das autorizações institucionais e dos testes de permissão/privacidade.
-- A identidade visual B e a assinatura «Criado por Marcelo Santos» foram mantidas, sem alterar Apertaquem, Som da Turma, MeEmpresta ou ApertaLetra.
+A identidade B do ecossistema foi preservada. Nenhuma mudança neste fluxo altera Apertaquem, Som da Turma, MeEmpresta, ApertaLetra, Supabase ou a conta comum futura.
