@@ -46,7 +46,7 @@ function saveStatus(){
   }else if(S.isLinked()){
     node.textContent='Tudo salvo no Google Drive'+(savedAt?' · '+savedAt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'')+'.';
   }else{
-    node.textContent='Preparando pasta segura no Google Drive…';
+    node.textContent='Preparando pasta no Google Drive…';
   }
   $('retrySaveBtn').hidden=!saveError||saveError.code==='CONFLICT';
   $('reloadRemoteBtn').hidden=!saveError||saveError.code!=='CONFLICT'||!S.isLinked();
@@ -262,9 +262,11 @@ function folderUrl(){
   return 'https://drive.google.com/drive/folders/'+encodeURIComponent(S.link.folderId);
 }
 function showGoogleFolder(){
+  // noopener evita dar à página externa acesso à janela do FotoCrachá.
   const url=folderUrl();
-  const opened=window.open(url,'_blank','noopener,noreferrer');
-  if(!opened)report('Abra esta pasta no Google Drive: '+url,'info');
+  const link=document.createElement('a');
+  link.href=url;link.target='_blank';link.rel='noopener noreferrer';
+  link.click();
 }
 async function clipboardFolder(){
   const url=folderUrl();
