@@ -11,7 +11,7 @@
 export const CLOUD_CONFIG = Object.freeze({
   googleOAuthClientId: '784125401141-t2gv5h9323bl783281qpifplse69n5ln.apps.googleusercontent.com',
   googleCloudProjectNumber: '784125401141',
-  googlePickerApiKey: ''
+  googlePickerApiKey: 'AIzaSyBfHOahmkaUOSkvXMAzskbKUqWfaFFnrJk'
 });
 export function isGoogleConfigured() {
   return /^\d+-[\w.-]+\.apps\.googleusercontent\.com$/.test(CLOUD_CONFIG.googleOAuthClientId);
