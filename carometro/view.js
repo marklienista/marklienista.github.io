@@ -24,15 +24,20 @@ export function renderStudentCards(space,classId,photoUrls,selected,query,missin
     card.append(photo,make('h3','',student.name));
     if(student.code)card.append(make('p','',student.code));
     if(!src)card.append(make('span','badge',student.photoId?'Carregando ou sem acesso':'Sem foto'));
-    const actionsEl=make('div','mini-actions');
-    const label=make('label','',src?'Trocar foto':'Fotografar');
-    const input=make('input');input.type='file';input.accept='image/jpeg,image/png,image/webp';input.setAttribute('aria-label','Escolher foto para '+student.name);input.setAttribute('capture','environment');
-    input.onchange=e=>{const file=e.target.files?.[0];if(file)actions.onPhoto(student.id,file)};
-    label.append(input);actionsEl.append(label);
-    const edit=make('button','','Editar');edit.type='button';edit.onclick=()=>actions.onEdit(student.id);actionsEl.append(edit);
-    if(src){const clear=make('button','','Retirar foto');clear.type='button';clear.onclick=()=>actions.onRemovePhoto(student.id);actionsEl.append(clear)}
-    const end=make('button','','Transferência');end.type='button';end.onclick=()=>actions.onInactive(student.id);actionsEl.append(end);
-    card.append(actionsEl);root.append(card);
+    if(actions.canEdit){
+      const actionsEl=make('div','mini-actions');
+      const label=make('label','',src?'Trocar foto':'Fotografar');
+      const input=make('input');input.type='file';input.accept='image/jpeg,image/png,image/webp';
+      input.setAttribute('aria-label','Escolher foto para '+student.name);
+      input.setAttribute('capture','environment');
+      input.onchange=e=>{const file=e.target.files?.[0];if(file)actions.onPhoto(student.id,file)};
+      label.append(input);actionsEl.append(label);
+      const edit=make('button','','Editar');edit.type='button';edit.onclick=()=>actions.onEdit(student.id);actionsEl.append(edit);
+      if(src){const clear=make('button','','Retirar foto');clear.type='button';clear.onclick=()=>actions.onRemovePhoto(student.id);actionsEl.append(clear)}
+      const end=make('button','','Transferência');end.type='button';end.onclick=()=>actions.onInactive(student.id);actionsEl.append(end);
+      card.append(actionsEl);
+    }
+    root.append(card);
   });
 }
 
