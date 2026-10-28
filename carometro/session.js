@@ -176,7 +176,9 @@ export class Session{
       link=await this.drive.createManifest(state); // Criação já grava o cadastro FINAL; não fazer PATCH extra.
       if(link.recovered&&link.snapshot!==JSON.stringify(state)){
         this.link=link;this.space.drive={...state.drive};
-        throw Error('Um cadastro com este identificador já existe no Drive, mas o conteúdo difere. Reabra a pasta antes de continuar para não sobrescrever dados.');
+        const conflict=new Error('Um cadastro com este identificador já existe no Drive, mas seu conteúdo difere. Nenhum arquivo foi sobrescrito. Reabra o espaço para conferir o estado atual.');
+        conflict.code='CONFLICT';
+        throw conflict;
       }
     }
     if(this.space.id!==spaceId)throw Error('O espaço mudou durante o salvamento. Reabra o cadastro antes de editar.');
