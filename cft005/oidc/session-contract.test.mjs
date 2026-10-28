@@ -219,8 +219,16 @@ test('invalid-refresh probe is ephemeral and cannot alter or sign out the primar
   const result=await identity.probeInvalidRefresh(sdk,cfg,primary,USER1);
   assert.equal(result.result,'PASS');assert.equal(result.primarySessionUnchanged,true);assert.equal(result.httpStatus,400);
   assert.equal(options.auth.persistSession,false);assert.equal(options.auth.autoRefreshToken,false);assert.notEqual(options.auth.storageKey,'cft005.oidc.demo');
-  assert.equal(request.refresh_token,'CFT005-SYNTHETIC-UNISSUED-REFRESH');assert.equal(signouts,0);
+  assert.match(request.refresh_token,/^[a-zA-Z0-9]{12}$/);assert.equal(signouts,0);
   assert.doesNotMatch(JSON.stringify(result),/private|FIXTURE|00000000/);
+});
+
+test('invalid-refresh probe does not promote a format rejection to a successful token rejection',async()=>{
+  const cfg={provider:'custom:conta-central',callbackUrl:A+'/callback.html',allowedCallbacks:[A+'/callback.html'],supabaseUrl:'https://example.supabase.co',publishableKey:'sb_publishable_FIXTURE'};
+  const primary={auth:{getSession:async()=>({data:{session:{}},error:null}),getUser:async()=>({data:{user:{id:USER1}},error:null})}};
+  const sdk={createClient:()=>({auth:{refreshSession:async()=>({error:{status:400,code:'validation_failed',message:'Invalid input'}})}})};
+  const result=await identity.probeInvalidRefresh(sdk,cfg,primary,USER1);
+  assert.equal(result.result,'BLOCKED');assert.equal(result.expectedInvalidRefresh,false);assert.equal(result.primarySessionUnchanged,true);
 });
 
 test('invalid-refresh probe fails on an identity change or an unexpectedly accepted sentinel',async()=>{

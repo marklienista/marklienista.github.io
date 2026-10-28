@@ -126,7 +126,7 @@ export async function probeInvalidRefresh(sdk, config, primaryClient, expectedId
     storageKey:'cft005.oidc.invalid-refresh-probe'
   }});
   let error;
-  try { ({error} = await probe.auth.refreshSession({refresh_token:'CFT005-SYNTHETIC-UNISSUED-REFRESH'})); }
+  try { ({error} = await probe.auth.refreshSession({refresh_token:'cft005probe0'})); }
   catch (caught) { error=caught; }
   const after = await currentUser(primaryClient);
   const same = Boolean(after && before.id===after.id && (!expectedId || before.id===expectedId));
