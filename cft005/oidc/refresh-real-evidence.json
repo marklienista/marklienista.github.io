@@ -1,0 +1,325 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-28",
+  "scope": "Original isolated SPA/Supabase test clients; U1 only; no application records queried",
+  "preparationCommit": "c6b6ba2343dacd7e6d72ab9ca8fc4985f9a497ce",
+  "correctedSourceCommit": "5a54b40d5db349f0b04e9f22bc353125b870f258",
+  "events": [
+    {
+      "case": "LOGIN_A_AND_B",
+      "at": "2026-10-28T17:41:14.194Z",
+      "aVerified": true,
+      "bVerified": true,
+      "sameIdentity": true,
+      "aManualRefreshes": 0,
+      "bManualRefreshes": 0,
+      "passwordEntryRequired": false
+    },
+    {
+      "case": "MANUAL_REFRESH_A",
+      "at": "2026-10-28T17:41:25.461Z",
+      "verified": true,
+      "manualRefreshes": 1,
+      "lastRefresh": {
+        "requestCompleted": true,
+        "previousSessionPresent": true,
+        "accessCredentialChanged": true,
+        "refreshCredentialChanged": true,
+        "identityPreserved": true
+      },
+      "sameIdentityAsBaseline": true
+    },
+    {
+      "case": "B_RELOAD_AFTER_A_REFRESH",
+      "at": "2026-10-28T17:44:16.798Z",
+      "verified": true,
+      "sameIdentityAsBaseline": true,
+      "manualRefreshes": 0
+    },
+    {
+      "case": "MANUAL_REFRESH_B",
+      "at": "2026-10-28T17:44:25.775Z",
+      "verified": true,
+      "manualRefreshes": 1,
+      "lastRefresh": {
+        "requestCompleted": true,
+        "previousSessionPresent": true,
+        "accessCredentialChanged": true,
+        "refreshCredentialChanged": true,
+        "identityPreserved": true
+      },
+      "sameIdentityAsBaseline": true
+    },
+    {
+      "case": "A_RELOAD_AFTER_B_REFRESH",
+      "at": "2026-10-28T17:44:32.296Z",
+      "verified": true,
+      "sameIdentityAsBaseline": true
+    },
+    {
+      "case": "INVALID_REFRESH_A_INITIAL_SENTINEL",
+      "at": "2026-10-28T17:48:21.144Z",
+      "sourceCommit": "c6b6ba2343dacd7e6d72ab9ca8fc4985f9a497ce",
+      "probe": {
+        "result": "BLOCKED",
+        "requestRejected": true,
+        "expectedInvalidRefresh": false,
+        "httpStatus": 400,
+        "code": "E_REFRESH_PROBE_UNAVAILABLE",
+        "primarySessionUnchanged": true
+      },
+      "verified": true,
+      "sameIdentityAsBaseline": true
+    },
+    {
+      "at": "2026-10-28T17:53:18.626Z",
+      "sourceCommit": "5a54b40d5db349f0b04e9f22bc353125b870f258",
+      "probe": {
+        "result": "PASS",
+        "requestRejected": true,
+        "expectedInvalidRefresh": true,
+        "httpStatus": 400,
+        "code": "E_REFRESH_INVALID",
+        "primarySessionUnchanged": true
+      },
+      "verified": true,
+      "sameIdentityAsBaseline": true,
+      "case": "INVALID_REFRESH_A_CORRECTED_SENTINEL"
+    },
+    {
+      "at": "2026-10-28T17:53:27.723Z",
+      "sourceCommit": "5a54b40d5db349f0b04e9f22bc353125b870f258",
+      "probe": {
+        "result": "PASS",
+        "requestRejected": true,
+        "expectedInvalidRefresh": true,
+        "httpStatus": 400,
+        "code": "E_REFRESH_INVALID",
+        "primarySessionUnchanged": true
+      },
+      "verified": true,
+      "sameIdentityAsBaseline": true,
+      "case": "INVALID_REFRESH_B_CORRECTED_SENTINEL"
+    },
+    {
+      "at": "2026-10-28T17:53:37.338Z",
+      "aVerified": false,
+      "aIdentityCleared": true,
+      "case": "LOCAL_LOGOUT_A"
+    },
+    {
+      "at": "2026-10-28T17:53:41.378Z",
+      "verified": true,
+      "sameIdentityAsBaseline": true,
+      "case": "B_RELOAD_AFTER_A_LOGOUT"
+    },
+    {
+      "at": "2026-10-28T17:53:46.371Z",
+      "bVerified": false,
+      "bIdentityCleared": true,
+      "case": "LOCAL_LOGOUT_B_AFTER_A"
+    },
+    {
+      "at": "2026-10-28T17:54:24.430Z",
+      "verified": true,
+      "sameIdentityAsBaseline": true,
+      "passwordEntryRequired": false,
+      "callbackQueryAbsentWhenObserved": true,
+      "case": "A_REENTRY_AFTER_BOTH_LOCAL_LOGOUTS"
+    },
+    {
+      "at": "2026-10-28T17:54:35.973Z",
+      "sourceCommit": "5a54b40d5db349f0b04e9f22bc353125b870f258",
+      "verified": true,
+      "lastRefresh": {
+        "requestCompleted": true,
+        "previousSessionPresent": true,
+        "accessCredentialChanged": true,
+        "refreshCredentialChanged": true,
+        "identityPreserved": true
+      },
+      "sameIdentityAsBaseline": true,
+      "case": "MANUAL_REFRESH_A_FINAL_SOURCE"
+    }
+  ],
+  "limits": [
+    "U2 positive login and two-user synthetic record access remain BLOCKED",
+    "Natural access-token expiry and rejection of an actually issued then revoked refresh token were not tested",
+    "Invalid refresh probe uses an unissued fixed synthetic sentinel; it is not central revocation",
+    "Identity pseudonym compared only in memory; raw identifiers and credential values excluded",
+    "Page counters reset on reload; UI observations are not independent provider attestation",
+    "Provider and host internal request retention not proven; raw authentication logs not collected",
+    "No published products, Apertaquem, global TTL, Auth0/Supabase auth configuration or application records modified"
+  ],
+  "timestampMeaning": "UTC time of visible UI observation, not provider event time",
+  "localTests": {
+    "identityAndSessionContract": {
+      "pass": 27,
+      "fail": 0,
+      "kind": "Node fixtures"
+    }
+  },
+  "deploys": {
+    "A": {
+      "serviceId": "srv-dbfnj8t9el5s73fuf7bg",
+      "deployId": "dep-dbh3clifngtc73f9lreg",
+      "status": "live",
+      "commit": "5a54b40d5db349f0b04e9f22bc353125b870f258"
+    },
+    "B": {
+      "serviceId": "srv-dbfnjcks728c738dvun0",
+      "deployId": "dep-dbh3cmo8v5cc73ea5890",
+      "status": "live",
+      "commit": "5a54b40d5db349f0b04e9f22bc353125b870f258"
+    }
+  },
+  "publicFileVerification": [
+    {
+      "side": "a",
+      "path": "index.html",
+      "status": 200,
+      "exactSourceMatch": true,
+      "sha256": "bb78ab52472b81290ad64f83184f42fc6e0b38aca92960a828b848d2cdb1ec15",
+      "headers": {
+        "referrerPolicy": "no-referrer",
+        "cacheControl": "no-store",
+        "nosniff": "nosniff",
+        "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+      }
+    },
+    {
+      "side": "a",
+      "path": "callback.html",
+      "status": 200,
+      "exactSourceMatch": true,
+      "sha256": "48db633927ddda5030454cb49f7b3bcf3ee7276b54d4d2fc4f68b9d2eaf510ff",
+      "headers": {
+        "referrerPolicy": "no-referrer",
+        "cacheControl": "no-store",
+        "nosniff": "nosniff",
+        "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+      }
+    },
+    {
+      "side": "a",
+      "path": "callback-start.js",
+      "status": 200,
+      "exactSourceMatch": true,
+      "sha256": "127a56bff68e5a8af646080fac0ea31091ad0859db51d4985ccac18ff5bf72a2",
+      "headers": {
+        "referrerPolicy": "no-referrer",
+        "cacheControl": "no-store",
+        "nosniff": "nosniff",
+        "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+      }
+    },
+    {
+      "side": "a",
+      "path": "app.mjs",
+      "status": 200,
+      "exactSourceMatch": true,
+      "sha256": "54633d80a8c3f51419cf332474ea081bc1fe87ab8d55fd7002ef59c845151575",
+      "headers": {
+        "referrerPolicy": "no-referrer",
+        "cacheControl": "no-store",
+        "nosniff": "nosniff",
+        "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+      }
+    },
+    {
+      "side": "a",
+      "path": "identity.mjs",
+      "status": 200,
+      "exactSourceMatch": true,
+      "sha256": "c815c3496f1a13a4996fa37f4c1504a21978ec94f4c1db9bfd9ae86f23ea8121",
+      "headers": {
+        "referrerPolicy": "no-referrer",
+        "cacheControl": "no-store",
+        "nosniff": "nosniff",
+        "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+      }
+    },
+    {
+      "side": "b",
+      "path": "index.html",
+      "status": 200,
+      "exactSourceMatch": true,
+      "sha256": "bb78ab52472b81290ad64f83184f42fc6e0b38aca92960a828b848d2cdb1ec15",
+      "headers": {
+        "referrerPolicy": "no-referrer",
+        "cacheControl": "no-store",
+        "nosniff": "nosniff",
+        "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+      }
+    },
+    {
+      "side": "b",
+      "path": "callback.html",
+      "status": 200,
+      "exactSourceMatch": true,
+      "sha256": "48db633927ddda5030454cb49f7b3bcf3ee7276b54d4d2fc4f68b9d2eaf510ff",
+      "headers": {
+        "referrerPolicy": "no-referrer",
+        "cacheControl": "no-store",
+        "nosniff": "nosniff",
+        "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+      }
+    },
+    {
+      "side": "b",
+      "path": "callback-start.js",
+      "status": 200,
+      "exactSourceMatch": true,
+      "sha256": "127a56bff68e5a8af646080fac0ea31091ad0859db51d4985ccac18ff5bf72a2",
+      "headers": {
+        "referrerPolicy": "no-referrer",
+        "cacheControl": "no-store",
+        "nosniff": "nosniff",
+        "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+      }
+    },
+    {
+      "side": "b",
+      "path": "app.mjs",
+      "status": 200,
+      "exactSourceMatch": true,
+      "sha256": "54633d80a8c3f51419cf332474ea081bc1fe87ab8d55fd7002ef59c845151575",
+      "headers": {
+        "referrerPolicy": "no-referrer",
+        "cacheControl": "no-store",
+        "nosniff": "nosniff",
+        "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+      }
+    },
+    {
+      "side": "b",
+      "path": "identity.mjs",
+      "status": 200,
+      "exactSourceMatch": true,
+      "sha256": "c815c3496f1a13a4996fa37f4c1504a21978ec94f4c1db9bfd9ae86f23ea8121",
+      "headers": {
+        "referrerPolicy": "no-referrer",
+        "cacheControl": "no-store",
+        "nosniff": "nosniff",
+        "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+      }
+    }
+  ],
+  "sentinelDiagnostics": {
+    "initial": {
+      "status": 400,
+      "code": "validation_failed",
+      "result": "BLOCKED"
+    },
+    "corrected": {
+      "status": 400,
+      "code": "refresh_token_not_found",
+      "realCredentialUsed": false
+    },
+    "realBrowserProbeResults": "PASS in A and B"
+  },
+  "references": [
+    "https://supabase.com/docs/guides/auth/debugging/error-codes",
+    "https://github.com/supabase/auth/blob/master/internal/models/refresh_token.go"
+  ]
+}

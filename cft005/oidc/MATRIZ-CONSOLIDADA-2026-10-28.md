@@ -25,29 +25,29 @@ Evidências: [sessões automáticas](../oidc-backends/browser-session-evidence.j
 
 ## S01–S14 dos clientes SPA/Supabase originais
 
-Os estados abaixo mantêm o escopo original do README. As correções locais desses clientes ainda não foram implantadas nas origens antigas; a rodada atual não iniciou novo fluxo OAuth nesses clientes. PASS de BFF não vira PASS de refresh/sessão Supabase.
+Rodada executada pelo agente no Chrome externo em 28/10, 14:41–14:54 BRT, somente nas duas origens SPA de teste. Código preparado em c6b6ba2 e corrigido/implantado em 5a54b40; nenhuma alteração nos produtos publicados. [Eventos sanitizados](./refresh-real-evidence.json). Tempos são observações da interface, sem inspeção de credenciais. A igualdade do UUID validado por getUser foi comparada por pseudônimo em memória; somente o booleano foi persistido.
 
 | Caso | Estado | Limite atual |
 |---|---|---|
-| S01 A→B, senha e UUID Supabase | BLOCKED | Relato histórico preservado; sem nova homologação SPA. BFF usa identidade OIDC própria. |
+| S01 A→B, senha e UUID Supabase | PASS | A/B autenticados U1 sem digitar nova senha; mesma identidade validada no servidor e comparada em memória. |
 | S02 dois usuários/perfis | BLOCKED | Falta login positivo da segunda identidade prevista. |
-| S03 renovação manual A | BLOCKED | Contrato local PASS; refresh Supabase real pendente. Backends aprovados não recebem refresh grant. |
-| S04 B após renovar A | BLOCKED | Não houve refresh Supabase real. Independência BFF é uma prova separada. |
-| S05 logout A preserva B | BLOCKED | PASS no BFF não exercita o SDK Supabase original. |
-| S06 logout B/IdP | BLOCKED | Logout local BFF passou; sessão/fluxo central do SPA não foi homologado. |
-| S07 reentrada Auth0 | BLOCKED | Reentrada BFF sem nova senha passou; fluxo SPA original permanece sem nova prova. |
-| S08 cancelamento/retorno/PKCE | BLOCKED | BFF: abandono e oito barreiras reais PASS. Manipulação PKCE no navegador e callback de recusa real não testados. |
-| S09 expiração/refresh inválido | BLOCKED | Vencimento local BFF não equivale a expiração JWT, revogação ou refresh Supabase inválido. TTL global preservado. |
-| S10 persistência por origem | BLOCKED | Persistência BFF observada; SDK/armazenamento Supabase original não revalidado. |
+| S03 renovação manual A | PASS | 14:41:25.461 BRT e repetição na versão final 14:54:35.973: access/refresh mudaram; getUser confirmou mesma pessoa. Renovação B também PASS às 14:44:25.775. |
+| S04 B após renovar A | PASS | Recarga B manteve identidade verificada às 14:44:16.798. A também continuou após renovação B. Nenhum novo login nessas recargas. |
+| S05 logout A preserva B | PASS | A sem sessão às 14:53:37; B recarregado ainda verificado às 14:53:41. scope:local no SDK. |
+| S06 sair também de B | PASS | B sem sessão às 14:53:46. A reentrou depois sem senha, compatível com sessão central preservada; não é revogação. |
+| S07 reentrada Auth0 | PASS | 14:54:24: A verificado com mesma identidade, sem entrada de senha após logout local de ambos. |
+| S08 cancelamento/retorno/PKCE | BLOCKED | Callback real observado sem query após limpeza precoce; fixtures PKCE PASS. Cancelamento/PKCE adulterado reais no SPA ainda não executados. Provas BFF separadas. |
+| S09 expiração/refresh inválido | BLOCKED | Parte refresh fictício PASS: A/B HTTP 400 esperado, sessão principal preservada. Primeira sonda de formato BLOCKED preservada e corrigida. Expiração natural do access token e refresh real revogado não exercitados; TTL intacto. |
+| S10 persistência por origem | PASS | Recargas A/B após renovação e deploy mantiveram identidade sem login. Logout independente corrobora sessões por origem; não houve leitura de localStorage pelo agente nem reinício completo do Chrome. |
 | S11 leitura/escrita U1/U2 | BLOCKED | Dados negativos sintéticos U1 passaram; duas identidades positivas não comprovadas. |
 | S12 isolamento por produto publicado | FAIL | Mesmo usuário no modelo compartilhado Supabase continua sem fronteira comprovada por produto. Protótipo BFF prova uma alternativa isolada, sem integração aos dados publicados. |
 | S13 logout central/revogação | FAIL | Não implementado/homologado. Logout local e reentrada sem senha não constituem revogação central. |
-| S14 dependência/CSP/XSS/URLs/logs | BLOCKED | Correções SPA apenas na branch; cabeçalhos BFF PASS não homologam os clientes antigos nem retenção interna do provedor/host. |
+| S14 dependência/CSP/XSS/URLs/logs | BLOCKED | SDK 2.117.2/SRI conferido, dez arquivos e cabeçalhos HTTP PASS, limpeza antes do SDK e erros sanitizados implantados nos SPAs. Não é revisão XSS integral nem prova de retenção interna do host/provedor. |
 
 ## Correções e validação
 
-As correções de diagnóstico sem erros brutos, validação de cliente/subject e recuperação de logout permanecem na branch de testes. O código de execução BFF é o de b0839202423600018b8bd08fc364b5ab090ec899; B usa commit posterior somente de evidências, com executáveis idênticos. Nesta rodada não houve alteração de executável, configuração, TTL ou deploy.
+SPAs: instrumentação somente de booleanos, identidade pseudonimizada, rejeição de mudança de pessoa e limpeza precoce do callback em c6b6ba2; correção do sentinela de refresh em 5a54b40. Deploys A dep-dbh3clifngtc73f9lreg e B dep-dbh3cmo8v5cc73ea5890 LIVE, dez arquivos HTTP 200 idênticos à branch. Somente esses sites receberam cabeçalhos de proteção. Nenhuma configuração Auth0/Supabase, TTL, registro real ou produto publicado foi alterado. Código BFF b083920 preservado.
 
-Mantidos os resultados anteriores: 22/22 das duas suítes Node originais, 51/51 cenários do BFF e 91/91 cenários do contrato local de backend. São testes locais/fixtures, não emissões Auth0 reais. Não foram repetidos porque nenhuma implementação mudou. As novas observações de navegador e HTTP reais estão separadas nas evidências acima.
+Duas suítes Node originais repetidas: **27/27 PASS**, zero falhas. BFF 51/51 e contrato local backend 91/91 preservados da rodada anterior, sem nova alteração nesses executáveis. Fixtures e emissão/renovação real permanecem evidências distintas. A sonda corrigida não usa refresh emitido, não revoga sessão e não prova logout central. Nenhum registro de aplicativo foi consultado nesta rodada.
 
-**Único próximo passo:** preparar a rodada de renovação manual real nos clientes SPA isolados de teste, conferindo a implantação da branch corrigida e o tratamento de callback/logs antes de autenticar. Aplicativos publicados, dados reais e Apertaquem preservados.
+**Único próximo passo:** executar um ensaio isolado do ciclo de validade de um token realmente emitido, incluindo recuperação após falha de renovação, sem mudar TTL global ou revogar sessões de produtos publicados. Expiração natural e refresh inválido emitido continuam sem comprovação. U2 permanece BLOCKED; S12/S13 publicados FAIL; CFT-005 ABERTO.
