@@ -1,4 +1,4 @@
-# FotoCrachá — ambiente de testes 0.11.1 (Google Drive, gravação automática e Picker)
+# FotoCrachá — ambiente de testes 0.11.2 (Google Drive, gravação automática e Picker)
 
 **Aplicativo:** https://carometro-teste.onrender.com
 **Código único:** GitHub `marklienista/marklienista.github.io`, branch `carometro-lab-002`, diretório `carometro/`.
@@ -80,3 +80,18 @@ Próximo passo: confirmar publicação no Render (autoDeploy desligado), abrir a
 ## Ativação técnica em 28/10/2026
 
 A configuração pública do Picker está presente no GitHub; o Client ID OAuth Web e número do projeto `784125401141` permaneceram inalterados. O aplicativo carrega agora `app.js?v=0.11.1`, `session.js?v=0.11.1`, `picker.js?v=0.11.1` e `config.js?v=0.11.1` para evitar que o navegador reutilize módulos antigos sem a chave. A seleção de um arquivo específico indicado no convite utiliza `DocsView.setFileIds` com a opção de lista compatível com `drive.file`, conforme documentação do Google. O código foi conferido, mas o funcionamento real do Picker deve ser testado com a conta convidada e arquivos fictícios.
+
+
+## Diagnóstico de acesso compartilhado e cache — 28/10/2026
+
+Foi relatado que o convite de pasta/arquivo gerava 404 via API Google Drive com a conta convidada, apesar de a pasta estar compartilhada, e que o botão “Escolher no Google Drive” permaneceu desabilitado. A leitura das configurações no GitHub e do deploy publicado indicava que a chave pública do Picker já havia sido registrada corretamente. A ausência de autorização via `drive.file` explica o 404 para uma conta convidada; o botão desabilitado era incompatível com o código publicado e sugere módulo antigo em cache ou divergência do navegador. A causa exata do estado na aba do usuário não pôde ser observada diretamente.
+
+A versão **0.11.2** faz mudanças delimitadas, sem tocar em cadastros:
+- Não bloqueia o controle de escolher arquivo apenas porque uma sessão em cache ainda não reconheceu a chave; ao clicar, consulta `config.js?v=0.11.2` se necessário e informa como atualizar em caso de falha.
+- Quando o convite contém `?space=ID`, o botão é apresentado como **Autorizar cadastro recebido no Google Drive** e o Picker é orientado a exibir aquele arquivo.
+- Colar o link de uma pasta inacessível via API pode abrir o Picker como alternativa, sem criar outra pasta ou outro arquivo.
+- Os erros 403/404 de permissão passam a indicar a necessidade de selecionar `carometro.json`, sem afirmar incorretamente que ainda falta configurar uma API key.
+- O HTML importa `app.js?v=0.11.2`, que por sua vez importa `session.js?v=0.11.2` e `picker.js?v=0.11.2`; a sessão importa `config.js?v=0.11.2` e `drive-files.js?v=0.11.2`. Para evitar um HTML antigo no cache, acessar `https://carometro-teste.onrender.com/?release=0.11.2` ou usar Ctrl+Shift+R.
+- Testes locais simulados confirmaram seleção sugerida pelo Picker, botão habilitado mesmo com configuração inicial obsoleta e fallback ao colar uma pasta inacessível via API. **Não são testes reais de autorização com uma segunda conta.**
+
+**Situação da permissão no Drive:** quando um convidado tem acesso à pasta como Editor, isso não autoriza automaticamente o aplicativo a acessar os arquivos pelo escopo `drive.file`. O Google Picker é a forma adequada de permitir que esse aplicativo acesse o manifesto selecionado. Fotografia e edição por segunda conta continuam pendentes de prova real. Não criar contas/bancos/arquivos de controle próprios e não aumentar escopos.
