@@ -167,7 +167,7 @@ textarea:focus-visible{outline:3px solid #174c9d;outline-offset:3px}
 
 /* FotoCrachá 0.11 — portão de acesso, espaços do Drive e feedback persistente. */
 #entryGate[hidden],#workspaceApp[hidden],#entryDisconnected[hidden],#entryChoose[hidden],
-#retrySaveBtn[hidden],#reloadRemoteBtn[hidden],#settingsBtn[hidden]{display:none!important}
+#retrySaveBtn[hidden],#reauthorizeBtn[hidden],#reloadRemoteBtn[hidden],#settingsBtn[hidden]{display:none!important}
 .entry-gate{max-width:930px;margin:30px auto 70px}
 .entry-panel{padding:clamp(20px,4vw,42px)}
 .entry-panel h1{font-size:clamp(26px,4vw,40px);margin:19px 0 15px;letter-spacing:-1px;color:var(--deep)}
