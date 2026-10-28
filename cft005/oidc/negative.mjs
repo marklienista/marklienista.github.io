@@ -6,7 +6,7 @@ function client(sdk,config){
   if(url.protocol!=='https:'||url.pathname!=='/'||url.username||url.password||url.search||url.hash||!config.publishableKey?.startsWith('sb_publishable_'))throw Error('config_missing');
   // Deliberately discard the generated verifier. The callback receives only a
   // fixed synthetic mismatch, via the documented SDK storage adapter interface.
-  const storage={getItem:key=>key.endsWith('-code-verifier')?'CFT005_SYNTHETIC_WRONG_VERIFIER_012345678901234567890123456789':null,setItem:()=>{},removeItem:()=>{}};
+  const storage={getItem:key=>key.endsWith('-code-verifier')?JSON.stringify('CFT005_SYNTHETIC_WRONG_VERIFIER_012345678901234567890123456789'):null,setItem:()=>{},removeItem:()=>{}};
   return sdk.createClient(url.origin,config.publishableKey,{auth:{flowType:'pkce',persistSession:true,autoRefreshToken:false,detectSessionInUrl:false,storageKey:'cft005.oidc.negative',storage}});
 }
 export async function beginNegativeLogin(sdk,config){
@@ -20,5 +20,7 @@ export async function completeNegativeLogin(sdk,config,href){
   const probe=client(sdk,config);
   const {data,error}=await probe.auth.exchangeCodeForSession(url.searchParams.get('code'));
   const expected=error?.status===400&&error?.code==='bad_code_verifier';
-  return {case:'REAL_PKCE_MISMATCH',result:expected?'PASS':!error?'FAIL':'BLOCKED',at:new Date().toISOString(),requestRejected:Boolean(error),expectedPkceMismatch:expected,httpStatus:Number.isInteger(error?.status)?error.status:null,unexpectedSession:Boolean(data?.session),mainSessionStorageUntouched:true,callbackQueryCleared:!location.search};
+  const category=error?.code||error?.name;
+  const failureCategory=['bad_code_verifier','validation_failed','flow_state_not_found','flow_state_expired','AuthPKCECodeVerifierMissingError'].includes(category)?category:error?'UNCLASSIFIED':null;
+  return {case:'REAL_PKCE_MISMATCH',result:expected?'PASS':!error?'FAIL':'BLOCKED',at:new Date().toISOString(),requestRejected:Boolean(error),expectedPkceMismatch:expected,failureCategory,httpStatus:Number.isInteger(error?.status)?error.status:null,unexpectedSession:Boolean(data?.session),mainSessionStorageUntouched:true,callbackQueryCleared:!location.search};
 }
