@@ -1,6 +1,6 @@
 import {emptySpace,validateSpace,setPhoto} from './model.js?v=0.11';
 import {DriveFiles} from './drive-files.js?v=0.11';
-import {CLOUD_CONFIG} from './config.js?v=0.11';
+import {CLOUD_CONFIG} from './config.js?v=0.11.1';
 
 export class Session{
   constructor(){
