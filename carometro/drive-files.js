@@ -1,4 +1,4 @@
-import {Drive} from './drive.js';
+import {Drive} from './drive.js?v=0.11';
 
 const MANIFEST='carometro.json'; // Identificador interno antigo: não renomear arquivos existentes.
 export function driveItemId(input){
