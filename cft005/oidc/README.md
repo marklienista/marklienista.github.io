@@ -1,6 +1,6 @@
 # CFT-005 — OIDC externo com domínios independentes
 
-Continuidade em 27/10/2026: os [dois backends confidenciais de teste](../oidc-backends/README.md) estão LIVE, com health HTTP 200. A prova de autorização por produto foi preparada com recibos sanitizados; o login humano e as recusas com tokens reais ainda aguardam execução. Isso não altera os resultados anteriores da matriz S01–S14 nem o FAIL de isolamento do modelo Supabase publicado.
+Continuidade em 27/10/2026: os [dois backends confidenciais de teste](../oidc-backends/README.md) estão LIVE, com health HTTP 200. A emissão real A/U1 passou às 22:15 BRT; o primeiro recibo passou oito verificações locais e terminou BLOCKED na etapa remota. Login B, recusa criptográfica entre backends e login positivo U2 ainda aguardam comprovação. Isso não altera os resultados anteriores da matriz S01–S14 nem o FAIL de isolamento do modelo Supabase publicado.
 
 Estado em 26/10/2026: **SSO entre duas origens confirmado por relato do usuário e corroborado parcialmente no Supabase**; testes locais ampliados. O **isolamento dos dados por aplicativo está BLOQUEADO** no modelo de tokens atual. Os testes reais de refresh, expiração e logout ainda não foram concluídos. OAuth Server beta segue desligado, sem migração ou lançamento.
 

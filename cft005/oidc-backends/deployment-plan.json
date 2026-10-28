@@ -1,8 +1,8 @@
 {
-  "status": "BOTH_BACKENDS_HEALTH_PASS_REAL_LOGIN_PENDING",
+  "status": "REAL_A_U1_LOGIN_PASS_REMOTE_PROOF_BLOCKED_B_PENDING",
   "applied": true,
   "runtimeReady": true,
-  "realAuth0Issuance": "BLOCKED",
+  "realAuth0Issuance": "A_U1_PASS_B_NOT_EXECUTED",
   "workspace": {
     "name": "My Workspace",
     "id": "tea-dattm47lk1mc73cu74bg",
@@ -40,7 +40,7 @@
       "plan": "free",
       "region": "virginia",
       "autoDeploy": "no",
-      "latestDeployId": "dep-dbghl8bl550s738dqm1g",
+      "latestDeployId": "dep-dbgkms4ipgvc73drq0cg",
       "latestDeployStatus": "live",
       "health": {
         "status": 200,
@@ -106,7 +106,7 @@
       "evidence": "runtime-gate-evidence.json"
     }
   },
-  "nextStep": "Human login U1 in both origins and run the proof; inspect sanitized receipts, then repeat with U2. No credentials in outputs.",
+  "nextStep": "Repeat A proof with B responding, then login and run proof on B with U1. Keep current A session. Then test U2 and independent sessions.",
   "proofRunner": {
     "deployedOnBoth": true,
     "receiptPath": "/proof/results",
@@ -114,5 +114,15 @@
     "peerPath": "/proof/token-policy",
     "tokenDestinations": "FIXED_TEST_ORIGINS_ONLY",
     "realTokenExecution": "BLOCKED_AWAITING_BROWSER"
+  },
+  "currentRealUserEvidence": {
+    "sourceCommit": "b0839202423600018b8bd08fc364b5ab090ec899",
+    "file": "real-login-evidence.json",
+    "aLogin": "PASS",
+    "bLogin": "BLOCKED",
+    "aLocalProofPassed": 8,
+    "remoteClientBinding": "BLOCKED",
+    "secondIdentityPositiveLogin": "BLOCKED",
+    "existingServicesModified": false
   }
 }

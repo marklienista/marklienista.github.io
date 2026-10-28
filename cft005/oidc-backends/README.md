@@ -1,8 +1,16 @@
 # CFT-005 — Integração de dois backends confidenciais
 
-**27/10/2026: A/B LIVE e health HTTP 200. Segredos inseridos pelo usuário nos campos protegidos. Login humano e bloqueio com JWT real: BLOCKED, aguardando execução no navegador. Runner sanitizado preparado e validado localmente. CFT-005 continua ABERTO.**
+**27/10/2026: login real A/U1 PASS. Primeira prova A: oito verificações locais PASS, etapa remota BLOCKED. B ainda sem login comprovado. Ambos LIVE; CFT-005 continua ABERTO.**
 
 O código de integração está preparado nesta branch; os resultados locais abaixo não comprovam emissão pelo Auth0. Esta pasta é independente de `oidc/` e `backend-proof/` e não substitui os aplicativos publicados.
+
+## Primeiro login real A/U1 — 27/10/2026, 22:15 BRT
+
+Após o usuário reinstalar a credencial exclusiva do A no ambiente protegido e o deploy `dep-dbgkms4ipgvc73drq0cg`, o servidor registrou `PASS/authenticated` às 01:15:02.502Z de 28/10 (22:15 BRT de 27/10). A troca confidencial, assinatura de ID/access token e vínculo de cliente/subject foram validados pelo código em execução `b0839202423600018b8bd08fc364b5ab090ec899`. Não se inspecionou o segredo anterior.
+
+[real-login-evidence.json](real-login-evidence.json) preserva a observação sanitizada. No primeiro recibo, oito verificações PASS: duas permissões do token próprio, leitura/escrita próprias 200, outro rótulo 404 e outro produto nas rotas do A 403. O recibo inteiro é **BLOCKED**, pois a etapa remota não concluiu; a preservação final do outro registro não foi alcançada. Não há ainda prova criptográfica A→B ou B→A com JWT real, nem login positivo de U2.
+
+B respondeu depois com health 200 e recusou bearer fictício com 401. Isso permite repetir a prova, mas não comprova bloqueio de token válido estrangeiro. A possível partida após suspensão do plano gratuito é hipótese de transporte; não foi comprovada. Não repetir login do A ou implantar código sem necessidade, pois as sessões e os registros de teste são mantidos em memória.
 
 ## Continuidade: bootstrap e prova executável — 27/10/2026
 

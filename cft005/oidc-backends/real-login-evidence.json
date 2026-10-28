@@ -1,0 +1,126 @@
+{
+  "schema": 1,
+  "scope": "HOSTED_AUTH0_USER_LOGIN_AND_SYNTHETIC_AUTHORIZATION",
+  "sourceCommit": "b0839202423600018b8bd08fc364b5ab090ec899",
+  "sourceDeployA": "dep-dbgkms4ipgvc73drq0cg",
+  "sourceDeployB": "dep-dbgi0aom7kps739dcuqg",
+  "aLogin": {
+    "result": "PASS",
+    "observedAt": "2026-10-28T01:15:02.502Z",
+    "syntheticLabel": "U1",
+    "diagnostic": {
+      "product": "A",
+      "started": 2,
+      "callbacks": 1,
+      "successes": 1,
+      "failures": 0,
+      "last": {
+        "at": "2026-10-28T01:15:02.502Z",
+        "result": "PASS",
+        "stage": "authenticated"
+      }
+    }
+  },
+  "bLogin": {
+    "result": "BLOCKED_NOT_EXECUTED",
+    "diagnostic": {
+      "product": "B",
+      "started": 0,
+      "callbacks": 0,
+      "successes": 0,
+      "failures": 0,
+      "last": null
+    }
+  },
+  "proofAttempts": [
+    {
+      "startedAt": "2026-10-28T01:15:17.003Z",
+      "product": "A",
+      "user": "U1",
+      "cases": [
+        {
+          "id": "OWN-TOKEN-records:read",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-TOKEN-records:write",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-READ",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-WRITE",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-READ",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-WRITE",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-READ",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-WRITE",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "TRANSPORT-OR-POLICY",
+          "result": "BLOCKED"
+        }
+      ],
+      "finishedAt": "2026-10-28T01:15:27.528Z",
+      "result": "BLOCKED"
+    }
+  ],
+  "peerAvailabilityAfterAttempt": [
+    {
+      "path": "/health",
+      "httpStatus": 200,
+      "elapsedMs": 324,
+      "payload": {
+        "ready": true,
+        "product": "B"
+      }
+    },
+    {
+      "path": "/proof/token-policy",
+      "httpStatus": 401,
+      "elapsedMs": 184,
+      "payload": {
+        "error": "unauthorized"
+      }
+    }
+  ],
+  "limits": [
+    "First A proof passed eight local checks; remote token policy not completed.",
+    "B login and reverse-direction token refusal not yet proved.",
+    "Second identity positive login and bidirectional data separation pending.",
+    "No JWT, OAuth code, subject, cookie, CSRF, secret or record contents captured.",
+    "Shared published Supabase architecture S12 remains FAIL; CFT-005 OPEN."
+  ],
+  "existingAppsModified": false,
+  "realDataAccessed": false
+}
