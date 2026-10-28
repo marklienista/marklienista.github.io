@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0f4f42">
   <meta name="robots" content="noindex,nofollow">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>FotoCrachá — carômetros e crachás para sua turma</title>
+  <title>FotoCrachá — organize suas turmas no Google Drive</title>
   <meta name="description" content="Organize turmas, acompanhe fotografias e prepare carômetros e crachás para impressão.">
   <link rel="stylesheet" href="./styles.css">
 </head>
@@ -15,26 +15,63 @@
 <div class="app-shell">
   <header class="topbar no-print">
     <div class="brand"><span class="brand-mark" aria-hidden="true">◩</span><span><strong>FotoCrachá</strong><small>por <b>Marcelo Santos</b></small></span></div>
-    <div class="top-actions"><span class="version">LABORATÓRIO 0.10 · NÃO LANÇADO</span><button type="button" id="helpBtn" class="quiet">Ajuda</button><button type="button" id="settingsBtn" class="quiet">Configurar</button></div>
+    <div class="top-actions"><span class="version">LABORATÓRIO 0.11 · NÃO LANÇADO</span><button type="button" id="helpBtn" class="quiet">Ajuda</button><button type="button" id="settingsBtn" class="quiet" hidden>Configurar</button></div>
   </header>
   <main id="conteudo" class="container">
+    <div id="alerts" class="alerts no-print" aria-live="polite" role="status"></div>
+    <div id="entryGate" class="entry-gate no-print">
+      <section id="entryDisconnected" class="entry-panel panel" aria-labelledby="entryTitle">
+        <span class="tab">FOTOCRACHÁ · SUAS TURMAS NO SEU DRIVE</span>
+        <h1 id="entryTitle">Conecte seu Google Drive para começar</h1>
+        <p class="entry-lead">Organize suas turmas, reconheça os estudantes e prepare carômetros e crachás. Escolha uma conta Google segura. Nenhum estudante fictício é carregado automaticamente.</p>
+        <button id="entryConnectBtn" type="button" class="primary entry-connect">Conectar ao Google Drive</button>
+        <div class="privacy-notes">
+          <p><strong>Seus arquivos, na sua conta.</strong> O FotoCrachá processa cadastros e fotografias no navegador e os envia diretamente à pasta autorizada em seu Google Drive. Não mantém uma base própria desses dados em seus servidores. O Google armazena os arquivos conforme as configurações de sua conta.</p>
+          <p><strong>Proteja os estudantes.</strong> Prefira uma conta institucional ou privada segura, com senha forte e verificação em duas etapas. Confirme as autorizações da escola, controle quem acessa a pasta e não publique dados ou imagens de crianças. A pessoa e a instituição responsáveis pelo Drive devem administrar as permissões e cumprir suas obrigações de privacidade.</p>
+          <p><strong>Não edite os arquivos técnicos.</strong> Faça as alterações de nomes, turmas e imagens dentro do FotoCrachá. Alterar manualmente o arquivo de cadastro carometro.json, mover as pastas ou apagar fotografias pode impedir a leitura dos registros.</p>
+        </div>
+        <p class="entry-footnote">Ambiente de testes: use somente estudantes e fotografias fictícios até validar acessos e privacidade. Não há reconhecimento facial.</p>
+      </section>
+      <section id="entryChoose" class="entry-panel panel" aria-labelledby="entryChooseTitle" hidden>
+        <span class="tab">GOOGLE DRIVE CONECTADO</span>
+        <h1 id="entryChooseTitle">Qual espaço deseja abrir?</h1>
+        <p class="sub" id="entryAccount"></p>
+        <p>Abra um cadastro existente na sua conta, informe uma pasta compartilhada ou crie um espaço vazio. As alterações serão salvas automaticamente no Google Drive.</p>
+        <div class="chooser-actions">
+          <button id="refreshSpacesBtn" type="button" class="light">Atualizar meus espaços</button>
+          <button id="entryNewBtn" type="button" class="primary">+ Criar espaço</button>
+        </div>
+        <div id="spacesList" class="spaces-list" aria-live="polite"></div>
+        <div class="soft folder-access">
+          <label>Já recebeu uma pasta ou arquivo do FotoCrachá?
+            <input id="entryFolderLink" type="text" maxlength="450" placeholder="Cole o link do Google Drive ou o ID do arquivo">
+          </label>
+          <button id="openFolderBtn" type="button" class="light">Abrir pasta ou arquivo</button>
+          <button id="entryPickerBtn" type="button" class="light">Escolher no Google Drive</button>
+          <p class="sub" id="pickerNotice">Uma pasta compartilhada precisa estar autorizada para sua conta. O Google pode exigir também a seleção do arquivo no Google Picker.</p>
+        </div>
+        <button id="changeAccountBtn" type="button" class="quiet">Trocar conta Google</button>
+      </section>
+    </div>
+    <div id="workspaceApp" hidden>
     <div class="safety no-print" role="note"><strong>Ambiente de testes.</strong> Use apenas dados e imagens fictícios. Sem conexão ao Google Drive, as alterações ficam somente neste navegador de teste.</div>
     <section class="hero no-print" aria-labelledby="heroTitle">
       <div><span class="tab">RECORTES EM USO · EDUCAÇÃO</span><h1 id="heroTitle">Seu carômetro, seus crachás, tudo da mesma turma.</h1><p>Cadastre estudantes uma vez, organize fotografias e imprima carômetros ou crachás. Atualize as turmas a cada ano sem refazer o trabalho.</p></div>
       <div class="hero-symbol" aria-hidden="true"><span></span><span></span><span></span></div>
     </section>
     <section class="workspace-head no-print" aria-labelledby="spaceTitle">
-      <div><p class="eyebrow">ESPAÇO DE TRABALHO</p><h2 id="spaceTitle">Escola Exemplo</h2><p class="sub" id="modeText">Demonstração local · nenhuma informação no servidor</p></div>
-      <div class="head-actions"><button id="connectBtn" class="light" type="button">Conectar ao Google Drive</button><button id="saveBtn" class="primary" type="button" disabled>Salvar no Drive</button><button id="newSpaceBtn" class="light" type="button">+ Novo espaço</button></div>
+      <div><p class="eyebrow">ESPAÇO DE TRABALHO</p><h2 id="spaceTitle">Escola</h2><p class="sub" id="modeText"></p>
+        <p id="saveStatus" class="save-status" role="status" aria-live="polite">Conectado · aguardando alterações</p>
+        <div class="save-recovery"><button id="retrySaveBtn" type="button" class="light" hidden>Tentar salvar novamente</button><button id="reloadRemoteBtn" type="button" class="light" hidden>Reabrir do Google Drive</button></div>
+      </div>
+      <div class="head-actions"><button id="openDriveFolderBtn" class="light" type="button">Pasta no Google Drive</button><button id="switchSpaceBtn" class="light" type="button">Trocar espaço</button><button id="connectBtn" class="quiet" type="button">Trocar conta</button><button id="newSpaceBtn" class="light" type="button">+ Novo espaço</button></div>
     </section>
-    <p id="saveGuide" class="save-guide no-print" hidden aria-live="polite"></p>
     <nav class="navtabs no-print" aria-label="Áreas do FotoCrachá">
       <button type="button" data-view="turmas" aria-current="page">Turmas e estudantes</button>
       <button type="button" data-view="listas">Lista piloto</button>
       <button type="button" data-view="impressao">Imprimir</button>
       <button type="button" data-view="partilha">Compartilhar</button>
     </nav>
-    <div id="alerts" class="alerts no-print" aria-live="polite" role="status"></div>
     <section id="view-turmas" class="view" aria-labelledby="classesHeading">
       <div class="panel split">
         <div><p class="eyebrow">ORGANIZAÇÃO</p><h2 id="classesHeading">Suas turmas</h2><p class="sub">Alunos permanecem vinculados ao histórico, mesmo quando mudam de turma.</p></div>
@@ -82,14 +119,16 @@
     </section>
     <section id="view-partilha" class="view" hidden>
       <div class="panel">
-        <p class="eyebrow">PESSOAS E PERMISSÕES</p><h2>Compartilhar este espaço</h2><p>O responsável pode convidar outra pessoa para visualizar ou editar os arquivos. O Google Drive controla o acesso real.</p>
+        <p class="eyebrow">PESSOAS E PERMISSÕES</p><h2>Compartilhar a pasta no Google Drive</h2><p>O Google Drive gerencia as permissões. Compartilhe a <strong>pasta</strong> com pessoas específicas, como <strong>Leitor</strong> ou <strong>Editor</strong>. Apenas possuir o link não concede acesso a quem não foi autorizado.</p>
+        <div class="inline"><button id="manageFolderBtn" type="button" class="primary">Abrir pasta e gerenciar no Google</button><button id="copyFolderBtn" type="button" class="light">Copiar link da pasta</button></div>
         <div class="soft"><label>E-mail do convidado<input id="inviteEmail" type="email" placeholder="professora@escola.edu.br" autocomplete="off"></label><label>Permissão<select id="inviteRole"><option value="reader">Visualizar</option><option value="writer">Visualizar e editar</option></select></label><button id="inviteBtn" type="button" class="primary">Compartilhar pasta</button><button type="button" id="copyLinkBtn" class="light">Copiar link de acesso</button></div>
-        <p class="sub">Convidados poderão precisar selecionar o arquivo carometro.json pelo Google Picker para autorizar o acesso ao aplicativo. Uma pasta compartilhada não garante, sozinha, que todas as fotografias sejam acessíveis via API.</p>
-        <div class="inline"><button id="pickerBtn" type="button" class="light">Escolher arquivo compartilhado</button><button id="loadIdBtn" type="button" class="light">Abrir pelo ID do arquivo</button></div>
+        <p class="sub">As permissões ficam no Google Drive, não em uma lista paralela do FotoCrachá. Convidados podem precisar selecionar carometro.json pelo Google Picker; apenas compartilhar a pasta não dá acesso automaticamente à API para todas as fotografias. Edite um de cada vez e nunca modifique o arquivo técnico manualmente.</p>
+        <div class="inline"><button id="pickerBtn" type="button" class="light">Selecionar arquivo compartilhado</button></div>
         <div id="permissionsList" class="permissions"></div>
       </div>
     </section>
     <footer class="site-foot no-print"><p><strong>FotoCrachá</strong> · uma ferramenta de Marcelo Santos · versão de testes, não lançada</p><p>Fotografias e cadastros reais exigem autorização e política de privacidade adequada. Sem reconhecimento facial.</p></footer>
+    </div>
   </main>
 </div>
 <dialog id="studentDialog" aria-labelledby="studentModalTitle"><form id="studentForm"><h2 id="studentModalTitle">Estudante</h2><input type="hidden" id="studentId"><label>Nome completo<input id="studentName" maxlength="140" required></label><label>Matrícula / RA (opcional)<input id="studentCode" maxlength="80"></label><label>Turma<select id="studentClass" required></select></label><div class="dialog-buttons"><button type="button" class="light" data-close>Cancelar</button><button class="primary" type="submit">Salvar estudante</button></div></form></dialog>
@@ -105,7 +144,7 @@
   <p class="sub">Por enquanto, utilize somente informações e fotografias fictícias nesta prévia.</p>
   <div class="dialog-buttons"><button class="primary" type="button" data-close>Entendi</button></div>
 </dialog>
-<dialog id="helpDialog" aria-labelledby="helpTitle"><h2 id="helpTitle">Como utilizar o FotoCrachá</h2><p>Crie turmas, informe o professor responsável, cadastre estudantes fictícios e fotografias ou importe uma lista. Na seção <strong>Imprimir</strong>, escolha Carômetro ou Crachás. O texto adicional dos crachás existe apenas durante a impressão e não é salvo. Para guardar os cadastros no Drive, pressione <strong>Conectar ao Google Drive</strong>, escolha a conta Google, autorize e depois toque em <strong>Salvar no Drive</strong>.</p><p><strong>Privacidade:</strong> não utilize dados reais enquanto o acesso compartilhado, a recuperação e o tratamento institucional não forem validados. O laboratório não possui reconhecimento facial nem envia imagens a serviços de IA.</p><p><strong>Conta Marcelo Santos:</strong> a identidade comum é uma arquitetura futura; login único ainda não foi homologado. O Google Drive exige consentimento separado.</p><div class="dialog-buttons"><button class="primary" type="button" data-close>Entendi</button></div></dialog>
+<dialog id="helpDialog" aria-labelledby="helpTitle"><h2 id="helpTitle">Como utilizar o FotoCrachá</h2><p>Primeiro conecte uma conta segura do Google Drive. Depois abra uma pasta existente ou crie um espaço vazio. Cadastre turmas, professor, estudantes e fotografias fictícias. <strong>O FotoCrachá salva automaticamente no Google Drive</strong>; acompanhe o indicador no topo. Na aba Imprimir, escolha Carômetro ou Crachás. A informação adicional dos crachás não é salva.</p><p><strong>Compartilhamento:</strong> compartilhe a pasta pelo Google Drive, com permissão de leitura ou edição. Edite um de cada vez; para segurança o FotoCrachá evita sobrescrever alterações diferentes. O convidado pode precisar autorizar o arquivo pelo Google Picker.</p><p><strong>Não edite o arquivo técnico no Drive:</strong> modificar carometro.json, mover pastas ou apagar imagens pode impedir a recuperação.</p><p><strong>Privacidade:</strong> não utilize dados reais enquanto o acesso compartilhado, a recuperação e o tratamento institucional não forem validados. O laboratório não possui reconhecimento facial nem envia imagens a serviços de IA.</p><p><strong>Conta Marcelo Santos:</strong> a identidade comum é uma arquitetura futura; login único ainda não foi homologado. O Google Drive exige consentimento separado.</p><div class="dialog-buttons"><button class="primary" type="button" data-close>Entendi</button></div></dialog>
 <script type="module" src="./app.js"></script>
 </body>
 </html>
