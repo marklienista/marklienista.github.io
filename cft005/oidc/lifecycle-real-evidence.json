@@ -93,15 +93,67 @@
           "autoRefreshDisabledForThisTestClient": true,
           "expiry": null,
           "revocation": null
+        },
+        {
+          "phase": "EXPIRY_CHECKED",
+          "capturedAt": "2026-10-28T19:07:37.248Z",
+          "expiresAt": "2026-10-28T19:29:13.000Z",
+          "checkAfter": "2026-10-28T19:30:28.000Z",
+          "verifiedBeforeExpiry": true,
+          "autoRefreshDisabledForThisTestClient": true,
+          "expiry": {
+            "result": "PASS",
+            "checkedAt": "2026-10-28T19:30:29.920Z",
+            "oldAccessRejected": true,
+            "oldAccessExpired": true,
+            "oldAccessFailureCategory": "bad_jwt",
+            "expirySignal": true,
+            "httpStatus": 403,
+            "refreshSucceeded": true,
+            "identityPreserved": true,
+            "accessCredentialChanged": true,
+            "refreshCredentialChanged": true
+          },
+          "revocation": null
+        },
+        {
+          "phase": "LOCAL_REVOCATION_CHECKED",
+          "capturedAt": "2026-10-28T19:07:37.248Z",
+          "expiresAt": "2026-10-28T19:29:13.000Z",
+          "checkAfter": "2026-10-28T19:30:28.000Z",
+          "verifiedBeforeExpiry": true,
+          "autoRefreshDisabledForThisTestClient": true,
+          "expiry": {
+            "result": "PASS",
+            "checkedAt": "2026-10-28T19:30:29.920Z",
+            "oldAccessRejected": true,
+            "oldAccessExpired": true,
+            "oldAccessFailureCategory": "bad_jwt",
+            "expirySignal": true,
+            "httpStatus": 403,
+            "refreshSucceeded": true,
+            "identityPreserved": true,
+            "accessCredentialChanged": true,
+            "refreshCredentialChanged": true
+          },
+          "revocation": {
+            "result": "PASS",
+            "checkedAt": "2026-10-28T19:36:04.843Z",
+            "scope": "local",
+            "issuedRefreshRejected": true,
+            "expectedRevocationError": true,
+            "httpStatus": 400,
+            "localSessionAbsent": true
+          }
         }
       ],
-      "result": "BLOCKED",
-      "limit": "Waiting until the recorded checkAfter time; do not reload this tab"
+      "result": "PASS",
+      "limit": "Natural expiry and same-identity renewal verified; local issued-refresh revocation and U1 reentry verified separately. No central logout claim."
     }
   ],
   "limits": [
     "Credentials retained only in private test controller memory and normal SDK session storage; no credential values or account identifiers in this file",
-    "B remains frozen without automatic renewal; no additional normal B tab should remain open",
+    "B natural-expiry wait completed without reload or concurrent normal B client; later local revocation and U1 recovery completed.",
     "The 403 classifier requires recognized JWT category and expiry signal; generic 403 cannot pass"
   ],
   "deploys": {
@@ -335,6 +387,8 @@
     "sameConversation": true,
     "expectedWindowBrt": "2026-10-28 around 16:32",
     "deadlineBrt": "2026-10-28 16:30:28",
-    "stopAfterResult": true
+    "stopAfterResult": true,
+    "completedAt": "2026-10-28T19:37:12.817Z",
+    "result": "PASS"
   }
 }

@@ -159,6 +159,34 @@
       "verified": true,
       "sameIdentityAsU1": true,
       "passwordEntryRequired": false
+    },
+    {
+      "case": "A_AFTER_B_NATURAL_EXPIRY_AND_RENEWAL",
+      "at": "2026-10-28T19:37:12.814Z",
+      "verified": true,
+      "sameIdentityAsU1": true,
+      "newLoginStarted": false
+    },
+    {
+      "case": "B_NO_SESSION_AFTER_ISSUED_REFRESH_REVOCATION",
+      "at": "2026-10-28T19:36:04.843Z",
+      "verified": false,
+      "identityCleared": true
+    },
+    {
+      "case": "B_RECOVERY_AFTER_ISSUED_REFRESH_REJECTION",
+      "at": "2026-10-28T19:37:12.816Z",
+      "verified": true,
+      "sameIdentityAsU1": true,
+      "passwordEntryRequired": false,
+      "callbackQueryCleared": true
+    },
+    {
+      "case": "A_AFTER_B_LOCAL_REVOCATION_AND_RECOVERY",
+      "at": "2026-10-28T19:37:12.816Z",
+      "verified": true,
+      "sameIdentityAsU1": true,
+      "newLoginStarted": false
     }
   ]
 }
