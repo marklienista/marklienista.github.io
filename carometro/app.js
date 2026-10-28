@@ -95,7 +95,7 @@ function render(){
   $('captureModeBtn').disabled=!c||!S.editable();
   if(c)renderStudentCards(S.space,c.id,S.photos,S.selected,$('searchStudents').value,$('onlyMissing').checked,{
     onSelect:(id,checked)=>{if(checked)S.selected.add(id);else S.selected.delete(id);render()},
-    onPhoto:(id,file)=>run(async()=>{await S.photo(id,file);report('Fotografia de teste preparada na memória. Use Salvar no Drive para mantê-la.','warning')}),
+    onPhoto:(id,file)=>run(async()=>{await S.photo(id,file);report('Fotografia preparada. O FotoCrachá vai salvá-la automaticamente no Google Drive.','info')}),
     onEdit:openStudent,
     onRemovePhoto:id=>run(async()=>{if(!confirm('Remover a foto do carômetro? O arquivo anterior continuará no Drive até exclusão manual.'))return;S.removePhoto(id);report('Referência da foto retirada; nenhuma exclusão permanente foi realizada.','warning')}),
     onInactive:id=>run(async()=>{if(!confirm('Marcar o estudante como transferido nesta turma? O histórico será preservado.'))return;S.update(markStudentInactive(S.space,id,c.id));S.selected.delete(id)})
@@ -338,10 +338,15 @@ function initForms(){
     const all=classStudents(S.space,S.classId);const every=all.every(p=>S.selected.has(p.id));
     all.forEach(p=>every?S.selected.delete(p.id):S.selected.add(p.id));render();
   };
-  $('newSpaceBtn').onclick=()=>presentModal('newSpaceDialog');
+  $('newSpaceBtn').onclick=openNewSpaceDialog;
+  $('entryNewBtn').onclick=openNewSpaceDialog;
   $('newSpaceForm').onsubmit=e=>run(async()=>{
-    e.preventDefault();if(S.dirty&&S.isLinked()&&!confirm('Existem alterações não salvas no Drive. Criar outro carômetro mesmo assim?'))return;
-    S.startSpace($('newSpaceName').value);resetTemporaryPrint();closeModal('newSpaceDialog');report('Espaço criado. Cadastre uma turma e salve no Drive quando estiver pronto.');
+    e.preventDefault();
+    if(!await flushEdits())return;
+    S.startSpace($('newSpaceName').value);
+    resetTemporaryPrint();
+    closeModal('newSpaceDialog');
+    report('Espaço criado. As alterações serão salvas automaticamente no Google Drive.');
   });
   $('settingsForm').onsubmit=e=>run(async()=>{
     e.preventDefault();
@@ -349,7 +354,7 @@ function initForms(){
     if(!name)throw Error('Informe o nome da escola.');
     const changed=structuredClone(S.space);changed.school.name=name;S.update(changed);
     if($('logoFile').files?.[0])await S.logo($('logoFile').files[0]);
-    $('logoFile').value='';closeModal('settingsDialog');report('Configurações aplicadas. Salve no Drive se desejar manter.');
+    $('logoFile').value='';closeModal('settingsDialog');report('Configurações aplicadas. O salvamento acontece automaticamente.');
   });
 }
 
@@ -394,7 +399,7 @@ function initPromotion(){
     const target=Number(S.year)+1;
     const result=applyPromotion(S.space,Number(S.year),target,promotionPlan);
     S.update(result.space);S.chooseYear(target);S.selected.clear();closeModal('promotionDialog');
-    report('Passagem preparada: '+result.done.length+' turmas promovidas. Salve no Drive para confirmar o registro.');
+    report('Passagem preparada: '+result.done.length+' turmas promovidas. Salvamento automático ativado.');
   });
 }
 async function loadPermissions(){
@@ -416,35 +421,41 @@ async function loadPermissions(){
   }catch(e){root.textContent='Permissões indisponíveis: '+e.message}
 }
 function initSharing(){
+  $('manageFolderBtn').onclick=()=>run(async()=>showGoogleFolder());
+  $('openDriveFolderBtn').onclick=()=>run(async()=>showGoogleFolder());
+  $('copyFolderBtn').onclick=()=>run(clipboardFolder);
   $('inviteBtn').onclick=()=>run(async()=>{
-    if(!S.isCloud()||!S.link?.folderId||!S.link.canShare)throw Error('Conecte e salve um espaço sob sua responsabilidade no Drive.');
+    if(!S.isCloud()||!S.link?.folderId||!S.link.canShare)throw Error('É necessário ser responsável por uma pasta do FotoCrachá no Google Drive.');
     const email=$('inviteEmail').value.trim();
-    if(!confirm('Compartilhar com '+email+' pelo Google Drive?'))return;
-    await S.drive.share(S.link.folderId,email,$('inviteRole').value);
-    report('Permissão enviada pelo Google. O convidado deve autorizar o arquivo no aplicativo; o acesso completo às fotos requer teste.','warning');
+    const role=$('inviteRole').value;
+    if(!email)throw Error('Informe o e-mail do convidado.');
+    if(!confirm('Convidar '+email+' como '+(role==='writer'?'Editor':'Leitor')+' da pasta no Google Drive?'))return;
+    await S.drive.share(S.link.folderId,email,role);
+    report('Permissão da pasta enviada pelo Google. A pessoa deve abrir a pasta com sua conta e pode precisar autorizar o arquivo pelo Google Picker.','info');
     await loadPermissions();
   });
   $('copyLinkBtn').onclick=()=>run(async()=>{
-    if(!S.link?.manifestId)throw Error('Salve no Drive antes de gerar o link.');
-    const u=new URL(location.href);u.search='';u.searchParams.set('space',S.link.manifestId);
-    try{await navigator.clipboard.writeText(u.href);report('Link copiado. Compartilhe somente com pessoas autorizadas no Google Drive.')}
-    catch{prompt('Copie o link:',u.href)}
+    if(!S.link?.manifestId)throw Error('O Google Drive ainda não confirmou o cadastro.');
+    const url=new URL(location.href);url.search='';
+    url.searchParams.set('space',S.link.manifestId);
+    try{await navigator.clipboard.writeText(url.href);report('Link do FotoCrachá copiado. A pessoa ainda precisa receber acesso à pasta no Google Drive.')}
+    catch{prompt('Copie o link do FotoCrachá:',url.href)}
   });
   $('pickerBtn').onclick=()=>run(async()=>{
-    if(!S.isCloud())throw Error('Conecte o Drive.');
+    if(!S.isCloud())throw Error('Conecte ao Google Drive.');
+    if(!S.config.pickerKey)throw Error('O Google Picker ainda não está ativado. Use uma pasta já autorizada ao aplicativo.');
+    if(!await flushEdits())return;
     const id=await pickManifest(S.drive.token,S.config.pickerKey,S.config.projectNumber);
-    if(!id)return;
-    if(S.dirty&&!confirm('Descartar alterações ainda não salvas neste carômetro?'))return;
-    const r=await loadSpace(id);
-    report(r.failed?'Carômetro aberto, mas '+r.failed+' imagens não puderam ser acessadas pelo convidado.':'Carômetro compartilhado aberto.');
+    if(id)await openSpace(id);
   });
-  $('loadIdBtn').onclick=()=>run(async()=>{
-    if(!S.isCloud())throw Error('Conecte o Drive.');
-    const id=prompt('Cole o ID do arquivo carometro.json');if(!id)return;
-    if(S.dirty&&!confirm('Descartar mudanças não salvas?'))return;
-    const r=await loadSpace(id.trim());
-    report(r.failed?'Registro aberto; algumas fotografias não foram autorizadas pelo Drive.':'Registro aberto do Drive.');
+  $('entryPickerBtn').onclick=()=>run(async()=>{
+    if(!S.isCloud())throw Error('Conecte ao Google Drive.');
+    if(!S.config.pickerKey)throw Error('O Google Picker ainda não foi ativado para este aplicativo.');
+    const id=await pickManifest(S.drive.token,S.config.pickerKey,S.config.projectNumber);
+    if(id)await openSpace(id);
   });
+  $('refreshSpacesBtn').onclick=()=>run(refreshSpaces);
+  $('openFolderBtn').onclick=()=>run(openProvidedFolder);
 }
 function updatePrintOptions(){
   const badges=$('printFormat').value==='badges';
@@ -550,63 +561,31 @@ function initPilot(){
     if(!count)throw Error('Nenhuma alteração marcada.');
     if(!confirm('Aplicar '+count+' alterações selecionadas ao carômetro?'))return;
     const result=applyPilot(S.space,pilot);S.update(result.space);pilot=[];$('pilotResults').hidden=true;$('pilotFile').value='';
-    report(result.applied+' alterações aplicadas. Salve no Drive para persistir.');
+    report(result.applied+' alterações aplicadas. O FotoCrachá vai gravá-las no Google Drive.');
   });
 }
 function initGoogle(){
-  $('connectBtn').onclick=()=>run(async()=>{
-    if(S.isCloud()){
-      if(S.dirty&&!confirm('Existem alterações não salvas. Desconectar mesmo assim?'))return;
-      const previousDrive=S.drive;
-      previousDrive.disconnect();
-      S.localSpaces.clear();
-      S.startSpace('Escola Exemplo');resetTemporaryPrint();
-      S.drive=null;S.dirty=false;render();
-      const button=$('openExistingBtn');if(button)button.remove();
-      report('Conta Google desconectada deste navegador. Para entrar com outra conta, use Conectar ao Google Drive.');
-      return;
-    }
-    if(!S.config.clientId){
-      presentModal('driveUnavailableDialog');
-      return;
-    }
-    const email=await S.connect();render();
-    report('Google Drive conectado'+(email?' a '+email:'')+'. Para guardar seu primeiro carômetro, toque em Salvar no Drive.','info');
-    $('saveBtn').scrollIntoView({block:'center',behavior:'smooth'});
-    const id=new URL(location.href).searchParams.get('space');
-    if(id){
-      if(S.dirty&&!confirm('Descartar alterações locais para abrir o convite?'))return;
-      try{const r=await loadSpace(id);report(r.failed?'Convite aberto, mas imagens requerem autorização por arquivo.':'Carômetro compartilhado aberto.')}
-      catch(e){report('O acesso ao arquivo compartilhado não foi comprovado. Use o Google Picker ou confirme a permissão: '+e.message,'warning')}
-    } else {
-      let existing=[];
-      try{existing=await S.drive.spaces();}
-      catch(error){
-        report('Conta Google conectada. A listagem de carômetros ainda não pôde ser acessada: '+error.message,'warning');
-        return;
-      }
-      if(existing.length){
-        const button=document.createElement('button');button.className='light';button.id='openExistingBtn';button.textContent='Abrir carômetro do Drive';button.type='button';
-        const old=$('openExistingBtn');if(old)old.remove();
-        button.onclick=()=>run(async()=>{
-          const files=await S.drive.spaces();
-          const choice=prompt('Selecione o número do arquivo:\n'+files.map((f,i)=>(i+1)+' · '+(f.modifiedTime||'')).join('\n'));
-          if(!choice)return;
-          const item=files[Number(choice)-1];if(!item)throw Error('Número inválido.');
-          if(S.dirty&&!confirm('Descartar mudanças locais não salvas?'))return;
-          const result=await loadSpace(item.id);report(result.failed?'Aberto; '+result.failed+' fotos sem acesso.':'Carômetro recuperado do Google Drive.');
-        });
-        $('connectBtn').after(button);
-      }
-    }
+  $('entryConnectBtn').onclick=()=>run(connectGoogle);
+  $('connectBtn').onclick=()=>run(disconnectGoogle);
+  $('changeAccountBtn').onclick=()=>run(disconnectGoogle);
+  $('switchSpaceBtn').onclick=()=>run(switchSpace);
+  $('retrySaveBtn').onclick=()=>run(async()=>{
+    if(!saveError||saveError.code==='CONFLICT')return;
+    saveError=null;savePhase='pending';
+    if(await saveNow())report('Alterações confirmadas no Google Drive.','info');
   });
-  $('saveBtn').onclick=()=>run(async()=>{
-    const link=await S.save();
-    report('Carômetro salvo no Drive. Arquivo ID '+link.manifestId+'.');
+  $('reloadRemoteBtn').onclick=()=>run(async()=>{
+    if(!S.link?.manifestId)throw Error('O cadastro no Google Drive não está associado a esta página.');
+    if(!confirm('Descartar alterações não salvas nesta página e reabrir a versão atual do Google Drive? Essa ação não apaga o arquivo remoto.'))return;
+    const id=S.link.manifestId;
+    if(saveTimer){clearTimeout(saveTimer);saveTimer=null}
+    if(savePending)await savePending;
+    S.resetToGate();saveError=null;savePhase='idle';savedAt=null;
+    await openSpace(id);
   });
 }
 window.addEventListener('beforeunload',e=>{
-  if(S.dirty&&S.isLinked()){e.preventDefault();e.returnValue=''}
+  if((S.hasSpace()&&S.dirty)||savePending){e.preventDefault();e.returnValue=''}
 });
 function start(){
   // O Client ID é definido para todo o aplicativo, não por parâmetros de convite.
@@ -615,6 +594,7 @@ function start(){
     address.searchParams.delete('client');
     history.replaceState(null,'',address.href);
   }
+  S.onUpdate=()=>{render();queueAutosave()};
   bindNavigation();initForms();initCapture();initPromotion();initPilot();initPrint();initSharing();initGoogle();
   render();
   if(S.config.clientId){
@@ -623,7 +603,7 @@ function start(){
     prepareGoogleIdentity().catch(()=>{});
   }
   if(new URL(location.href).searchParams.has('space')){
-    report('Você recebeu um convite. Conecte ao Google Drive para abrir o carômetro compartilhado.','warning');
+    report('Você recebeu o link de um espaço. Conecte-se à conta Google autorizada para abri-lo.','warning');
   }
 }
 start();
