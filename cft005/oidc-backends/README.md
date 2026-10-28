@@ -4,6 +4,12 @@
 
 O código de integração está preparado nesta branch; os resultados locais abaixo não comprovam emissão pelo Auth0. Esta pasta é independente de `oidc/` e `backend-proof/` e não substitui os aplicativos publicados.
 
+## Logout B e reentrada A sem nova senha — 28/10/2026, 09:10 BRT
+
+O usuário confirmou B sem sessão após sair apenas dali e A autenticado sem nova senha, com execução da prova. O servidor registrou login B às 12:10:32.796Z e recibo B/U1 **11/11 PASS** às 12:10:35.808Z; em seguida, login A às 12:10:43.987Z e recibo A/U1 **11/11 PASS** às 12:10:59.447Z. [session-reentry-evidence.json](session-reentry-evidence.json) preserva os dois recibos e os limites. O estado B após logout e a ausência de nova senha são relatos da interface; não houve leitura de cookies ou auditoria de evento de logout no servidor. A troca de código e a prova A corroboram a nova entrada funcional.
+
+PASS nesta rodada para logout local B e reentrada A sem nova senha. Isso é compatível com a sessão central mantida; não comprova logout central ou revogação. Os contadores de falha incluem as sondas anônimas anteriores e a recusa U2, não novas falhas atribuídas ao usuário. U2, refresh real do SPA e o modelo publicado mantêm seus limites. Sem alteração de executável ou deploy.
+
 ## Continuidade sem U2 e retornos inválidos — 28/10/2026
 
 O usuário confirmou não ter senha Auth0 para a identidade U2 configurada. Login positivo U2 e separação recíproca entre duas identidades ficam **BLOCKED** por indisponibilidade da credencial autorizada. A tentativa Google recusada foi preservada. Nenhuma conta foi criada, redefinida, vinculada ou adicionada à autorização; os PASS históricos U1 não mudam.
@@ -162,6 +168,6 @@ Durante a integração local, o emissor de teste inicialmente recusou Basic porq
 
 Há dois serviços LIVE, emissão humana A/B com U1, prova criptográfica remota bidirecional e logout local A/continuidade B PASS. Falta login positivo U2 e a rodada completa de sessões. Esses resultados não removem o FAIL de S12 na arquitetura publicada. Sessões/dados/recibos em memória são adequados apenas à prova de instância única, sem disponibilidade, durabilidade ou logout central. As rotas dos aplicativos existentes continuam fora desta mudança. Os recibos públicos são evidência sanitizada de teste, não um sistema de auditoria durável ou com atestação externa.
 
-**Único próximo passo:** com U1, sair apenas do B e reentrar no A, informar se foi pedida senha e executar a prova A. U2 permanece BLOCKED sem criar ou redefinir conta. Não enviar segredos por chat. A participação humana no login é necessária enquanto o controle autenticado do Chrome permanecer interrompido.
+**Único próximo passo:** em nova janela anônima, abrir a entrada A e interromper na tela Auth0 antes de autenticar; depois abrir a página inicial A em novo contexto anônimo e conferir ausência de sessão. U2 permanece BLOCKED sem criar ou redefinir conta. Não enviar segredos por chat. A participação humana no login é necessária enquanto o controle autenticado do Chrome permanecer interrompido.
 
 Referências: [openid-client](https://github.com/panva/openid-client), [Auth0: clientes confidenciais](https://auth0.com/docs/get-started/applications/confidential-and-public-applications), [Render: variáveis e segredos](https://render.com/docs/configure-environment-variables).

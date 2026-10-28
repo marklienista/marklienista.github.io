@@ -106,7 +106,7 @@
       "evidence": "runtime-gate-evidence.json"
     }
   },
-  "nextStep": "With U1, log out locally from B and reenter A; report whether a password is requested, then run the A proof.",
+  "nextStep": "In a fresh private context, open A login, abandon at the Auth0 login page before authenticating, then reopen A home in a fresh private context and report no local session.",
   "proofRunner": {
     "deployedOnBoth": true,
     "receiptPath": "/proof/results",
@@ -127,8 +127,8 @@
     "bToATokenPolicy": "PASS",
     "aProofPassed": 11,
     "bProofPassed": 11,
-    "independentSessionLogout": "PASS_A_LOCAL_LOGOUT_B_CONTINUITY",
-    "reentryA": "PASS_FUNCTIONAL_PASSWORD_PROMPT_NOT_REPORTED",
+    "independentSessionLogout": "PASS_A_LOCAL_LOGOUT_B_CONTINUITY_AND_B_LOCAL_LOGOUT",
+    "reentryA": "PASS_NO_NEW_PASSWORD_USER_REPORTED_SERVER_LOGIN_AND_PROOF_CORROBORATED",
     "browserSessionPersistenceB": "PASS_WITHIN_RUNNING_BROWSER",
     "u2AttemptEvidence": "u2-login-denial-evidence.json",
     "anonymousCallbackGates": {
@@ -136,6 +136,7 @@
       "total": 8,
       "evidence": "anonymous-callback-evidence.json",
       "realProviderCancellation": "NOT_PROVED"
-    }
+    },
+    "sessionReentryEvidence": "session-reentry-evidence.json"
   }
 }

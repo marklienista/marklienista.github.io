@@ -1,0 +1,206 @@
+{
+  "schema": 1,
+  "date": "2026-10-28",
+  "scope": "HOSTED_B_LOCAL_LOGOUT_AND_A_PASSWORD_FREE_REENTRY",
+  "implementationCommit": "b0839202423600018b8bd08fc364b5ab090ec899",
+  "userReport": {
+    "bAfterLocalLogout": "NO_LOCAL_SESSION",
+    "aReentry": "WITHOUT_NEW_PASSWORD",
+    "aProof": "EXECUTED"
+  },
+  "diagnostics": {
+    "A": {
+      "product": "A",
+      "started": 3,
+      "callbacks": 5,
+      "successes": 1,
+      "failures": 4,
+      "last": {
+        "at": "2026-10-28T12:10:43.987Z",
+        "result": "PASS",
+        "stage": "authenticated"
+      }
+    },
+    "B": {
+      "product": "B",
+      "started": 2,
+      "callbacks": 4,
+      "successes": 1,
+      "failures": 3,
+      "last": {
+        "at": "2026-10-28T12:10:32.796Z",
+        "result": "PASS",
+        "stage": "authenticated"
+      }
+    }
+  },
+  "proofReceipts": {
+    "B": {
+      "startedAt": "2026-10-28T12:10:35.043Z",
+      "product": "B",
+      "user": "U1",
+      "cases": [
+        {
+          "id": "OWN-TOKEN-records:read",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-TOKEN-records:write",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-READ",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-WRITE",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-READ",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-WRITE",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-READ",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-WRITE",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "PEER-TOKEN-records:read",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "PEER-TOKEN-records:write",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "OTHER-USER-UNCHANGED",
+          "expected": true,
+          "actual": true,
+          "result": "PASS"
+        }
+      ],
+      "finishedAt": "2026-10-28T12:10:35.808Z",
+      "result": "PASS"
+    },
+    "A": {
+      "startedAt": "2026-10-28T12:10:58.814Z",
+      "product": "A",
+      "user": "U1",
+      "cases": [
+        {
+          "id": "OWN-TOKEN-records:read",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-TOKEN-records:write",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-READ",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-WRITE",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-READ",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-WRITE",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-READ",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-WRITE",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "PEER-TOKEN-records:read",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "PEER-TOKEN-records:write",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "OTHER-USER-UNCHANGED",
+          "expected": true,
+          "actual": true,
+          "result": "PASS"
+        }
+      ],
+      "finishedAt": "2026-10-28T12:10:59.447Z",
+      "result": "PASS"
+    }
+  },
+  "verdicts": {
+    "bLocalLogout": "PASS_USER_UI_REPORT",
+    "aReentry": "PASS_SERVER_LOGIN_AND_USER_REPORT_NO_NEW_PASSWORD",
+    "aProof": "PASS_11_OF_11",
+    "bProofBeforeLogout": "PASS_11_OF_11"
+  },
+  "limits": [
+    "B local logout state and absence of a new password were reported by the user; no logout-event audit or browser-cookie inspection available.",
+    "Public diagnostics and receipts corroborate successful B login/proof followed by A login/proof, not a central logout.",
+    "Diagnostic failure counts include earlier anonymous negative probes and the U2 denial; they are not attributed to new user failures.",
+    "U2 positive login and reciprocal two-user proof remain BLOCKED; original SPA refresh and central revocation remain unproved.",
+    "No token, OAuth code, subject, cookie, CSRF, secret, email or record contents captured."
+  ]
+}
