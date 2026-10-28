@@ -10,6 +10,8 @@ O usuário tentou entrar com o e-mail autorizado U2 e relatou a mensagem de cont
 
 O identificador U2 fornecido corresponde à conexão Auth0 de e-mail/senha. Google e e-mail/senha podem representar identidades diferentes com o mesmo e-mail. O método usado na tentativa ainda não foi confirmado; essa possibilidade é hipótese, sem leitura do token ou alteração do mapeamento. Não autorizar por igualdade de e-mail nem vincular contas para contornar a recusa. Os recibos atuais em memória estavam vazios; os recibos históricos já preservados continuam documentados. Não houve mudança de código ou deploy. A resposta não esclareceu se a reentrada U1 anterior pediu senha.
 
+Continuidade: o usuário confirmou que usou **Continuar com Google**. Esse método difere do cadastro Auth0 de e-mail/senha informado para U2 e é compatível com a recusa observada; o subject recebido não foi lido. Aguardamos nova tentativa pelo formulário Auth0 no A. Se essa credencial não estiver disponível, manter U2 BLOCKED sem criar, redefinir ou vincular contas.
+
 ## Logout local A e continuidade B — 27/10/2026, 22:37 BRT
 
 O usuário confirmou A sem sessão e B ainda autenticado. O segundo recibo B/U1 terminou às 01:37:18.333Z de 28/10 com **11/11 PASS**, sem novo login B: o contador permaneceu em um sucesso e o último login continuou às 01:31:41.486Z. A nova entrada funcional do A passou às 01:36:56.235Z. A ausência de sessão A foi relatada na interface; não há auditoria de eventos de logout no servidor. A necessidade de senha na reentrada não foi informada.
@@ -154,6 +156,6 @@ Durante a integração local, o emissor de teste inicialmente recusou Basic porq
 
 Há dois serviços LIVE, emissão humana A/B com U1, prova criptográfica remota bidirecional e logout local A/continuidade B PASS. Falta login positivo U2 e a rodada completa de sessões. Esses resultados não removem o FAIL de S12 na arquitetura publicada. Sessões/dados/recibos em memória são adequados apenas à prova de instância única, sem disponibilidade, durabilidade ou logout central. As rotas dos aplicativos existentes continuam fora desta mudança. Os recibos públicos são evidência sanitizada de teste, não um sistema de auditoria durável ou com atestação externa.
 
-**Único próximo passo:** confirmar se U2 entrou pelo Google ou pelo formulário Auth0 de e-mail/senha e repetir somente pelo método correspondente ao cadastro autorizado. Se essa identidade não estiver acessível, manter a rodada U2 BLOCKED. Não enviar segredos por chat. A participação humana no login é necessária enquanto o controle autenticado do Chrome permanecer interrompido.
+**Único próximo passo:** tentar U2 pelo formulário Auth0 de e-mail/senha no A, em nova janela anônima, e executar a prova se aparecer Produto A · U2. Se essa identidade não estiver acessível, manter a rodada U2 BLOCKED sem criar ou redefinir conta. Não enviar segredos por chat. A participação humana no login é necessária enquanto o controle autenticado do Chrome permanecer interrompido.
 
 Referências: [openid-client](https://github.com/panva/openid-client), [Auth0: clientes confidenciais](https://auth0.com/docs/get-started/applications/confidential-and-public-applications), [Render: variáveis e segredos](https://render.com/docs/configure-environment-variables).

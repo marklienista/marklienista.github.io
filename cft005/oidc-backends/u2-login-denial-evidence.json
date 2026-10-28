@@ -34,9 +34,9 @@
     "positiveU2Login": "BLOCKED",
     "reciprocalUserIsolation": "BLOCKED"
   },
-  "loginMethod": "NOT_YET_CONFIRMED",
+  "loginMethod": "GOOGLE_SOCIAL_CONFIRMED_BY_USER",
   "configuredU2LoginMethod": "AUTH0_DATABASE_EMAIL_PASSWORD",
-  "hypothesis": "A social identity with the same email may have a different subject. Actual method/subject not captured or confirmed.",
+  "hypothesis": "User confirmed Google social login; configured U2 identity uses Auth0 database email/password. This is consistent with allowlist denial; actual returned subject was not captured.",
   "previousU1PasswordPrompt": "NOT_REPORTED",
   "limits": [
     "No token, OAuth code, subject, cookie, CSRF, secret, email or record contents captured.",
@@ -44,5 +44,5 @@
     "Empty in-memory receipts do not invalidate earlier receipts preserved in Git.",
     "No positive U2 login proved. No conclusion about SSO password prompt from this reply."
   ],
-  "nextStep": "Confirm Google versus Auth0 email/password method, then repeat only the method corresponding to the authorized identity."
+  "nextStep": "Try the existing authorized Auth0 email/password identity as U2 in A, in a fresh private browser context. If unavailable, keep U2 BLOCKED without creating or resetting an account."
 }

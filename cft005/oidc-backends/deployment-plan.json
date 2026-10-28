@@ -106,7 +106,7 @@
       "evidence": "runtime-gate-evidence.json"
     }
   },
-  "nextStep": "Confirm Google versus Auth0 email/password method, then repeat only the method corresponding to the authorized identity.",
+  "nextStep": "Try the existing authorized Auth0 email/password identity as U2 in A, in a fresh private browser context. If unavailable, keep U2 BLOCKED without creating or resetting an account.",
   "proofRunner": {
     "deployedOnBoth": true,
     "receiptPath": "/proof/results",
@@ -121,7 +121,7 @@
     "aLogin": "PASS",
     "bLogin": "PASS",
     "remoteClientBinding": "BIDIRECTIONAL_PASS_U1",
-    "secondIdentityPositiveLogin": "BLOCKED_SUBJECT_ALLOWLIST_LOGIN_METHOD_UNCONFIRMED",
+    "secondIdentityPositiveLogin": "BLOCKED_GOOGLE_USED_INSTEAD_OF_CONFIGURED_AUTH0_DATABASE_IDENTITY",
     "existingServicesModified": false,
     "aToBTokenPolicy": "PASS",
     "bToATokenPolicy": "PASS",
