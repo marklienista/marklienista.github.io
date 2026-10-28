@@ -1,0 +1,612 @@
+{
+  "schema": 1,
+  "date": "2026-10-28",
+  "scope": "AUTOMATED_EXTERNAL_CHROME_SESSION_PERSISTENCE_AND_LOCAL_EXPIRY",
+  "implementationCommit": "b0839202423600018b8bd08fc364b5ab090ec899",
+  "deployments": {
+    "A": {
+      "id": "dep-dbgkms4ipgvc73drq0cg",
+      "commit": "b0839202423600018b8bd08fc364b5ab090ec899",
+      "status": "live"
+    },
+    "B": {
+      "id": "dep-dbgkttfb9u1s738jjma0",
+      "commit": "a87f74dbaa3dcbbcbb74fcd268a690520606441b",
+      "status": "live",
+      "executablesSameAsImplementation": true
+    }
+  },
+  "previousAttempt": {
+    "result": "BLOCKED_INCONCLUSIVE",
+    "reason": "User closed the whole browser before completing the timed test; no expiry conclusion from that attempt."
+  },
+  "control": {
+    "browser": "External Chrome via connected official extension",
+    "user": "U1",
+    "credentialEntryByAgent": false,
+    "credentialOrTokenRead": false,
+    "settingsChanged": false,
+    "executablesChanged": false,
+    "deploymentTriggered": false
+  },
+  "baseline": {
+    "A": {
+      "product": "A",
+      "started": 1,
+      "callbacks": 1,
+      "successes": 1,
+      "failures": 0,
+      "last": {
+        "at": "2026-10-28T16:32:33.892Z",
+        "result": "PASS",
+        "stage": "authenticated"
+      }
+    },
+    "B": {
+      "product": "B",
+      "started": 1,
+      "callbacks": 1,
+      "successes": 1,
+      "failures": 0,
+      "last": {
+        "at": "2026-10-28T16:38:20.481Z",
+        "result": "PASS",
+        "stage": "authenticated"
+      }
+    }
+  },
+  "receiptsBeforeExpiry": {
+    "A": [
+      {
+        "startedAt": "2026-10-28T16:33:58.799Z",
+        "product": "A",
+        "user": "U1",
+        "cases": [
+          {
+            "id": "OWN-TOKEN-records:read",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OWN-TOKEN-records:write",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OWN-READ",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OWN-WRITE",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-USER-READ",
+            "expected": 404,
+            "actual": 404,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-USER-WRITE",
+            "expected": 404,
+            "actual": 404,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-PRODUCT-READ",
+            "expected": 403,
+            "actual": 403,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-PRODUCT-WRITE",
+            "expected": 403,
+            "actual": 403,
+            "result": "PASS"
+          },
+          {
+            "id": "TRANSPORT-OR-POLICY",
+            "result": "BLOCKED"
+          }
+        ],
+        "finishedAt": "2026-10-28T16:33:59.594Z",
+        "result": "BLOCKED"
+      },
+      {
+        "startedAt": "2026-10-28T16:34:57.202Z",
+        "product": "A",
+        "user": "U1",
+        "cases": [
+          {
+            "id": "OWN-TOKEN-records:read",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OWN-TOKEN-records:write",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OWN-READ",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OWN-WRITE",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-USER-READ",
+            "expected": 404,
+            "actual": 404,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-USER-WRITE",
+            "expected": 404,
+            "actual": 404,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-PRODUCT-READ",
+            "expected": 403,
+            "actual": 403,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-PRODUCT-WRITE",
+            "expected": 403,
+            "actual": 403,
+            "result": "PASS"
+          },
+          {
+            "id": "PEER-TOKEN-records:read",
+            "expected": 401,
+            "actual": 401,
+            "result": "PASS",
+            "bindingVerified": true
+          },
+          {
+            "id": "PEER-TOKEN-records:write",
+            "expected": 401,
+            "actual": 401,
+            "result": "PASS",
+            "bindingVerified": true
+          },
+          {
+            "id": "OTHER-USER-UNCHANGED",
+            "expected": true,
+            "actual": true,
+            "result": "PASS"
+          }
+        ],
+        "finishedAt": "2026-10-28T16:34:57.943Z",
+        "result": "PASS"
+      },
+      {
+        "startedAt": "2026-10-28T16:36:07.626Z",
+        "product": "A",
+        "user": "U1",
+        "cases": [
+          {
+            "id": "OWN-TOKEN-records:read",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OWN-TOKEN-records:write",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OWN-READ",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OWN-WRITE",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-USER-READ",
+            "expected": 404,
+            "actual": 404,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-USER-WRITE",
+            "expected": 404,
+            "actual": 404,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-PRODUCT-READ",
+            "expected": 403,
+            "actual": 403,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-PRODUCT-WRITE",
+            "expected": 403,
+            "actual": 403,
+            "result": "PASS"
+          },
+          {
+            "id": "PEER-TOKEN-records:read",
+            "expected": 401,
+            "actual": 401,
+            "result": "PASS",
+            "bindingVerified": true
+          },
+          {
+            "id": "PEER-TOKEN-records:write",
+            "expected": 401,
+            "actual": 401,
+            "result": "PASS",
+            "bindingVerified": true
+          },
+          {
+            "id": "OTHER-USER-UNCHANGED",
+            "expected": true,
+            "actual": true,
+            "result": "PASS"
+          }
+        ],
+        "finishedAt": "2026-10-28T16:36:08.335Z",
+        "result": "PASS"
+      }
+    ],
+    "B": [
+      {
+        "startedAt": "2026-10-28T16:38:30.727Z",
+        "product": "B",
+        "user": "U1",
+        "cases": [
+          {
+            "id": "OWN-TOKEN-records:read",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OWN-TOKEN-records:write",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OWN-READ",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OWN-WRITE",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-USER-READ",
+            "expected": 404,
+            "actual": 404,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-USER-WRITE",
+            "expected": 404,
+            "actual": 404,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-PRODUCT-READ",
+            "expected": 403,
+            "actual": 403,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-PRODUCT-WRITE",
+            "expected": 403,
+            "actual": 403,
+            "result": "PASS"
+          },
+          {
+            "id": "PEER-TOKEN-records:read",
+            "expected": 401,
+            "actual": 401,
+            "result": "PASS",
+            "bindingVerified": true
+          },
+          {
+            "id": "PEER-TOKEN-records:write",
+            "expected": 401,
+            "actual": 401,
+            "result": "PASS",
+            "bindingVerified": true
+          },
+          {
+            "id": "OTHER-USER-UNCHANGED",
+            "expected": true,
+            "actual": true,
+            "result": "PASS"
+          }
+        ],
+        "finishedAt": "2026-10-28T16:38:31.359Z",
+        "result": "PASS"
+      }
+    ]
+  },
+  "observations": [
+    {
+      "case": "A_RELOAD",
+      "source": "AUTOMATED_VISIBLE_UI",
+      "actual": "Produto A · U1",
+      "result": "PASS"
+    },
+    {
+      "case": "A_CLOSE_AND_REOPEN_TAB",
+      "source": "AUTOMATED_VISIBLE_UI_AND_NEW_PROOF",
+      "actual": "Produto A · U1",
+      "proofFinishedAt": "2026-10-28T16:36:08.335Z",
+      "result": "PASS"
+    },
+    {
+      "case": "A_AND_B_RELOAD_BEFORE_A_EXPIRY",
+      "observedBetween": {
+        "from": "2026-10-28T16:43:15Z",
+        "through": "2026-10-28T16:44:58Z"
+      },
+      "source": "AUTOMATED_VISIBLE_UI",
+      "a": "Produto A · U1",
+      "b": "Produto B · U1",
+      "result": "PASS"
+    },
+    {
+      "case": "A_LAST_LIVE_BEFORE_EXPIRY",
+      "observedAt": "2026-10-28T16:46:16.703Z",
+      "actual": "Produto A · U1",
+      "proofFinishedAt": "2026-10-28T16:46:18.252Z",
+      "result": "PASS"
+    }
+  ],
+  "timing": {
+    "aLoginAt": "2026-10-28T16:32:33.892Z",
+    "bLoginAt": "2026-10-28T16:38:20.481Z",
+    "aLocalSessionMaxSeconds": 900,
+    "verifyAAfter": "2026-10-28T16:48:00.000Z"
+  },
+  "localExpiry": {
+    "result": "PASS_LOCAL_BFF_SESSION",
+    "observedAt": "2026-10-28T16:48:24.214Z",
+    "actual": "Sem sessão local",
+    "secondsSinceObservedLogin": 950.322,
+    "loginAttemptsBetweenBaselineAndExpiry": 0,
+    "scope": "Local BFF session cap only"
+  },
+  "bContinuityAfterAExpiry": {
+    "result": "PASS",
+    "observedAt": "2026-10-28T16:48:25.171Z",
+    "actual": "Produto B · U1",
+    "proofFinishedAt": "2026-10-28T16:48:30.887Z",
+    "proofPassed": 11,
+    "proofTotal": 11,
+    "newBLoginBetweenProofs": false
+  },
+  "limits": [
+    "Tests the local BFF session cap, not natural expiry or revocation of an Auth0 access token and not Supabase refresh.",
+    "Whole-browser restart inside the valid session lifetime was not tested; reload and tab reopening were tested.",
+    "The initial A receipt remains BLOCKED (8 local checks passed; peer transport/policy did not complete); B was visibly on the Render startup page. The subsequent warm-service proofs passed.",
+    "Public in-memory counters and receipts corroborate process continuity; no external process attestation or durable audit.",
+    "No password, JWT, OAuth code, subject, cookie, CSRF, client secret, email or record contents captured.",
+    "U2 positive login remains BLOCKED; original SPA matrix and published product architecture are not homologated by this BFF round."
+  ],
+  "finalDiagnostics": {
+    "A": {
+      "product": "A",
+      "started": 1,
+      "callbacks": 1,
+      "successes": 1,
+      "failures": 0,
+      "last": {
+        "at": "2026-10-28T16:32:33.892Z",
+        "result": "PASS",
+        "stage": "authenticated"
+      }
+    },
+    "B": {
+      "product": "B",
+      "started": 1,
+      "callbacks": 1,
+      "successes": 1,
+      "failures": 0,
+      "last": {
+        "at": "2026-10-28T16:38:20.481Z",
+        "result": "PASS",
+        "stage": "authenticated"
+      }
+    }
+  },
+  "laterProofReceipts": {
+    "A": {
+      "startedAt": "2026-10-28T16:46:17.392Z",
+      "product": "A",
+      "user": "U1",
+      "cases": [
+        {
+          "id": "OWN-TOKEN-records:read",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-TOKEN-records:write",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-READ",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-WRITE",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-READ",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-WRITE",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-READ",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-WRITE",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "PEER-TOKEN-records:read",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "PEER-TOKEN-records:write",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "OTHER-USER-UNCHANGED",
+          "expected": true,
+          "actual": true,
+          "result": "PASS"
+        }
+      ],
+      "finishedAt": "2026-10-28T16:46:18.252Z",
+      "result": "PASS"
+    },
+    "B": {
+      "startedAt": "2026-10-28T16:48:30.330Z",
+      "product": "B",
+      "user": "U1",
+      "cases": [
+        {
+          "id": "OWN-TOKEN-records:read",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-TOKEN-records:write",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-READ",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-WRITE",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-READ",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-WRITE",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-READ",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-WRITE",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "PEER-TOKEN-records:read",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "PEER-TOKEN-records:write",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "OTHER-USER-UNCHANGED",
+          "expected": true,
+          "actual": true,
+          "result": "PASS"
+        }
+      ],
+      "finishedAt": "2026-10-28T16:48:30.887Z",
+      "result": "PASS"
+    }
+  },
+  "processContinuityCorroboration": {
+    "authenticationCountersUnchanged": true,
+    "earlierReceiptsPreserved": true
+  },
+  "sanitizedLocalScreenshots": [
+    "a-before-expiry.png",
+    "a-session-expired.png",
+    "b-session-after-a-expiry.png",
+    "b-proof-after-a-expiry.png"
+  ]
+}

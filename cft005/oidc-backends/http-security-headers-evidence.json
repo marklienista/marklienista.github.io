@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "date": "2026-10-28",
+  "scope": "HOSTED_BFF_HTTP_SECURITY_HEADERS",
+  "responses": [
+    {
+      "product": "A",
+      "path": "/",
+      "httpStatus": 200,
+      "headers": {
+        "csp": "default-src 'none'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+        "cache": "no-store",
+        "referrer": "no-referrer",
+        "contentTypeOptions": "nosniff"
+      },
+      "checks": {
+        "csp": true,
+        "cache": true,
+        "referrer": true,
+        "nosniff": true
+      },
+      "result": "PASS"
+    },
+    {
+      "product": "A",
+      "path": "/client.js",
+      "httpStatus": 200,
+      "headers": {
+        "csp": "default-src 'none'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+        "cache": "no-store",
+        "referrer": "no-referrer",
+        "contentTypeOptions": "nosniff"
+      },
+      "checks": {
+        "csp": true,
+        "cache": true,
+        "referrer": true,
+        "nosniff": true
+      },
+      "result": "PASS"
+    },
+    {
+      "product": "B",
+      "path": "/",
+      "httpStatus": 200,
+      "headers": {
+        "csp": "default-src 'none'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+        "cache": "no-store",
+        "referrer": "no-referrer",
+        "contentTypeOptions": "nosniff"
+      },
+      "checks": {
+        "csp": true,
+        "cache": true,
+        "referrer": true,
+        "nosniff": true
+      },
+      "result": "PASS"
+    },
+    {
+      "product": "B",
+      "path": "/client.js",
+      "httpStatus": 200,
+      "headers": {
+        "csp": "default-src 'none'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+        "cache": "no-store",
+        "referrer": "no-referrer",
+        "contentTypeOptions": "nosniff"
+      },
+      "checks": {
+        "csp": true,
+        "cache": true,
+        "referrer": true,
+        "nosniff": true
+      },
+      "result": "PASS"
+    }
+  ],
+  "limits": [
+    "Public GETs only; no credentials, cookies, records or authentication responses inspected.",
+    "Header controls do not constitute exhaustive XSS, browser-storage or host log-retention approval.",
+    "Original Supabase SPA origins were not deployed or modified."
+  ]
+}

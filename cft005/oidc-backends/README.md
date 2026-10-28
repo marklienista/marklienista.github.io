@@ -4,6 +4,16 @@
 
 O código de integração está preparado nesta branch; os resultados locais abaixo não comprovam emissão pelo Auth0. Esta pasta é independente de `oidc/` e `backend-proof/` e não substitui os aplicativos publicados.
 
+## Rodada automática no Chrome: persistência e vencimento — 28/10/2026, 13:48 BRT
+
+O Chrome externo passou a estar conectado pela extensão oficial. O agente executou a entrada A/U1, sem digitar ou ler credenciais, às 13:32:33.892 BRT. Recarregar e fechar/reabrir a aba preservou U1 sem novo login; a prova passou 11/11, inclusive às 13:46:18.252. Às **13:48:24.214**, a recarga mostrou **Sem sessão local**, sem nova entrada ou renovação. **PASS para o vencimento da sessão local BFF**, limitada a quinze minutos.
+
+B entrou mais tarde, às 13:38:20.481. Após vencer A, B continuou U1 às 13:48:25.171 e sua prova terminou **11/11 PASS** às 13:48:30.887, sem novo login B. Os contadores de autenticação e os recibos anteriores ficaram preservados nos dois serviços, corroborando continuidade do processo. Não é atestação externa nem teste de expiração do JWT Auth0, revogação central ou refresh Supabase. O teste manual anterior, interrompido pelo fechamento do navegador, continua inconclusivo; o resultado atual não o reclassifica.
+
+O primeiro recibo A da nova rodada foi BLOCKED na etapa remota, com oito controles locais PASS; B foi observado na tela de inicialização do Render. Após disponibilidade do B, a repetição passou 11/11. Ambos os resultados foram preservados. Quatro respostas públicas de HTML/script em A/B também passaram nos controles CSP restritiva, no-store, no-referrer e nosniff. Isso não é homologação completa de XSS, armazenamento ou retenção interna de logs.
+
+Evidências: [sessões do navegador](browser-session-evidence.json), [cabeçalhos HTTP](http-security-headers-evidence.json) e [matriz consolidada](../oidc/MATRIZ-CONSOLIDADA-2026-10-28.md). Capturas locais mostram somente interface sanitizada, sem parâmetros de autenticação. Nenhum segredo, cookie, token, código OAuth, subject ou conteúdo de registro integra os artefatos. Nenhuma alteração de executável, configuração, TTL ou deploy nesta rodada.
+
 ## Interrupção antes de autenticar — 28/10/2026, 09:17 BRT
 
 O usuário confirmou que viu a tela Auth0, fechou a janela antes de autenticar e abriu a página inicial A em novo contexto anônimo, sem sessão. Entre as observações, A passou de três para cinco aberturas de entrada, mas permaneceu com cinco callbacks e um sucesso; o último evento foi `PENDING/redirect_started` às 12:17:13.266Z. O recibo U1 anterior permaneceu inalterado. **PASS para abandono antes da autenticação**, por relato da interface e contadores corroborantes. [login-abandonment-evidence.json](login-abandonment-evidence.json) preserva os limites.
@@ -174,6 +184,6 @@ Durante a integração local, o emissor de teste inicialmente recusou Basic porq
 
 Há dois serviços LIVE, emissão humana A/B com U1, prova criptográfica remota bidirecional e logout local A/continuidade B PASS. Falta login positivo U2 e a rodada completa de sessões. Esses resultados não removem o FAIL de S12 na arquitetura publicada. Sessões/dados/recibos em memória são adequados apenas à prova de instância única, sem disponibilidade, durabilidade ou logout central. As rotas dos aplicativos existentes continuam fora desta mudança. Os recibos públicos são evidência sanitizada de teste, não um sistema de auditoria durável ou com atestação externa.
 
-**Único próximo passo:** no contexto habitual A, conferir U1/prova antes de 09:27 BRT de 28/10 e atualizar a página inicial após esse horário, sem nova entrada, para observar o vencimento da sessão local. U2 permanece BLOCKED sem criar ou redefinir conta. Não enviar segredos por chat. A participação humana no login é necessária enquanto o controle autenticado do Chrome permanecer interrompido.
+**Único próximo passo:** preparar a rodada de renovação manual real nos clientes SPA isolados de teste, conferindo a implantação da branch corrigida e o tratamento de callback/logs antes de autenticar. U2 permanece BLOCKED sem criar ou redefinir conta. Não enviar segredos por chat. O Chrome externo está conectado; as interrupções anteriores do controle de navegador permanecem apenas como histórico.
 
 Referências: [openid-client](https://github.com/panva/openid-client), [Auth0: clientes confidenciais](https://auth0.com/docs/get-started/applications/confidential-and-public-applications), [Render: variáveis e segredos](https://render.com/docs/configure-environment-variables).

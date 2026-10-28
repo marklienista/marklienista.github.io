@@ -1,5 +1,7 @@
 # CFT-005 — OIDC externo com domínios independentes
 
+Continuidade em 28/10/2026: [matriz consolidada](./MATRIZ-CONSOLIDADA-2026-10-28.md). No Chrome externo, recarga/reabertura da aba A, vencimento local A e continuidade B com prova 11/11 passaram, sem novo login nem alteração de TTL. São sessões BFF, sem equivalência com refresh Supabase. U2 permanece BLOCKED por indisponibilidade da credencial da identidade prevista. Aplicativos publicados preservados; CFT-005 ABERTO.
+
 Continuidade em 27/10/2026: os [dois backends confidenciais de teste](../oidc-backends/README.md) estão LIVE, com health HTTP 200. A emissão real A/U1 e B/U1 passou; as provas de cada backend passaram 11/11, com recusa de JWT real nas duas direções após assinatura/azp. Logout local A/continuidade B passou por relato da interface A e novo recibo B de 11/11, sem novo login B. Login positivo U2 ainda aguarda comprovação. Isso não altera os resultados anteriores da matriz S01–S14 nem o FAIL de isolamento do modelo Supabase publicado.
 
 Estado em 26/10/2026: **SSO entre duas origens confirmado por relato do usuário e corroborado parcialmente no Supabase**; testes locais ampliados. O **isolamento dos dados por aplicativo está BLOQUEADO** no modelo de tokens atual. Os testes reais de refresh, expiração e logout ainda não foram concluídos. OAuth Server beta segue desligado, sem migração ou lançamento.
