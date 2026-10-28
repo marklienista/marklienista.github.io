@@ -1,4 +1,4 @@
-# FotoCrachá — ambiente de testes 0.11 (Google Drive e gravação automática)
+# FotoCrachá — ambiente de testes 0.11.1 (Google Drive, gravação automática e Picker)
 
 **Aplicativo:** https://carometro-teste.onrender.com
 **Código único:** GitHub `marklienista/marklienista.github.io`, branch `carometro-lab-002`, diretório `carometro/`.
@@ -30,7 +30,7 @@
 - Espaços antigos com pasta `Carômetro — [escola]` permanecem onde estavam e são descobertos por `carometro.json`. Nenhum arquivo existente é renomeado automaticamente.
 - A pasta do Drive é a **fonte única de permissões** (Leitor ou Editor). A interface abre a pasta para gerenciar acessos no Google; pode convidar usuários por e-mail, mostrar permissões e revogá-las quando a conta tem direito. Se uma permissão `anyone` ou `domain` aparecer, o aplicativo alerta para revisar exposição indevida.
 - Colar o link de pasta/cadastro funciona somente se o OAuth limitado `drive.file` já permitir o acesso. Para a conta convidada, **compartilhar uma pasta não autoriza automaticamente a API a ler cada arquivo**. É necessário selecionar `carometro.json` pelo Google Picker; além disso, o acesso a fotografias filhas precisa ser validado por conta.
-- A **Google Picker API key pública restrita ainda não foi fornecida**, logo o botão Picker fica desabilitado e a experiência completa de convite/colaboração NÃO está homologada. Não substituir o scope `drive.file` por acesso irrestrito ao Drive como atalho.
+- A **Google Picker API key pública informada por Marcelo** foi registrada manualmente em `config.js`, na branch de testes. O botão Picker passa a ficar habilitado após a publicação da versão 0.11.1. A seleção pelo Google e a colaboração real NÃO estão homologadas antes do teste entre duas contas adultas. Não substituir o scope `drive.file` por acesso irrestrito ao Drive como atalho.
 - A API do Drive pode indicar que um arquivo perdeu a permissão de edição; a aplicação deve bloquear gravação em vez de tentar sobrescrever ou conceder autorização por conta própria.
 
 ## Privacidade e integridade
@@ -60,14 +60,14 @@ Se surgir erro de salvamento, **não apagar ou editar manualmente o JSON**. Regi
 
 ## Integração Google Cloud
 
-Projeto Google Cloud: `784125401141`. Client ID OAuth Web público centralizado em `config.js`, origem autorizada `https://carometro-teste.onrender.com`, scope mínimo `https://www.googleapis.com/auth/drive.file`. Manter configuração de testes e adultos autorizados; a Google Picker API key pública restrita continua pendente. Nunca incluir `client_secret`, tokens de acesso ou fotos reais no repositório.
+Projeto Google Cloud: `784125401141`. Client ID OAuth Web público centralizado em `config.js`, origem autorizada `https://carometro-teste.onrender.com`, scope mínimo `https://www.googleapis.com/auth/drive.file`. Manter configuração de testes e adultos autorizados. A Google Picker API key foi preenchida manualmente por Marcelo em `config.js` na branch de testes, sem alterar o OAuth Client ID nem o número do projeto. A verificação direta das restrições no Google Cloud e o teste ponta a ponta continuam pendentes. Nunca incluir `client_secret`, tokens de acesso ou fotos reais no repositório.
 
 A identidade B do ecossistema foi preservada. Nenhuma mudança neste fluxo altera Apertaquem, Som da Turma, MeEmpresta, ApertaLetra, Supabase ou a conta comum futura.
 
 
 ## Preparação do Google Picker — 28/10/2026
 
-Marcelo informou que criou uma chave pública do Google Picker, mas **a chave ainda não está no aplicativo**: o salvamento automático da chave no repositório foi bloqueado pelo mecanismo de segurança da ferramenta. Não inserir Client Secret nem desativar proteções do GitHub/Google Cloud. `config.js` permanece com `googlePickerApiKey` vazia até a configuração pelo responsável.
+Marcelo criou a chave pública do Google Picker e a registrou manualmente na branch de testes em `config.js` em 28/10/2026. A inserção automática inicial foi bloqueada por segurança; a edição manual foi conferida por leitura do GitHub, sem reproduzir o valor da chave nos documentos. Não inserir Client Secret nem desativar proteções do GitHub/Google Cloud.
 
 Foi preparada a seleção de cadastros compartilhados:
 - `picker.js` usa `DocsViewMode.LIST`, adequado ao escopo restrito `drive.file`;
@@ -75,4 +75,8 @@ Foi preparada a seleção de cadastros compartilhados:
 - o arquivo selecionado deve ser `carometro.json`; a decisão de acesso continua com o Google;
 - fluxo validado com 9 checagens simuladas de seleção de arquivo, modo lista, número do projeto, origem e comportamento com chave ausente; **nenhum teste real com segunda conta realizado**.
 
-Próximo passo administrativo: o responsável cadastrar **somente a chave pública restrita** no campo `googlePickerApiKey` de `carometro/config.js`, na branch de testes, por um método autorizado. A chave precisa ser restrita aos referrers `https://carometro-teste.onrender.com/*` e `https://docs.google.com/*`, e às APIs Picker e Drive. Não divulgar nem armazenar credenciais privadas. Como autoDeploy no Render está desligado, o commit sozinho não publica: depois verificar a branch, fazer deploy explícito, confirmar `live` e então testar o Picker com duas contas adultas fictícias, inclusive acesso às fotografias, sem presumir que autorizar o JSON concede acesso a todos os arquivos.
+Próximo passo: confirmar publicação no Render (autoDeploy desligado), abrir a versão 0.11.1 em duas contas adultas de teste e verificar se a conta convidada consegue selecionar `carometro.json` no Picker, carregar cadastro e fotografias e respeitar a permissão Leitor/Editor. A chave deve estar restrita aos referrers `https://carometro-teste.onrender.com/*` e `https://docs.google.com/*`, e às APIs Picker e Drive; a presença da chave no GitHub não permite verificar as restrições do Google Cloud. Nenhum dado real de estudantes antes da validação.
+
+## Ativação técnica em 28/10/2026
+
+A configuração pública do Picker está presente no GitHub; o Client ID OAuth Web e número do projeto `784125401141` permaneceram inalterados. O aplicativo carrega agora `app.js?v=0.11.1`, `session.js?v=0.11.1`, `picker.js?v=0.11.1` e `config.js?v=0.11.1` para evitar que o navegador reutilize módulos antigos sem a chave. A seleção de um arquivo específico indicado no convite utiliza `DocsView.setFileIds` com a opção de lista compatível com `drive.file`, conforme documentação do Google. O código foi conferido, mas o funcionamento real do Picker deve ser testado com a conta convidada e arquivos fictícios.
