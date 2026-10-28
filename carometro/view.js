@@ -1,4 +1,4 @@
-import {classStudents,studentClass} from './model.js';
+import {classStudents,studentClass} from './model.js?v=0.11';
 const make=(tag,cls,text)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(text!==undefined)x.textContent=text;return x};
 export function renderClassBar(space,year,selectedClassId,onSelect) {
   const root=document.getElementById('classList');
