@@ -1,0 +1,368 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-28T18:32:03.393Z",
+  "sourceCommit": "ecb76c5d8003a37702a8abf9eb581a6f50e8c371",
+  "scope": "Controlled test code and public responses only",
+  "publicFiles": [
+    {
+      "side": "a",
+      "path": "index.html",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "bb78ab52472b81290ad64f83184f42fc6e0b38aca92960a828b848d2cdb1ec15",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "a",
+      "path": "callback.html",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "48db633927ddda5030454cb49f7b3bcf3ee7276b54d4d2fc4f68b9d2eaf510ff",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "a",
+      "path": "callback-start.js",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "127a56bff68e5a8af646080fac0ea31091ad0859db51d4985ccac18ff5bf72a2",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "a",
+      "path": "app.mjs",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "2f473cd070636c635e295ef4750523a15ace742682831027cf702e3560c898ff",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "a",
+      "path": "identity.mjs",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "c815c3496f1a13a4996fa37f4c1504a21978ec94f4c1db9bfd9ae86f23ea8121",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "a",
+      "path": "negative.html",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "f20aca4eb4de767309323e678fb402ac96a0cf3f7e45d2b7bcb76caa7330ec39",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "a",
+      "path": "negative-app.mjs",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "dd1a52582194c715df26b91ca90541a9d87ed43ce18d3233ab297aac1827dec3",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "a",
+      "path": "negative.mjs",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "e2a2ecbb1d9939be0ced616843e0ca6d2cd4d318dec9841eb5b1d3cd366437cb",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "a",
+      "path": "lifecycle.html",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "a47839cf2e06aebf8148f37b57d44e6ab31eb561862a1e934182947f184ce1a5",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "a",
+      "path": "lifecycle-app.mjs",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "0923ee38a5f19a7078b02582e52b43124c231ffdef53fb630a4f13194e530187",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "a",
+      "path": "lifecycle.mjs",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "e676c1b7df9b841b2859c615eb346be117216d3b86786ce6fb619a90c7f545e0",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "b",
+      "path": "index.html",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "bb78ab52472b81290ad64f83184f42fc6e0b38aca92960a828b848d2cdb1ec15",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "b",
+      "path": "callback.html",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "48db633927ddda5030454cb49f7b3bcf3ee7276b54d4d2fc4f68b9d2eaf510ff",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "b",
+      "path": "callback-start.js",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "127a56bff68e5a8af646080fac0ea31091ad0859db51d4985ccac18ff5bf72a2",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "b",
+      "path": "app.mjs",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "2f473cd070636c635e295ef4750523a15ace742682831027cf702e3560c898ff",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "b",
+      "path": "identity.mjs",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "c815c3496f1a13a4996fa37f4c1504a21978ec94f4c1db9bfd9ae86f23ea8121",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "b",
+      "path": "negative.html",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "f20aca4eb4de767309323e678fb402ac96a0cf3f7e45d2b7bcb76caa7330ec39",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "b",
+      "path": "negative-app.mjs",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "dd1a52582194c715df26b91ca90541a9d87ed43ce18d3233ab297aac1827dec3",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "b",
+      "path": "negative.mjs",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "e2a2ecbb1d9939be0ced616843e0ca6d2cd4d318dec9841eb5b1d3cd366437cb",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "b",
+      "path": "lifecycle.html",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "a47839cf2e06aebf8148f37b57d44e6ab31eb561862a1e934182947f184ce1a5",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "b",
+      "path": "lifecycle-app.mjs",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "0923ee38a5f19a7078b02582e52b43124c231ffdef53fb630a4f13194e530187",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    },
+    {
+      "side": "b",
+      "path": "lifecycle.mjs",
+      "status": 200,
+      "sourceMatches": true,
+      "sha256": "e676c1b7df9b841b2859c615eb346be117216d3b86786ce6fb619a90c7f545e0",
+      "cacheControl": "no-store",
+      "referrerPolicy": "no-referrer",
+      "contentTypeOptions": "nosniff",
+      "csp": "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://jxyylpdgwvswaapeefsy.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    }
+  ],
+  "dependencyAudit": {
+    "endpoint": "https://registry.npmjs.org/-/npm/v1/security/advisories/bulk",
+    "status": 200,
+    "packages": {
+      "jose": [
+        "6.2.13"
+      ],
+      "openid-client": [
+        "6.8.8"
+      ],
+      "oauth4webapi": [
+        "3.8.8"
+      ],
+      "@supabase/supabase-js": [
+        "2.117.2"
+      ],
+      "@supabase/auth-js": [
+        "2.117.2"
+      ],
+      "@supabase/storage-js": [
+        "2.117.2"
+      ],
+      "@supabase/realtime-js": [
+        "2.117.2"
+      ],
+      "@supabase/functions-js": [
+        "2.117.2"
+      ],
+      "@supabase/postgrest-js": [
+        "2.117.2"
+      ]
+    },
+    "advisories": {}
+  },
+  "sourceReview": [
+    {
+      "path": "cft005/oidc/callback-start.js",
+      "htmlExecutionSink": false,
+      "consoleCalls": false,
+      "credentialLiteralPattern": false
+    },
+    {
+      "path": "cft005/oidc/app.mjs",
+      "htmlExecutionSink": false,
+      "consoleCalls": false,
+      "credentialLiteralPattern": false
+    },
+    {
+      "path": "cft005/oidc/identity.mjs",
+      "htmlExecutionSink": false,
+      "consoleCalls": false,
+      "credentialLiteralPattern": false
+    },
+    {
+      "path": "cft005/oidc/negative-app.mjs",
+      "htmlExecutionSink": false,
+      "consoleCalls": false,
+      "credentialLiteralPattern": false
+    },
+    {
+      "path": "cft005/oidc/negative.mjs",
+      "htmlExecutionSink": false,
+      "consoleCalls": false,
+      "credentialLiteralPattern": false
+    },
+    {
+      "path": "cft005/oidc/lifecycle-app.mjs",
+      "htmlExecutionSink": false,
+      "consoleCalls": false,
+      "credentialLiteralPattern": false
+    },
+    {
+      "path": "cft005/oidc/lifecycle.mjs",
+      "htmlExecutionSink": false,
+      "consoleCalls": false,
+      "credentialLiteralPattern": false
+    },
+    {
+      "path": "cft005/oidc-backends/backend.mjs",
+      "htmlExecutionSink": false,
+      "consoleCalls": false,
+      "credentialLiteralPattern": false
+    },
+    {
+      "path": "cft005/oidc-backends/provider.mjs",
+      "htmlExecutionSink": false,
+      "consoleCalls": false,
+      "credentialLiteralPattern": false
+    },
+    {
+      "path": "cft005/oidc-backends/start.mjs",
+      "htmlExecutionSink": false,
+      "consoleCalls": true,
+      "credentialLiteralPattern": false
+    }
+  ],
+  "startupConsoleReview": "start.mjs contains only product readiness and fixed failure messages; no request, credential or raw error logging",
+  "references": [
+    {
+      "url": "https://render.com/docs/logging",
+      "verifiedStatement": "Render does not emit logs for static sites; this does not attest all internal provider retention"
+    },
+    {
+      "url": "https://supabase.com/docs/reference/javascript/auth-stopautorefresh",
+      "verifiedStatement": "Stopping the test client refresh process removes its managed visibility callback"
+    },
+    {
+      "url": "https://support.auth0.com/center/s/article/Clarification-about-what-happens-when-the-prompt-parameter-is-not-sent-to-authorize",
+      "verifiedStatement": "prompt=login requests reauthentication; normal login behavior remains unchanged"
+    }
+  ],
+  "limits": [
+    "The SDK bundled transitive dependency graph was not fully inventoried",
+    "Regex and manual review are scoped checks, not proof against every XSS vector",
+    "The HTML callback probe was rejected by the Render WAF before application execution",
+    "No raw authentication logs collected; internal provider retention not independently attested",
+    "No application records or published products inspected or modified"
+  ]
+}

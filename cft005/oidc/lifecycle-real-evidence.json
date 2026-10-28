@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "b3f3643b5282b2ba4a8d442f5cb7b9f69374668c",
+  "scope": "Original SPA A U1; natural expiry; no global TTL or clock changes",
+  "observations": [
+    {
+      "phase": "WAITING_FOR_NATURAL_EXPIRY",
+      "capturedAt": "2026-10-28T18:02:57.478Z",
+      "expiresAt": "2026-10-28T18:54:24.000Z",
+      "checkAfter": "2026-10-28T18:55:39.000Z",
+      "verifiedBeforeExpiry": true,
+      "autoRefreshDisabledForThisTestClient": true,
+      "expiry": null,
+      "revocation": null
+    }
+  ],
+  "result": "BLOCKED",
+  "limit": "Waiting for natural expiry; not yet a completed test"
+}

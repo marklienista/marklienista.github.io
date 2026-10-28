@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-28",
+  "events": [
+    {
+      "case": "U2_ORIGINAL_SPA_B_LOGIN",
+      "at": "2026-10-28T18:15:31.982Z",
+      "verified": true,
+      "differentFromU1": true,
+      "accountSelectedThroughAuthorizedGoogleLogin": true
+    },
+    {
+      "case": "U2_ORIGINAL_SPA_B_REFRESH",
+      "at": "2026-10-28T18:15:54.328Z",
+      "verified": true,
+      "sameIdentityAsU2": true,
+      "lastRefresh": {
+        "requestCompleted": true,
+        "previousSessionPresent": true,
+        "accessCredentialChanged": true,
+        "refreshCredentialChanged": true,
+        "identityPreserved": true
+      }
+    },
+    {
+      "case": "REAL_PKCE_MISMATCH_INITIAL_ADAPTER",
+      "result": "BLOCKED",
+      "at": "2026-10-28T18:16:18.584Z",
+      "requestRejected": true,
+      "expectedPkceMismatch": false,
+      "httpStatus": 400,
+      "unexpectedSession": false,
+      "mainSessionStorageUntouched": true,
+      "callbackQueryCleared": true,
+      "sourceCommit": "314f72ae768f3497ae8015e60da30c2cf9aed0c6",
+      "limit": "SDK-local verifier availability was not distinguished; this attempt does not prove a server PKCE mismatch"
+    },
+    {
+      "case": "REAL_PKCE_MISMATCH_REPEAT_OLD_DEPLOY",
+      "result": "BLOCKED",
+      "at": "2026-10-28T18:20:32.313Z",
+      "requestRejected": true,
+      "expectedPkceMismatch": false,
+      "httpStatus": 400,
+      "unexpectedSession": false,
+      "mainSessionStorageUntouched": true,
+      "callbackQueryCleared": true,
+      "sourceCommit": "314f72ae768f3497ae8015e60da30c2cf9aed0c6",
+      "limit": "The correction was still building; this page used the previous source, not the corrected adapter"
+    },
+    {
+      "at": "2026-10-28T18:22:19.965Z",
+      "case": "SYNTHETIC_DENIAL_HTML_INPUT",
+      "executionMarkerPresent": false,
+      "injectedImagePresent": false,
+      "queryCleared": false,
+      "rawHtmlReflected": false,
+      "result": "BLOCKED",
+      "httpStatus": 403,
+      "wafBlockedBeforeApplication": true,
+      "limit": "Render WAF rejected the HTML probe; application sanitization not exercised by this request"
+    },
+    {
+      "case": "SPA_U2_SESSION_AFTER_NEGATIVE_ATTEMPTS",
+      "at": "2026-10-28T18:22:43.421Z",
+      "verified": true,
+      "sameIdentityAsU2": true
+    },
+    {
+      "at": "2026-10-28T18:23:08.029Z",
+      "case": "SYNTHETIC_ACCESS_DENIED_CALLBACK",
+      "deniedCategoryShown": true,
+      "queryCleared": true,
+      "rawDescriptionReflected": false,
+      "result": "PASS",
+      "limit": "Synthetic callback input, not a real provider denial"
+    },
+    {
+      "at": "2026-10-28T18:23:58.631Z",
+      "case": "DUPLICATED_SYNTHETIC_CALLBACK",
+      "invalidCodeCategoryShown": true,
+      "queryCleared": true,
+      "syntheticInputReflected": false,
+      "result": "PASS"
+    },
+    {
+      "case": "REAL_PKCE_MISMATCH",
+      "result": "PASS",
+      "at": "2026-10-28T18:25:01.980Z",
+      "requestRejected": true,
+      "expectedPkceMismatch": true,
+      "failureCategory": "bad_code_verifier",
+      "httpStatus": 400,
+      "unexpectedSession": false,
+      "mainSessionStorageUntouched": true,
+      "callbackQueryCleared": true,
+      "product": "A",
+      "sourceCommit": "82bd23b0ac176d0c020a6cc1815e92aa72f58ea2"
+    },
+    {
+      "case": "REAL_PKCE_MISMATCH",
+      "result": "PASS",
+      "at": "2026-10-28T18:26:20.819Z",
+      "requestRejected": true,
+      "expectedPkceMismatch": true,
+      "failureCategory": "bad_code_verifier",
+      "httpStatus": 400,
+      "unexpectedSession": false,
+      "mainSessionStorageUntouched": true,
+      "callbackQueryCleared": true,
+      "product": "B",
+      "sourceCommit": "82bd23b0ac176d0c020a6cc1815e92aa72f58ea2"
+    },
+    {
+      "case": "U2_B_AFTER_REAL_PKCE_DENIAL",
+      "at": "2026-10-28T18:28:35.743Z",
+      "verified": true,
+      "sameIdentityAsU2": true
+    },
+    {
+      "case": "SPA_B_REAL_LOGIN_ABANDONED_BEFORE_AUTHENTICATION",
+      "at": "2026-10-28T18:29:05.193Z",
+      "auth0LoginPageObserved": true,
+      "passwordEntered": false,
+      "accountSelected": false,
+      "sourceCommit": "ecb76c5d8003a37702a8abf9eb581a6f50e8c371"
+    },
+    {
+      "case": "SPA_B_AFTER_ABANDONMENT",
+      "at": "2026-10-28T18:29:12.603Z",
+      "result": "PASS",
+      "sessionAbsent": true,
+      "identityCleared": true,
+      "limit": "Abandonment before authentication; not a provider-issued access_denied response"
+    },
+    {
+      "case": "SPA_B_RECOVERY_AFTER_ABANDONMENT",
+      "at": "2026-10-28T18:33:30.792Z",
+      "verified": true,
+      "sameIdentityAsU1": true,
+      "passwordEntryRequired": false
+    }
+  ]
+}

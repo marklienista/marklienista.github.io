@@ -1,0 +1,333 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-28",
+  "scope": "Hosted synthetic confidential BFFs only; no published records",
+  "sourceCommit": "89a6790771e158394b54d9b2eaa79661a92480b0",
+  "identityCorrection": {
+    "label": "U2",
+    "previousConnection": "Auth0 database identity without available password",
+    "verifiedConnection": "Existing authorized Google identity",
+    "verification": "Auth0 Dashboard exact email filter; two distinct subjects confirmed; exact Google subject used in protected environment mapping and cryptographically verified at login",
+    "environmentKey": "SYNTHETIC_SUBJECTS_JSON",
+    "mergeOnly": true,
+    "accountLinking": false,
+    "accountCreation": false,
+    "passwordReset": false,
+    "emailUsedAsBackendAuthorization": false
+  },
+  "receipts": [
+    {
+      "startedAt": "2026-10-28T18:13:32.770Z",
+      "product": "A",
+      "user": "U2",
+      "cases": [
+        {
+          "id": "OWN-TOKEN-records:read",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-TOKEN-records:write",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-READ",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-WRITE",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-READ",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-WRITE",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-READ",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-WRITE",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "PEER-TOKEN-records:read",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "PEER-TOKEN-records:write",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "OTHER-USER-UNCHANGED",
+          "expected": true,
+          "actual": true,
+          "result": "PASS"
+        }
+      ],
+      "finishedAt": "2026-10-28T18:13:33.508Z",
+      "result": "PASS"
+    },
+    {
+      "startedAt": "2026-10-28T18:13:39.518Z",
+      "product": "B",
+      "user": "U2",
+      "cases": [
+        {
+          "id": "OWN-TOKEN-records:read",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-TOKEN-records:write",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-READ",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-WRITE",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-READ",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-WRITE",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-READ",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-WRITE",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "PEER-TOKEN-records:read",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "PEER-TOKEN-records:write",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "OTHER-USER-UNCHANGED",
+          "expected": true,
+          "actual": true,
+          "result": "PASS"
+        }
+      ],
+      "finishedAt": "2026-10-28T18:13:40.216Z",
+      "result": "PASS"
+    },
+    {
+      "startedAt": "2026-10-28T18:19:16.310Z",
+      "product": "A",
+      "user": "U1",
+      "cases": [
+        {
+          "id": "OWN-TOKEN-records:read",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-TOKEN-records:write",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-READ",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-WRITE",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-READ",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-WRITE",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-READ",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-WRITE",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "PEER-TOKEN-records:read",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "PEER-TOKEN-records:write",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "OTHER-USER-UNCHANGED",
+          "expected": true,
+          "actual": true,
+          "result": "PASS"
+        }
+      ],
+      "finishedAt": "2026-10-28T18:19:16.940Z",
+      "result": "PASS"
+    },
+    {
+      "startedAt": "2026-10-28T18:19:52.361Z",
+      "product": "B",
+      "user": "U1",
+      "cases": [
+        {
+          "id": "OWN-TOKEN-records:read",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-TOKEN-records:write",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-READ",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-WRITE",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-READ",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-WRITE",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-READ",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-WRITE",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "PEER-TOKEN-records:read",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "PEER-TOKEN-records:write",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "OTHER-USER-UNCHANGED",
+          "expected": true,
+          "actual": true,
+          "result": "PASS"
+        }
+      ],
+      "finishedAt": "2026-10-28T18:19:52.996Z",
+      "result": "PASS"
+    }
+  ],
+  "limits": [
+    "Test data is in-memory synthetic data; deployment resets it",
+    "These four positive identity/product combinations do not homologate original Supabase RLS or published apps",
+    "Sessions were switched through reauthentication in the same Chrome profile; separate private profiles not exercised"
+  ]
+}
