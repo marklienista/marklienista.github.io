@@ -165,7 +165,7 @@ async function flushEdits(){
 async function openSpace(id){
   if(!await flushEdits())return false;
   saveError=null;savePhase='idle';savedAt=null;
-  const result=await S.load(id);
+  const result=await loadSpace(id);
   savedAt=new Date();savePhase='saved';rememberSpaceLink(id);render();
   report(result.failed
     ?'Espaço aberto; '+result.failed+' imagens não puderam ser carregadas pelo Google Drive.'
@@ -245,14 +245,14 @@ async function connectGoogle(){
 }
 async function disconnectGoogle(){
   if(!await flushEdits())return false;
-  S.disconnect();saveError=null;savePhase='idle';savedAt=null;clearSpaceLink();render();
+  S.disconnect();resetTemporaryPrint();saveError=null;savePhase='idle';savedAt=null;clearSpaceLink();render();
   $('spacesList').replaceChildren();
   report('Conta Google desconectada deste navegador. Nenhum arquivo do Drive foi apagado.');
   return true;
 }
 async function switchSpace(){
   if(!await flushEdits())return false;
-  S.resetToGate();saveError=null;savePhase='idle';savedAt=null;clearSpaceLink();render();
+  S.resetToGate();resetTemporaryPrint();saveError=null;savePhase='idle';savedAt=null;clearSpaceLink();render();
   await refreshSpaces();
   return true;
 }
