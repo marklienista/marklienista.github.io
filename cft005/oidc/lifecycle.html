@@ -7,7 +7,7 @@
 <h1>Ciclo de validade da sessão de teste</h1>
 <p>Ensaio isolado: espera o prazo real sem alterar o relógio ou o TTL global, verifica a recusa do acesso vencido e tenta renovar. Depois permite encerrar somente esta sessão e verificar a recusa do refresh que ela recebeu.</p>
 <p id="status" role="status">Preparando…</p>
-<button id="capture" disabled>Iniciar espera pelo vencimento</button><button id="check" disabled>Conferir vencimento agora</button><button id="revoke" disabled>Encerrar esta sessão e testar refresh revogado</button>
+<button id="capture" disabled>Iniciar espera pelo vencimento</button><button id="local-only" disabled>Preparar apenas teste de refresh revogado</button><button id="check" disabled>Conferir vencimento agora</button><button id="revoke" disabled>Encerrar esta sessão e testar refresh revogado</button>
 <pre id="audit" aria-label="Resultados sanitizados"></pre>
 <p>Credenciais permanecem apenas na memória privada do ensaio e no armazenamento normal da sessão deste cliente. O recibo contém somente horários e resultados. Não recarregue esta página durante a espera.</p>
 <a href="./index.html">Voltar à página inicial para reentrar</a>

@@ -30,7 +30,9 @@ export function makeLifecycleProbe(sdk,config,{now=()=>Date.now()}={}){
     if(receipt.expiry) return publish();
     if(now()<(held.expires+75)*1000) return publish();
     const old=await userOf(held.access);
-    const expired=old.error?.status===401 && (/expir/i.test(old.error?.message||'')||['jwt_expired','token_expired'].includes(old.error?.code));
+    const category=['bad_jwt','jwt_expired','token_expired'].includes(old.error?.code)?old.error.code:old.error?'UNCLASSIFIED':null;
+    const expiredSignal=/expir/i.test(old.error?.message||'');
+    const expired=[401,403].includes(old.error?.status)&&category!==null&&category!=='UNCLASSIFIED'&&expiredSignal;
     const invalid=Boolean(old.error);
     const next=await client.auth.refreshSession({refresh_token:held.refresh});
     const s=next.data?.session;
@@ -41,13 +43,21 @@ export function makeLifecycleProbe(sdk,config,{now=()=>Date.now()}={}){
       if(same) recovered={access:s.access_token,refresh:s.refresh_token};
     }
     receipt.phase='EXPIRY_CHECKED';
-    receipt.expiry={result:expired&&same?'PASS':(!invalid||(!next.error&&!same)?'FAIL':'BLOCKED'),checkedAt:new Date(now()).toISOString(),oldAccessRejected:invalid,oldAccessExpired:expired,httpStatus:Number.isInteger(old.error?.status)?old.error.status:null,refreshSucceeded:!next.error&&Boolean(s?.access_token),identityPreserved:same,accessCredentialChanged:Boolean(s?.access_token&&s.access_token!==held.access),refreshCredentialChanged:Boolean(s?.refresh_token&&s.refresh_token!==held.refresh)};
+    receipt.expiry={result:expired&&same?'PASS':(!invalid||(!next.error&&!same)?'FAIL':'BLOCKED'),checkedAt:new Date(now()).toISOString(),oldAccessRejected:invalid,oldAccessExpired:expired,oldAccessFailureCategory:category,expirySignal:expiredSignal,httpStatus:Number.isInteger(old.error?.status)?old.error.status:null,refreshSucceeded:!next.error&&Boolean(s?.access_token),identityPreserved:same,accessCredentialChanged:Boolean(s?.access_token&&s.access_token!==held.access),refreshCredentialChanged:Boolean(s?.refresh_token&&s.refresh_token!==held.refresh)};
     // Drop the expired access token and its consumed refresh value.
     held={expires:held.expires};
     return publish();
   }
+  async function captureForRevocation(){
+    await capture();
+    recovered={access:held.access,refresh:held.refresh};held=null;
+    receipt.phase='READY_FOR_LOCAL_REVOCATION';
+    return publish();
+  }
   async function revokeLocal(){
-    if(receipt?.expiry?.result!=='PASS'||!recovered||revoked) throw Error('probe_not_ready');
+    if(!(receipt?.phase==='READY_FOR_LOCAL_REVOCATION'||receipt?.expiry?.result==='PASS')||!recovered||revoked) throw Error('probe_not_ready');
+    const current=await client.auth.getSession();
+    if(current.error||current.data?.session?.access_token!==recovered.access)throw Error('probe_session_changed');
     const {error}=await client.auth.signOut({scope:'local'});
     if(error) throw Error('probe_local_logout_failed');
     revoked=true;
@@ -60,5 +70,5 @@ export function makeLifecycleProbe(sdk,config,{now=()=>Date.now()}={}){
     recovered=null; expectedId=null; held=null;
     return publish();
   }
-  return {capture,checkExpiry,revokeLocal};
+  return {capture,checkExpiry,captureForRevocation,revokeLocal};
 }

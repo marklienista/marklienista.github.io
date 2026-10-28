@@ -1,5 +1,21 @@
 # CFT-005 — Avaliação de autorização por produto
 
+## Estado comprovado em 28/10/2026
+
+O candidato foi integrado em dois backends isolados hospedados, com clientes confidenciais Auth0 distintos e emissão real. U1 e U2 Google autorizadas passaram nas quatro combinações pessoa/produto: **44/44 controles reais PASS**. A prova está em [two-user-real-evidence.json](../oidc-backends/two-user-real-evidence.json). As avaliações de 26/10 abaixo são histórico e desenho; os recursos publicados continuam fora da prova e **S12 permanece FAIL na arquitetura publicada**.
+
+O backend de cada produto valida a assinatura RS256 pelo JWKS do emissor fixo, audience da API sintética, perfil JWT previsto, expiração, escopo, subject exato autorizado e `azp` do seu cliente. O subject U2 Google foi confirmado no painel Auth0 e alterado somente no mapeamento protegido dos dois serviços de teste. O e-mail não participa da autorização e não houve vínculo de identidades. O perfil atual rejeita `client_id` e tipos inesperados; usar RFC 9068 exigiria outra política explícita.
+
+Nos testes reais, tokens válidos de A foram recusados por B e vice-versa com HTTP 401 **depois** da verificação de assinatura e do vínculo ao outro cliente. Em cada backend, operações próprias receberam 200, outro usuário 404, outro produto 403 e o registro sintético alheio permaneceu inalterado. As quatro sessões positivas foram estabelecidas pelo fluxo confidencial com PKCE/state/nonce, sem expor bearer ou Client Secret ao navegador. A sonda que recebe bearer em `/proof/token-policy` verifica a mesma política, mas não cria sessão nem consulta dados; rotas de dados rejeitam bearer direto.
+
+Os registros são mapas privados e independentes de cada processo de teste. Não existe um banco compartilhado por trás dessa prova: ela comprova a fronteira dos dois backends, não privilégios de banco, RLS, Storage, Realtime ou RPCs dos produtos existentes. Reinício/implantação perde dados e sessões em memória; o protótipo usa instância única e não é uma implantação de produção. Origin e CSRF protegem escritas da sessão, mas não definem a identidade criptográfica do produto.
+
+Para aplicar o candidato a um produto real, ainda é necessário definir seu recurso privado e fechar qualquer acesso direto por JWT Supabase compartilhado, com privilégios próprios por produto ou projetos separados. Manter um caminho público antigo para os mesmos dados permitiria contornar o BFF. Não foi feita migração, alteração de aplicativo publicado, mudança de privilégio existente ou uso de `service_role` para acessar registros reais. A etapa atual pode homologar somente os recursos sintéticos explicitamente testados.
+
+Sessões e renovação têm evidências separadas em [matriz consolidada](./MATRIZ-CONSOLIDADA-2026-10-28.md). Logout local não encerra o SSO central; a prova de expiração/refresh Supabase não deve ser atribuída aos BFFs, cujos clientes Auth0 aprovados não recebem refresh grant.
+
+## Histórico de 26/10/2026
+
 26/10/2026. Estado: [prova criptográfica local implementada e executada](../backend-proof/README.md), com 91/91 cenários HTTP PASS e somente identidades/dados sintéticos. Ainda sem implantação ou integração com o IdP e os recursos existentes. S12 permanece FAIL no desenho atual. Nenhum dado real foi consultado.
 
 ## Por que a configuração atual não atende

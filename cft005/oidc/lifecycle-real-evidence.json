@@ -12,8 +12,28 @@
       "autoRefreshDisabledForThisTestClient": true,
       "expiry": null,
       "revocation": null
+    },
+    {
+      "phase": "EXPIRY_CHECKED",
+      "capturedAt": "2026-10-28T18:02:57.478Z",
+      "expiresAt": "2026-10-28T18:54:24.000Z",
+      "checkAfter": "2026-10-28T18:55:39.000Z",
+      "verifiedBeforeExpiry": true,
+      "autoRefreshDisabledForThisTestClient": true,
+      "expiry": {
+        "result": "BLOCKED",
+        "checkedAt": "2026-10-28T18:55:40.089Z",
+        "oldAccessRejected": true,
+        "oldAccessExpired": false,
+        "httpStatus": 403,
+        "refreshSucceeded": true,
+        "identityPreserved": true,
+        "accessCredentialChanged": true,
+        "refreshCredentialChanged": true
+      },
+      "revocation": null
     }
   ],
   "result": "BLOCKED",
-  "limit": "Waiting for natural expiry; not yet a completed test"
+  "limit": "Old access rejected with HTTP 403, renewal and identity preservation passed; initial classifier accepted only 401 and did not expose the semantic error category. Do not retroactively promote this attempt."
 }
