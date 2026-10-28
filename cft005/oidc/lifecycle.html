@@ -1,0 +1,14 @@
+<!doctype html><html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<title>CFT-005 — Ciclo de validade isolado</title>
+<style>body{font:16px system-ui;color:#17233b;background:#f3f6f8;margin:30px}main{max-width:760px;background:white;margin:auto;padding:30px;border-radius:20px}button{font:inherit;padding:12px;margin:5px}p{line-height:1.6}pre{white-space:pre-wrap;overflow-wrap:anywhere}#status{padding:15px;background:#edf5fa}</style>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script type="module" src="./lifecycle-app.mjs"></script></head><body><main>
+<h1>Ciclo de validade da sessão de teste</h1>
+<p>Ensaio isolado: espera o prazo real sem alterar o relógio ou o TTL global, verifica a recusa do acesso vencido e tenta renovar. Depois permite encerrar somente esta sessão e verificar a recusa do refresh que ela recebeu.</p>
+<p id="status" role="status">Preparando…</p>
+<button id="capture" disabled>Iniciar espera pelo vencimento</button><button id="check" disabled>Conferir vencimento agora</button><button id="revoke" disabled>Encerrar esta sessão e testar refresh revogado</button>
+<pre id="audit" aria-label="Resultados sanitizados"></pre>
+<p>Credenciais permanecem apenas na memória privada do ensaio e no armazenamento normal da sessão deste cliente. O recibo contém somente horários e resultados. Não recarregue esta página durante a espera.</p>
+<a href="./index.html">Voltar à página inicial para reentrar</a>
+</main></body></html>
