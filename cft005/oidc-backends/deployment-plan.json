@@ -106,7 +106,7 @@
       "evidence": "runtime-gate-evidence.json"
     }
   },
-  "nextStep": "Log in as U2 in a separate browser context and run the proof in A and B; if unavailable, keep U2 BLOCKED.",
+  "nextStep": "Confirm Google versus Auth0 email/password method, then repeat only the method corresponding to the authorized identity.",
   "proofRunner": {
     "deployedOnBoth": true,
     "receiptPath": "/proof/results",
@@ -121,7 +121,7 @@
     "aLogin": "PASS",
     "bLogin": "PASS",
     "remoteClientBinding": "BIDIRECTIONAL_PASS_U1",
-    "secondIdentityPositiveLogin": "BLOCKED",
+    "secondIdentityPositiveLogin": "BLOCKED_SUBJECT_ALLOWLIST_LOGIN_METHOD_UNCONFIRMED",
     "existingServicesModified": false,
     "aToBTokenPolicy": "PASS",
     "bToATokenPolicy": "PASS",
@@ -129,6 +129,7 @@
     "bProofPassed": 11,
     "independentSessionLogout": "PASS_A_LOCAL_LOGOUT_B_CONTINUITY",
     "reentryA": "PASS_FUNCTIONAL_PASSWORD_PROMPT_NOT_REPORTED",
-    "browserSessionPersistenceB": "PASS_WITHIN_RUNNING_BROWSER"
+    "browserSessionPersistenceB": "PASS_WITHIN_RUNNING_BROWSER",
+    "u2AttemptEvidence": "u2-login-denial-evidence.json"
   }
 }

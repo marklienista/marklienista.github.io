@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "scope": "HOSTED_AUTH0_U2_LOGIN_ATTEMPT",
+  "date": "2026-10-28",
+  "sourceCommit": "b0839202423600018b8bd08fc364b5ab090ec899",
+  "intendedSyntheticLabel": "U2",
+  "userReport": "Authorized U2 email was used; UI reported no local session and account not matching authorized test identities.",
+  "aDiagnostic": {
+    "product": "A",
+    "started": 1,
+    "callbacks": 1,
+    "successes": 0,
+    "failures": 1,
+    "last": {
+      "at": "2026-10-28T11:43:27.281Z",
+      "result": "FAIL",
+      "stage": "subject_allowlist"
+    }
+  },
+  "bDiagnostic": {
+    "product": "B",
+    "started": 0,
+    "callbacks": 0,
+    "successes": 0,
+    "failures": 0,
+    "last": null
+  },
+  "currentReceiptCounts": {
+    "A": 0,
+    "B": 0
+  },
+  "verdicts": {
+    "allowlistRejection": "PASS",
+    "positiveU2Login": "BLOCKED",
+    "reciprocalUserIsolation": "BLOCKED"
+  },
+  "loginMethod": "NOT_YET_CONFIRMED",
+  "configuredU2LoginMethod": "AUTH0_DATABASE_EMAIL_PASSWORD",
+  "hypothesis": "A social identity with the same email may have a different subject. Actual method/subject not captured or confirmed.",
+  "previousU1PasswordPrompt": "NOT_REPORTED",
+  "limits": [
+    "No token, OAuth code, subject, cookie, CSRF, secret, email or record contents captured.",
+    "No allowlist, identity, account linking, grant, TTL, application or deployment changes.",
+    "Empty in-memory receipts do not invalidate earlier receipts preserved in Git.",
+    "No positive U2 login proved. No conclusion about SSO password prompt from this reply."
+  ],
+  "nextStep": "Confirm Google versus Auth0 email/password method, then repeat only the method corresponding to the authorized identity."
+}

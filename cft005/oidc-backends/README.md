@@ -4,6 +4,12 @@
 
 O código de integração está preparado nesta branch; os resultados locais abaixo não comprovam emissão pelo Auth0. Esta pasta é independente de `oidc/` e `backend-proof/` e não substitui os aplicativos publicados.
 
+## Tentativa U2 recusada — 28/10/2026, 08:43 BRT
+
+O usuário tentou entrar com o e-mail autorizado U2 e relatou a mensagem de conta não correspondente às autorizadas. A confirmou `FAIL/subject_allowlist` às 11:43:27.281Z, zero sucessos e nenhum recibo; B ainda tinha zero tentativas nesta instância. A recusa por subject exato é **PASS** como barreira, mas o login positivo U2 e a separação recíproca entre duas identidades continuam **BLOCKED**. [u2-login-denial-evidence.json](u2-login-denial-evidence.json) preserva somente diagnóstico sanitizado.
+
+O identificador U2 fornecido corresponde à conexão Auth0 de e-mail/senha. Google e e-mail/senha podem representar identidades diferentes com o mesmo e-mail. O método usado na tentativa ainda não foi confirmado; essa possibilidade é hipótese, sem leitura do token ou alteração do mapeamento. Não autorizar por igualdade de e-mail nem vincular contas para contornar a recusa. Os recibos atuais em memória estavam vazios; os recibos históricos já preservados continuam documentados. Não houve mudança de código ou deploy. A resposta não esclareceu se a reentrada U1 anterior pediu senha.
+
 ## Logout local A e continuidade B — 27/10/2026, 22:37 BRT
 
 O usuário confirmou A sem sessão e B ainda autenticado. O segundo recibo B/U1 terminou às 01:37:18.333Z de 28/10 com **11/11 PASS**, sem novo login B: o contador permaneceu em um sucesso e o último login continuou às 01:31:41.486Z. A nova entrada funcional do A passou às 01:36:56.235Z. A ausência de sessão A foi relatada na interface; não há auditoria de eventos de logout no servidor. A necessidade de senha na reentrada não foi informada.
@@ -148,6 +154,6 @@ Durante a integração local, o emissor de teste inicialmente recusou Basic porq
 
 Há dois serviços LIVE, emissão humana A/B com U1, prova criptográfica remota bidirecional e logout local A/continuidade B PASS. Falta login positivo U2 e a rodada completa de sessões. Esses resultados não removem o FAIL de S12 na arquitetura publicada. Sessões/dados/recibos em memória são adequados apenas à prova de instância única, sem disponibilidade, durabilidade ou logout central. As rotas dos aplicativos existentes continuam fora desta mudança. Os recibos públicos são evidência sanitizada de teste, não um sistema de auditoria durável ou com atestação externa.
 
-**Único próximo passo:** entrar como U2 em contexto separado e executar a prova em A e B. Se a conta não estiver acessível, manter a rodada U2 BLOCKED. Não enviar segredos por chat. A participação humana no login é necessária enquanto o controle autenticado do Chrome permanecer interrompido.
+**Único próximo passo:** confirmar se U2 entrou pelo Google ou pelo formulário Auth0 de e-mail/senha e repetir somente pelo método correspondente ao cadastro autorizado. Se essa identidade não estiver acessível, manter a rodada U2 BLOCKED. Não enviar segredos por chat. A participação humana no login é necessária enquanto o controle autenticado do Chrome permanecer interrompido.
 
 Referências: [openid-client](https://github.com/panva/openid-client), [Auth0: clientes confidenciais](https://auth0.com/docs/get-started/applications/confidential-and-public-applications), [Render: variáveis e segredos](https://render.com/docs/configure-environment-variables).
