@@ -69,7 +69,7 @@ function render(){
     const pickerReady=!!S.config.pickerKey;
     $('entryPickerBtn').disabled=!pickerReady;
     $('pickerNotice').textContent=pickerReady
-      ?'Para arquivos recebidos de outra pessoa, escolha carometro.json no seletor do Google. A pasta deve estar compartilhada com você.'
+      ?'Ao receber um link, conecte a conta convidada e escolha carometro.json no seletor do Google; o link já indica qual arquivo procurar.'
       :'A indicação de pasta funciona quando este aplicativo já tem acesso ao cadastro. Pastas compartilhadas por outra pessoa podem exigir o Google Picker, que ainda depende de uma chave pública.';
   }
   if(!workspaceVisible)return;
@@ -243,7 +243,7 @@ async function connectGoogle(){
   const fromLink=params.get('space');
   if(fromLink){
     try{if(await openSpace(fromLink))return}
-    catch(error){report('O Google Drive não abriu o espaço do convite: '+error.message,'warning')}
+    catch(error){report('O link não abriu o espaço diretamente: '+error.message+' Se a pasta foi compartilhada com você, use “Escolher no Google Drive” para autorizar o arquivo.','warning')}
   }
   const fromFolder=params.get('folder');
   if(fromFolder){
@@ -490,7 +490,8 @@ function initSharing(){
   $('entryPickerBtn').onclick=()=>run(async()=>{
     if(!S.isCloud())throw Error('Conecte ao Google Drive.');
     if(!S.config.pickerKey)throw Error('O Google Picker ainda não foi ativado para este aplicativo.');
-    const id=await pickManifest(S.drive.token,S.config.pickerKey,S.config.projectNumber);
+    const suggested=new URL(location.href).searchParams.get('space')||'';
+    const id=await pickManifest(S.drive.token,S.config.pickerKey,S.config.projectNumber,suggested);
     if(id)await openSpace(id);
   });
   $('refreshSpacesBtn').onclick=()=>run(refreshSpaces);
