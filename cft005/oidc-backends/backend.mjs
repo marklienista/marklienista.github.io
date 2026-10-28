@@ -81,11 +81,11 @@ export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchPr
       if(req.method==='GET'&&url.pathname==='/auth/status')return send(res,200,{product:cfg.product,...loginStatus});
       // Public audit summaries contain only synthetic labels, timestamps and verdicts; no records or credentials.
       if(req.method==='GET'&&url.pathname==='/proof/results')return send(res,200,{product:cfg.product,receipts});
-      if(req.method==='GET'&&url.pathname==='/auth/login'){
+      if(req.method==='GET'&&['/auth/login','/auth/login/choose'].includes(url.pathname)){
         if(transactions.size>=512)return fail(503,'capacity');
         if(sid)sessions.delete(sid);
         transactions.delete(jar.get(TRANSACTION));
-        const transaction=await provider.begin();const tx=random();
+        const transaction=await provider.begin({reauthenticate:url.pathname==='/auth/login/choose'});const tx=random();
         transactions.set(tx,{...transaction,exp:now+300});
         loginStatus.started++;noteLogin('PENDING','redirect_started');
         return send(res,303,{redirecting:true},{Location:transaction.url,'Set-Cookie':[

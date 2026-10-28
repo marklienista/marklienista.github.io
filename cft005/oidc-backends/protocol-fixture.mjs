@@ -100,8 +100,8 @@ export async function protocolFixture() {
       });
     });req.on('error',reject);req.end(body);
   });
-  async function begin(product,jar=new Map(),{user='U1',badNonce=false,badIdSignature=false,badAccessSignature=false,badChallenge=false,tokenEndpointDenial=false,accessClaims={}}={}) {
-    const response=await request(product,{path:'/auth/login',jar});
+  async function begin(product,jar=new Map(),{user='U1',badNonce=false,badIdSignature=false,badAccessSignature=false,badChallenge=false,tokenEndpointDenial=false,reauthenticate=false,accessClaims={}}={}) {
+    const response=await request(product,{path:reauthenticate?'/auth/login/choose':'/auth/login',jar});
     const url=new URL(response.headers.location);
     const code=randomBytes(24).toString('base64url');
     codes.set(code,{clientId:url.searchParams.get('client_id'),challenge:badChallenge?'wrong-challenge':url.searchParams.get('code_challenge'),

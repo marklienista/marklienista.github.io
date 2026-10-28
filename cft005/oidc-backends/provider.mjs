@@ -61,11 +61,12 @@ export async function createProvider(cfg,{fetchForTest}={}) {
     return {subject:payload.sub,label:subjects.get(payload.sub),expiresAt:payload.exp};
   }
   return Object.freeze({
-    async begin() {
+    async begin({reauthenticate=false}={}) {
       const verifier=oidc.randomPKCECodeVerifier(),state=oidc.randomState(),nonce=oidc.randomNonce();
       const url=oidc.buildAuthorizationUrl(client,{response_type:'code',response_mode:'form_post',
         redirect_uri:cfg.origin+'/auth/callback',scope:'openid records:read records:write',audience:cfg.audience,
-        code_challenge:await oidc.calculatePKCECodeChallenge(verifier),code_challenge_method:'S256',state,nonce});
+        code_challenge:await oidc.calculatePKCECodeChallenge(verifier),code_challenge_method:'S256',state,nonce,
+        ...(reauthenticate?{prompt:'login'}:{})});
       return {url:url.href,verifier,state,nonce};
     },
     async complete(transaction,request) {

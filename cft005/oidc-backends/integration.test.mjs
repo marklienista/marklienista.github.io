@@ -52,6 +52,9 @@ test('two confidential BFFs against LOCAL protocol fixture; NOT real Auth0 issua
     const tx=await fixture.begin('A');
     for(const [name,value]of Object.entries({response_type:'code',response_mode:'form_post',code_challenge_method:'S256',audience:AUDIENCE}))assert.equal(tx.url.searchParams.get(name),value);
     for(const name of ['state','nonce','code_challenge'])assert.ok(Boolean(tx.url.searchParams.get(name)));
+    assert.equal(tx.url.searchParams.get('prompt'),null);
+    const forced=await fixture.begin('A',new Map(),{reauthenticate:true});
+    assert.equal(forced.url.searchParams.get('prompt'),'login');
     assert.ok(tx.response.setCookies.some(c=>c.includes('SameSite=None')&&c.includes('Secure')&&c.includes('HttpOnly')));
   });
   await check('STATE','wrong state rejected before token exchange',async()=>{
