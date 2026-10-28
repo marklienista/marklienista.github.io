@@ -1,8 +1,8 @@
 {
-  "status": "A_U1_AND_A_TO_B_TOKEN_POLICY_PASS_B_LOGIN_FAIL",
+  "status": "REAL_U1_LOGIN_AND_BIDIRECTIONAL_CLIENT_BINDING_PASS",
   "applied": true,
   "runtimeReady": true,
-  "realAuth0Issuance": "A_U1_PASS_B_FAIL",
+  "realAuth0Issuance": "A_U1_PASS_B_U1_PASS",
   "workspace": {
     "name": "My Workspace",
     "id": "tea-dattm47lk1mc73cu74bg",
@@ -58,7 +58,7 @@
       "plan": "free",
       "region": "virginia",
       "autoDeploy": "no",
-      "latestDeployId": "dep-dbghl9ek1f9s738qeaag",
+      "latestDeployId": "dep-dbgkttfb9u1s738jjma0",
       "latestDeployStatus": "live",
       "health": {
         "status": 200,
@@ -106,25 +106,27 @@
       "evidence": "runtime-gate-evidence.json"
     }
   },
-  "nextStep": "User reinstalls B exclusive client secret in protected Render field; deploy B and repeat B U1 login/proof. Then U2 and independent sessions.",
+  "nextStep": "Reenter A, log out only A, rerun B proof without B login; then U2 in separate context.",
   "proofRunner": {
     "deployedOnBoth": true,
     "receiptPath": "/proof/results",
     "trigger": "POST /proof/run with authenticated session and CSRF",
     "peerPath": "/proof/token-policy",
     "tokenDestinations": "FIXED_TEST_ORIGINS_ONLY",
-    "realTokenExecution": "BLOCKED_AWAITING_BROWSER"
+    "realTokenExecution": "BIDIRECTIONAL_PASS_U1"
   },
   "currentRealUserEvidence": {
     "sourceCommit": "b0839202423600018b8bd08fc364b5ab090ec899",
     "file": "real-login-evidence.json",
     "aLogin": "PASS",
-    "bLogin": "FAIL_TOKEN_ENDPOINT_UNAUTHORIZED",
-    "aLocalProofPassed": 11,
-    "remoteClientBinding": "A_TO_B_PASS_REVERSE_PENDING",
+    "bLogin": "PASS",
+    "remoteClientBinding": "BIDIRECTIONAL_PASS_U1",
     "secondIdentityPositiveLogin": "BLOCKED",
     "existingServicesModified": false,
     "aToBTokenPolicy": "PASS",
-    "bToATokenPolicy": "BLOCKED"
+    "bToATokenPolicy": "PASS",
+    "aProofPassed": 11,
+    "bProofPassed": 11,
+    "independentSessionLogout": "BLOCKED_AWAITING_BROWSER"
   }
 }

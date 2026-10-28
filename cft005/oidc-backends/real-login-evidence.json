@@ -1,9 +1,9 @@
 {
-  "schema": 1,
+  "schema": 2,
   "scope": "HOSTED_AUTH0_USER_LOGIN_AND_SYNTHETIC_AUTHORIZATION",
   "sourceCommit": "b0839202423600018b8bd08fc364b5ab090ec899",
   "sourceDeployA": "dep-dbgkms4ipgvc73drq0cg",
-  "sourceDeployB": "dep-dbgi0aom7kps739dcuqg",
+  "sourceDeployB": "dep-dbgkttfb9u1s738jjma0",
   "aLogin": {
     "result": "PASS",
     "observedAt": "2026-10-28T01:15:02.502Z",
@@ -22,19 +22,19 @@
     }
   },
   "bLogin": {
-    "result": "FAIL",
+    "result": "PASS",
+    "observedAt": "2026-10-28T01:31:41.486Z",
+    "syntheticLabel": "U1",
     "diagnostic": {
       "product": "B",
-      "started": 3,
-      "callbacks": 2,
-      "successes": 0,
-      "failures": 2,
+      "started": 2,
+      "callbacks": 1,
+      "successes": 1,
+      "failures": 0,
       "last": {
-        "at": "2026-10-28T01:21:27.727Z",
-        "result": "FAIL",
-        "stage": "provider_denied",
-        "phase": "token_endpoint",
-        "reason": "unauthorized"
+        "at": "2026-10-28T01:31:41.486Z",
+        "result": "PASS",
+        "stage": "authenticated"
       }
     }
   },
@@ -198,11 +198,11 @@
     }
   ],
   "limits": [
-    "A/U1 retry passed all 11 checks; first blocked attempt preserved.",
-    "B own login failed at token endpoint with sanitized unauthorized; B-to-A real token proof pending.",
-    "Second identity positive login and bidirectional data separation pending.",
+    "Both U1 proof runs passed 11/11; first A transport-blocked attempt and prior B login failure preserved.",
+    "Only synthetic U1 has a positive real login; U2 positive login and reciprocal user separation still pending.",
+    "Local logout, reentry, independent sessions and original SPA refresh matrix require separate observation.",
     "No JWT, OAuth code, subject, cookie, CSRF, secret or record contents captured.",
-    "Shared published Supabase architecture S12 remains FAIL; CFT-005 OPEN."
+    "Published Supabase architecture S12 remains FAIL; CFT-005 OPEN."
   ],
   "existingAppsModified": false,
   "realDataAccessed": false,
@@ -210,6 +210,115 @@
     "result": "PASS",
     "syntheticLabel": "U1",
     "observedAt": "2026-10-28T01:21:16.978Z",
+    "permissions": [
+      "records:read",
+      "records:write"
+    ],
+    "expectedHttpStatus": 401,
+    "observedHttpStatus": 401,
+    "signatureAndOtherClientBindingVerified": true
+  },
+  "deploymentCommitB": "a87f74dbaa3dcbbcbb74fcd268a690520606441b",
+  "priorBLoginFailure": {
+    "result": "FAIL",
+    "diagnostic": {
+      "product": "B",
+      "started": 3,
+      "callbacks": 2,
+      "successes": 0,
+      "failures": 2,
+      "last": {
+        "at": "2026-10-28T01:21:27.727Z",
+        "result": "FAIL",
+        "stage": "provider_denied",
+        "phase": "token_endpoint",
+        "reason": "unauthorized"
+      }
+    }
+  },
+  "proofAttemptsB": [
+    {
+      "startedAt": "2026-10-28T01:31:47.283Z",
+      "product": "B",
+      "user": "U1",
+      "cases": [
+        {
+          "id": "OWN-TOKEN-records:read",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-TOKEN-records:write",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-READ",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-WRITE",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-READ",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-WRITE",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-READ",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-WRITE",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "PEER-TOKEN-records:read",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "PEER-TOKEN-records:write",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "OTHER-USER-UNCHANGED",
+          "expected": true,
+          "actual": true,
+          "result": "PASS"
+        }
+      ],
+      "finishedAt": "2026-10-28T01:31:48.320Z",
+      "result": "PASS"
+    }
+  ],
+  "bToATokenPolicy": {
+    "result": "PASS",
+    "syntheticLabel": "U1",
+    "observedAt": "2026-10-28T01:31:48.320Z",
     "permissions": [
       "records:read",
       "records:write"

@@ -1,8 +1,14 @@
 # CFT-005 — Integração de dois backends confidenciais
 
-**27/10/2026: login real A/U1 e prova A 11/11 PASS. JWT real do A recusado pelo B após assinatura/azp, para leitura e escrita. Login próprio B FAIL no token endpoint; direção B→A e U2 pendentes. CFT-005 continua ABERTO.**
+**27/10/2026: login real A/B com U1 PASS; prova de cada backend 11/11 PASS. JWT real A→B e B→A recusado após assinatura/azp para leitura/escrita. U2 e sessões independentes pendentes; CFT-005 ABERTO.**
 
 O código de integração está preparado nesta branch; os resultados locais abaixo não comprovam emissão pelo Auth0. Esta pasta é independente de `oidc/` e `backend-proof/` e não substitui os aplicativos publicados.
+
+## Emissão real B e prova bidirecional U1 — 27/10/2026, 22:31 BRT
+
+Após reinstalar a credencial exclusiva, B registrou PASS/authenticated às 01:31:41.486Z de 28/10 (22:31 BRT de 27/10). O recibo B/U1 terminou às 01:31:48.320Z com **11/11 PASS**, incluindo HTTP 401 para seu JWT real no A após assinatura e vínculo do outro cliente, nos dois escopos. Em conjunto com o recibo A/U1, a recusa real está comprovada nas duas direções para a política do protótipo. O erro antigo B e o primeiro recibo A bloqueado foram preservados.
+
+B usa deploy dep-dbgkttfb9u1s738jjma0, commit de evidências a87f74dbaa3dcbbcbb74fcd268a690520606441b; os executáveis são idênticos aos de b0839202423600018b8bd08fc364b5ab090ec899. A permanece no deploy anterior. Não há homologação da arquitetura publicada, login positivo de U2, logout/persistência completos ou refresh real do SPA. Nenhuma credencial ou conteúdo de registro integra os recibos.
 
 ## Prova A completa e erro B — 27/10/2026, 22:21 BRT
 
@@ -136,6 +142,6 @@ Durante a integração local, o emissor de teste inicialmente recusou Basic porq
 
 Há dois serviços LIVE, health PASS e emissão administrativa validada. Ainda não há emissão humana A/B ou prova remota com JWT de usuário. Os testes locais não removem o FAIL de S12 na arquitetura publicada. Sessões/dados/recibos em memória são adequados apenas à prova de instância única, sem disponibilidade, durabilidade ou logout central. As rotas dos aplicativos existentes continuam fora desta mudança. Os recibos públicos são evidência sanitizada de teste, não um sistema de auditoria durável ou com atestação externa.
 
-**Único próximo passo:** reinstalar a credencial exclusiva do B no campo protegido e implantar somente B; repetir seu login/prova U1. Depois conduzir U2 e sessões independentes. Não enviar segredos por chat. A participação humana no login é necessária enquanto o controle autenticado do Chrome permanecer interrompido.
+**Único próximo passo:** realizar nova entrada no A, sair apenas do A e repetir a prova B sem novo login B; conferir independência, depois conduzir U2 em contexto separado. Não enviar segredos por chat. A participação humana no login é necessária enquanto o controle autenticado do Chrome permanecer interrompido.
 
 Referências: [openid-client](https://github.com/panva/openid-client), [Auth0: clientes confidenciais](https://auth0.com/docs/get-started/applications/confidential-and-public-applications), [Render: variáveis e segredos](https://render.com/docs/configure-environment-variables).
