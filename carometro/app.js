@@ -29,22 +29,57 @@ async function loadSpace(manifestId){
   resetTemporaryPrint();
   return result;
 }
-function render(){
-  $('spaceTitle').textContent=S.space.school.name||'Escola sem nome';
-  const mode=S.isCloud()?(S.isLinked()?'Google Drive · '+(S.drive.email||'conta autorizada'):'Google conectado · ainda não salvo'):(S.config.clientId?'Demonstração temporária · Google Drive desconectado':'Demonstração temporária · integração Google em preparação');
-  $('modeText').textContent=mode+(S.dirty?' · alterações não salvas':'');
-  $('connectBtn').textContent=S.isCloud()?'Desconectar Google Drive':'Conectar ao Google Drive';
-  $('saveBtn').disabled=!S.isCloud()||!S.editable()||(!S.dirty&&S.isLinked());
-  $('saveBtn').textContent='Salvar no Drive';
-  const guidance=$('saveGuide');
-  guidance.hidden=!S.isCloud();
-  if(S.isCloud()){
-    guidance.textContent=!S.isLinked()
-      ? 'Google Drive conectado. Para guardar as turmas e as fotos, toque em Salvar no Drive — isso cria o carômetro na sua conta.'
-      : S.dirty
-        ? 'Existem alterações ainda não salvas no Google Drive. Toque em Salvar no Drive.'
-        : 'O carômetro está salvo no Google Drive. Faça alterações para habilitar Salvar no Drive novamente.';
+let saveTimer=null,savePending=null,saveError=null,savePhase='idle',savedAt=null;
+function saveStatus(){
+  const node=$('saveStatus');
+  if(!node)return;
+  node.classList.toggle('save-error',savePhase==='error');
+  node.classList.toggle('save-pending',savePhase==='pending'||savePhase==='saving');
+  if(saveError){
+    node.textContent='Não foi salvo no Google Drive: '+(saveError.message||'Erro desconhecido.');
+  }else if(!S.editable()){
+    node.textContent='Acesso somente leitura. Apenas quem tem permissão de edição pode salvar alterações.';
+  }else if(savePhase==='saving'){
+    node.textContent='Salvando alterações no Google Drive…';
+  }else if(S.dirty||savePhase==='pending'){
+    node.textContent='Alterações aguardando salvamento automático…';
+  }else if(S.isLinked()){
+    node.textContent='Tudo salvo no Google Drive'+(savedAt?' · '+savedAt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'')+'.';
+  }else{
+    node.textContent='Preparando pasta segura no Google Drive…';
   }
+  $('retrySaveBtn').hidden=!saveError||saveError.code==='CONFLICT';
+  $('reloadRemoteBtn').hidden=!saveError||saveError.code!=='CONFLICT'||!S.isLinked();
+}
+function render(){
+  const connected=S.isCloud(),hasSpace=S.hasSpace();
+  const workspaceVisible=connected&&hasSpace;
+  $('workspaceApp').hidden=!workspaceVisible;
+  $('entryGate').hidden=workspaceVisible;
+  $('entryDisconnected').hidden=connected;
+  $('entryChoose').hidden=!connected;
+  $('settingsBtn').hidden=!workspaceVisible;
+  if(!connected){
+    $('entryConnectBtn').textContent=hasSpace?'Reconectar ao Google Drive':'Conectar ao Google Drive';
+    $('entryTitle').textContent=hasSpace?'Reconecte seu Google Drive para proteger as alterações':'Conecte seu Google Drive para começar';
+  }
+  if(connected&&!hasSpace){
+    $('entryAccount').textContent=S.drive.email?'Conta conectada: '+S.drive.email:'Conta Google conectada';
+    const pickerReady=!!S.config.pickerKey;
+    $('entryPickerBtn').disabled=!pickerReady;
+    $('pickerNotice').textContent=pickerReady
+      ?'Para arquivos recebidos de outra pessoa, escolha carometro.json no seletor do Google. A pasta deve estar compartilhada com você.'
+      :'A indicação de pasta funciona quando este aplicativo já tem acesso ao cadastro. Pastas compartilhadas por outra pessoa podem exigir o Google Picker, que ainda depende de uma chave pública.';
+  }
+  if(!workspaceVisible)return;
+  $('spaceTitle').textContent=S.space.school.name||'Escola sem nome';
+  $('modeText').textContent=(S.isLinked()?'Google Drive · '+(S.drive.email||'conta autorizada'):'Criando pasta no Google Drive…')+
+    (S.link&&!S.link.canEdit?' · acesso para leitura':'');
+  $('newSpaceBtn').disabled=!!savePending;
+  $('openDriveFolderBtn').disabled=!S.link?.folderId;
+  $('inviteBtn').disabled=!S.link?.canShare;
+  $('pickerBtn').disabled=!S.config.pickerKey;
+  saveStatus();
   fillSelect($('yearSelect'),years().map(y=>({value:y,label:String(y)})),S.year);
   if(!S.classId||!currentClass()||currentClass().year!==Number(S.year))S.classId=classesForYear()[0]?.id||null;
   renderClassBar(S.space,S.year,S.classId,id=>S.selectClass(id));
@@ -68,7 +103,6 @@ function render(){
   else{$('studentsGrid').replaceChildren();$('emptyStudents').hidden=false}
   $('studentCount').textContent=c?classStudents(S.space,c.id).length+' estudantes · '+selectedCurrentStudents().length+' selecionados no ano':'Crie uma turma para começar.';
 }
-S.onUpdate=render;
 function bindNavigation(){
   document.querySelectorAll('.navtabs button').forEach(btn=>btn.onclick=()=>{
     document.querySelectorAll('.navtabs button').forEach(b=>b.removeAttribute('aria-current'));
