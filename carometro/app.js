@@ -103,6 +103,178 @@ function render(){
   else{$('studentsGrid').replaceChildren();$('emptyStudents').hidden=false}
   $('studentCount').textContent=c?classStudents(S.space,c.id).length+' estudantes · '+selectedCurrentStudents().length+' selecionados no ano':'Crie uma turma para começar.';
 }
+/* Persistência automática: um escritor por vez nesta aba; nenhuma edição silenciosa após erro. */
+function rememberSpaceLink(id){
+  const url=new URL(location.href);
+  url.searchParams.delete('folder');
+  url.searchParams.set('space',id);
+  history.replaceState(null,'',url.href);
+}
+function clearSpaceLink(){
+  const url=new URL(location.href);
+  url.searchParams.delete('space');url.searchParams.delete('folder');
+  history.replaceState(null,'',url.href);
+}
+function queueAutosave(){
+  if(!S.hasSpace()||!S.dirty||!S.isCloud()||!S.editable()||saveError)return;
+  if(saveTimer)clearTimeout(saveTimer);
+  savePhase='pending';
+  saveStatus();
+  saveTimer=setTimeout(()=>{saveTimer=null;void saveNow()},1200);
+}
+async function saveNow(){
+  if(savePending)return savePending;
+  if(!S.dirty)return true;
+  if(saveError)return false;
+  if(!S.isCloud()){
+    saveError=Error('A sessão Google expirou. Reconecte para salvar as alterações.');
+    savePhase='error';saveStatus();return false;
+  }
+  savePhase='saving';saveStatus();
+  const work=(async()=>{
+    try{
+      const link=await S.save();
+      if(!link?.manifestId)throw Error('O Google Drive não confirmou o arquivo do FotoCrachá.');
+      savedAt=new Date();saveError=null;
+      savePhase=S.dirty?'pending':'saved';
+      rememberSpaceLink(link.manifestId);
+      return true;
+    }catch(error){
+      saveError=error;savePhase='error';
+      report('Salvamento automático interrompido: '+(error.message||'Erro desconhecido.'),'error');
+      return false;
+    }finally{
+      savePending=null;
+      if(S.isCloud()&&S.hasSpace())saveStatus();
+      if(S.dirty&&!saveError&&S.isCloud())queueAutosave();
+    }
+  })();
+  savePending=work;
+  return work;
+}
+async function flushEdits(){
+  if(saveTimer){clearTimeout(saveTimer);saveTimer=null}
+  if(savePending)await savePending;
+  if(S.dirty&&!saveError)await saveNow();
+  if(S.dirty){
+    report('Há alterações sem confirmação no Google Drive. Resolva o erro de salvamento antes de trocar de espaço ou conta.','warning');
+    return false;
+  }
+  return true;
+}
+async function openSpace(id){
+  if(!await flushEdits())return false;
+  saveError=null;savePhase='idle';savedAt=null;
+  const result=await S.load(id);
+  savedAt=new Date();savePhase='saved';rememberSpaceLink(id);render();
+  report(result.failed
+    ?'Espaço aberto; '+result.failed+' imagens não puderam ser carregadas pelo Google Drive.'
+    :'Espaço recuperado do Google Drive. Suas próximas alterações serão salvas automaticamente.',
+    result.failed?'warning':'info');
+  return true;
+}
+async function refreshSpaces(){
+  if(!S.isCloud()||S.hasSpace())return;
+  const root=$('spacesList');
+  root.textContent='Procurando seus espaços no Google Drive…';
+  try{
+    const files=await S.drive.spaces();
+    root.replaceChildren();
+    if(!files.length){
+      root.textContent='Nenhum espaço acessível foi encontrado. Crie um novo ou indique a pasta que já possui no Google Drive.';
+      return;
+    }
+    const visible=files.slice(0,30);
+    const decorated=await Promise.all(visible.map(async f=>{
+      if(!f.parents?.[0])return {file:f,label:'Cadastro no Google Drive'};
+      try{
+        const folder=await S.drive.info(f.parents[0]);
+        return {file:f,label:String(folder.name||'Cadastro no Google Drive')};
+      }catch{return {file:f,label:'Cadastro no Google Drive'}}
+    }));
+    for(const item of decorated){
+      const button=document.createElement('button');
+      button.type='button';button.className='space-choice';
+      const title=document.createElement('strong'),sub=document.createElement('small');
+      title.textContent=item.label;
+      const date=item.file.modifiedTime?new Date(item.file.modifiedTime).toLocaleDateString('pt-BR'):'sem data';
+      sub.textContent='Alterado em '+date+' · abrir cadastro';
+      button.append(title,sub);
+      button.onclick=()=>run(async()=>openSpace(item.file.id));
+      root.append(button);
+    }
+    if(files.length>visible.length){
+      const info=document.createElement('p');info.className='sub';
+      info.textContent='Outros espaços podem ser abertos pelo link da pasta ou do arquivo.';
+      root.append(info);
+    }
+  }catch(error){
+    root.textContent='Não foi possível listar os arquivos nesta conta: '+error.message+
+      '. Você ainda pode indicar uma pasta, tentar o seletor do Google ou criar um espaço novo.';
+  }
+}
+async function openProvidedFolder(){
+  if(!S.isCloud())throw Error('Conecte sua conta Google.');
+  const text=$('entryFolderLink').value.trim();
+  if(!text)throw Error('Cole o link da pasta ou do arquivo no Google Drive.');
+  const manifestId=await S.drive.openFromFolder(text);
+  return openSpace(manifestId);
+}
+async function connectGoogle(){
+  if(!S.config.clientId){presentModal('driveUnavailableDialog');return}
+  const email=await S.connect();
+  report('Google Drive conectado'+(email?' como '+email:'')+'.','info');
+  if(S.hasSpace()){
+    if(saveError?.code!=='CONFLICT')saveError=null;
+    if(S.dirty)queueAutosave();
+    render();return;
+  }
+  render();
+  const params=new URL(location.href).searchParams;
+  const fromLink=params.get('space');
+  if(fromLink){
+    try{if(await openSpace(fromLink))return}
+    catch(error){report('O Google Drive não abriu o espaço do convite: '+error.message,'warning')}
+  }
+  const fromFolder=params.get('folder');
+  if(fromFolder){
+    try{const id=await S.drive.openFromFolder(fromFolder);if(await openSpace(id))return}
+    catch(error){report('A pasta indicada não pôde ser aberta: '+error.message,'warning')}
+  }
+  await refreshSpaces();
+}
+async function disconnectGoogle(){
+  if(!await flushEdits())return false;
+  S.disconnect();saveError=null;savePhase='idle';savedAt=null;clearSpaceLink();render();
+  $('spacesList').replaceChildren();
+  report('Conta Google desconectada deste navegador. Nenhum arquivo do Drive foi apagado.');
+  return true;
+}
+async function switchSpace(){
+  if(!await flushEdits())return false;
+  S.resetToGate();saveError=null;savePhase='idle';savedAt=null;clearSpaceLink();render();
+  await refreshSpaces();
+  return true;
+}
+function folderUrl(){
+  if(!S.link?.folderId)throw Error('Este espaço ainda não tem pasta confirmada no Google Drive.');
+  return 'https://drive.google.com/drive/folders/'+encodeURIComponent(S.link.folderId);
+}
+function showGoogleFolder(){
+  const url=folderUrl();
+  const opened=window.open(url,'_blank','noopener,noreferrer');
+  if(!opened)report('Abra esta pasta no Google Drive: '+url,'info');
+}
+async function clipboardFolder(){
+  const url=folderUrl();
+  try{await navigator.clipboard.writeText(url);report('Link da pasta copiado. A pessoa também precisa receber permissão de acesso no Google Drive.')}
+  catch{prompt('Copie o endereço da pasta do Google Drive:',url)}
+}
+function openNewSpaceDialog(){
+  $('newSpaceName').value='';
+  presentModal('newSpaceDialog');
+}
+
 function bindNavigation(){
   document.querySelectorAll('.navtabs button').forEach(btn=>btn.onclick=()=>{
     document.querySelectorAll('.navtabs button').forEach(b=>b.removeAttribute('aria-current'));
