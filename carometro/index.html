@@ -54,7 +54,7 @@
       </section>
     </div>
     <div id="workspaceApp" hidden>
-    <div class="safety no-print" role="note"><strong>Ambiente de testes.</strong> Use apenas dados e imagens fictícios. Sem conexão ao Google Drive, as alterações ficam somente neste navegador de teste.</div>
+    <div class="safety no-print" role="note"><strong>Ambiente de testes.</strong> Use somente dados e imagens fictícios. O salvamento e o acesso compartilhado ainda precisam de validação com contas adultas.</div>
     <section class="hero no-print" aria-labelledby="heroTitle">
       <div><span class="tab">RECORTES EM USO · EDUCAÇÃO</span><h1 id="heroTitle">Seu carômetro, seus crachás, tudo da mesma turma.</h1><p>Cadastre estudantes uma vez, organize fotografias e imprima carômetros ou crachás. Atualize as turmas a cada ano sem refazer o trabalho.</p></div>
       <div class="hero-symbol" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -124,7 +124,7 @@
         <div class="soft"><label>E-mail do convidado<input id="inviteEmail" type="email" placeholder="professora@escola.edu.br" autocomplete="off"></label><label>Permissão<select id="inviteRole"><option value="reader">Visualizar</option><option value="writer">Visualizar e editar</option></select></label><button id="inviteBtn" type="button" class="primary">Compartilhar pasta</button><button type="button" id="copyLinkBtn" class="light">Copiar link de acesso</button></div>
         <p class="sub">As permissões ficam no Google Drive, não em uma lista paralela do FotoCrachá. Convidados podem precisar selecionar carometro.json pelo Google Picker; apenas compartilhar a pasta não dá acesso automaticamente à API para todas as fotografias. Edite um de cada vez e nunca modifique o arquivo técnico manualmente.</p>
         <div class="inline"><button id="pickerBtn" type="button" class="light">Selecionar arquivo compartilhado</button></div>
-        <div id="permissionsList" class="permissions"></div>
+        <div class="inline"><button id="refreshPermissionsBtn" type="button" class="light">Atualizar acessos da pasta</button></div><div id="permissionsList" class="permissions"></div>
       </div>
     </section>
     <footer class="site-foot no-print"><p><strong>FotoCrachá</strong> · uma ferramenta de Marcelo Santos · versão de testes, não lançada</p><p>Fotografias e cadastros reais exigem autorização e política de privacidade adequada. Sem reconhecimento facial.</p></footer>
