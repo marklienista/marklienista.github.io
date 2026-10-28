@@ -153,13 +153,13 @@ test('revoked refresh is classified safely, without leaking the error details',(
 
 test('UI: a failed refresh or identity check still allows local logout and recovery', async()=>{
   const source=(await readFile(new URL('./app.mjs',import.meta.url),'utf8')).replace(/^import .*?;\r?\n/, '');
-  const elements=new Map(['status','enter','check','leave','refresh'].map(id=>[id,{
+  const elements=new Map(['status','enter','check','leave','refresh','probe','audit'].map(id=>[id,{
     disabled:true,textContent:'',listeners:{},addEventListener(event,handler){this.listeners[event]=handler;}
   }]));
-  let failing=true, session=true, signouts=0;
+  let failing=true, session=true, signouts=0, currentIdentity=USER1;
   const auth={
     getSession:async()=>({data:{session:session?{access_token:'fixture'}:null},error:null}),
-    getUser:async()=>({data:{user:{id:USER1}},error:failing?{code:'session_not_found',message:'private fixture'}:null}),
+    getUser:async()=>({data:{user:{id:currentIdentity}},error:failing?{code:'session_not_found',message:'private fixture'}:null}),
     refreshSession:async()=>({data:{session:null},error:{code:'refresh_token_not_found',message:'private fixture'}}),
     signOut:async({scope})=>{assert.equal(scope,'local');signouts++;session=false;return {error:null};}
   };
@@ -185,9 +185,64 @@ test('UI: a failed refresh or identity check still allows local logout and recov
   failing=false;
   await elements.get('check').listeners.click();
   assert.equal(elements.get('refresh').disabled,false);
+  assert.equal(elements.get('audit').textContent.includes(USER1),false,'audit must not expose the raw UUID');
+  currentIdentity=USER2;
+  await elements.get('check').listeners.click();
+  assert.match(elements.get('status').textContent,/E_IDENTITY/);
+  assert.equal(elements.get('leave').disabled,false);
+  assert.equal(elements.get('refresh').disabled,true);
+  assert.equal(elements.get('audit').textContent.includes(USER2),false);
+  currentIdentity=USER1;
+  await elements.get('check').listeners.click();
   await elements.get('leave').listeners.click();
   assert.equal(signouts,1);
   assert.equal(elements.get('leave').disabled,true);
   assert.equal(elements.get('refresh').disabled,true);
   assert.equal(elements.get('status').textContent.includes('private fixture'),false);
+});
+
+test('refresh observation exposes only rotation booleans after server identity verification',async()=>{
+  let observed;
+  const auth={getSession:async()=>({data:{session:{access_token:'FIXTURE_OLD_ACCESS',refresh_token:'FIXTURE_OLD_REFRESH'}},error:null}),
+    refreshSession:async()=>({data:{session:{access_token:'FIXTURE_NEW_ACCESS',refresh_token:'FIXTURE_NEW_REFRESH'}},error:null}),
+    getUser:async()=>({data:{user:{id:USER1}},error:null})};
+  assert.deepEqual(await refreshCurrentSession({auth},value=>{observed=value}),{id:USER1});
+  assert.deepEqual(observed,{requestCompleted:true,previousSessionPresent:true,accessCredentialChanged:true,refreshCredentialChanged:true});
+  assert.doesNotMatch(JSON.stringify(observed),/FIXTURE_|00000000/);
+});
+
+test('invalid-refresh probe is ephemeral and cannot alter or sign out the primary client',async()=>{
+  let options,request,signouts=0;
+  const primary={auth:{getSession:async()=>({data:{session:{}},error:null}),getUser:async()=>({data:{user:{id:USER1}},error:null}),signOut:async()=>{signouts++;throw Error('must not sign out');}}};
+  const sdk={createClient:(_url,_key,o)=>{options=o;return {auth:{refreshSession:async r=>{request=r;return {data:{session:null},error:{status:400,code:'refresh_token_not_found',message:'private FIXTURE credential detail'}}}}};}};
+  const cfg={provider:'custom:conta-central',callbackUrl:A+'/callback.html',allowedCallbacks:[A+'/callback.html'],supabaseUrl:'https://example.supabase.co',publishableKey:'sb_publishable_FIXTURE'};
+  const result=await identity.probeInvalidRefresh(sdk,cfg,primary,USER1);
+  assert.equal(result.result,'PASS');assert.equal(result.primarySessionUnchanged,true);assert.equal(result.httpStatus,400);
+  assert.equal(options.auth.persistSession,false);assert.equal(options.auth.autoRefreshToken,false);assert.notEqual(options.auth.storageKey,'cft005.oidc.demo');
+  assert.equal(request.refresh_token,'CFT005-SYNTHETIC-UNISSUED-REFRESH');assert.equal(signouts,0);
+  assert.doesNotMatch(JSON.stringify(result),/private|FIXTURE|00000000/);
+});
+
+test('invalid-refresh probe fails on an identity change or an unexpectedly accepted sentinel',async()=>{
+  const cfg={provider:'custom:conta-central',callbackUrl:A+'/callback.html',allowedCallbacks:[A+'/callback.html'],supabaseUrl:'https://example.supabase.co',publishableKey:'sb_publishable_FIXTURE'};
+  for(const change of [true,false]){
+    let reads=0;
+    const primary={auth:{getSession:async()=>({data:{session:{}},error:null}),getUser:async()=>({data:{user:{id:++reads>1&&change?USER2:USER1}},error:null})}};
+    const sdk={createClient:()=>({auth:{refreshSession:async()=>({data:{session:change?null:{access_token:'FIXTURE_UNEXPECTED'}},error:change?{status:400,code:'refresh_token_not_found'}:null})}})};
+    const result=await identity.probeInvalidRefresh(sdk,cfg,primary,USER1);
+    assert.equal(result.result,'FAIL');assert.doesNotMatch(JSON.stringify(result),/FIXTURE|00000000/);
+  }
+});
+
+test('callback bootstrap clears the URL before the SDK and consumes the callback once without storage',async()=>{
+  const source=await readFile(new URL('./callback-start.js',import.meta.url),'utf8');
+  const html=await readFile(new URL('./callback.html',import.meta.url),'utf8');
+  assert(html.indexOf('src="./callback-start.js"')<html.indexOf('src="https://cdn.jsdelivr.net/'));
+  const changes=[];
+  const context=vm.createContext({location:{href:A+'/callback.html?code=FIXTURE_ONLY',pathname:'/callback.html'},history:{replaceState:(_s,_t,path)=>changes.push(path)}});
+  vm.runInContext(source,context);
+  assert.deepEqual(changes,['/callback.html']);
+  assert.equal(context.__cft005TakeCallback(),A+'/callback.html?code=FIXTURE_ONLY');
+  assert.equal(context.__cft005TakeCallback,undefined);
+  assert.doesNotMatch(source,/localStorage|sessionStorage|console\./);
 });

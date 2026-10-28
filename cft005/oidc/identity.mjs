@@ -19,12 +19,17 @@ export function assertConfig(config) {
   return config;
 }
 
-export function makeClient(supabaseSdk, config) {
+function clientApi(supabaseSdk, config) {
   assertConfig(config);
   if (typeof supabaseSdk?.createClient !== 'function') throw new Error('supabase_sdk_missing');
   const api = new URL(config.supabaseUrl);
   if (api.protocol !== 'https:' || api.username || api.password || api.search || api.hash || api.pathname !== '/') throw new Error('supabase_url_invalid');
   if (typeof config.publishableKey !== 'string' || !config.publishableKey.startsWith('sb_publishable_')) throw new Error('publishable_key_missing');
+  return api;
+}
+
+export function makeClient(supabaseSdk, config) {
+  const api = clientApi(supabaseSdk, config);
   return supabaseSdk.createClient(api.origin, config.publishableKey, {
     auth: {
       flowType: 'pkce',
@@ -84,12 +89,55 @@ export async function currentUser(client) {
  * Explicitly refreshes a test-only Supabase session without leaking credentials.
  * This does not terminate or refresh the Auth0 central SSO cookie.
  */
-export async function refreshCurrentSession(client) {
+export async function refreshCurrentSession(client, observe) {
   if (typeof client?.auth?.refreshSession !== 'function') throw new Error('refresh_not_supported');
+  const before = typeof observe === 'function' ? await client.auth.getSession() : null;
+  if (before?.error) throw before.error;
+  const priorAccess = before?.data?.session?.access_token;
+  const priorRefresh = before?.data?.session?.refresh_token;
   const {data, error} = await client.auth.refreshSession();
   if (error) throw error;
   if (!data?.session?.access_token) throw new Error('refresh_no_session');
-  return currentUser(client);
+  const user = await currentUser(client);
+  if (typeof observe === 'function') observe({
+    requestCompleted: true,
+    previousSessionPresent: Boolean(before?.data?.session),
+    accessCredentialChanged: typeof priorAccess === 'string' ? priorAccess !== data.session.access_token : null,
+    refreshCredentialChanged: typeof priorRefresh === 'string' && typeof data.session.refresh_token === 'string' ? priorRefresh !== data.session.refresh_token : null
+  });
+  return user;
+}
+
+// Comparison pseudonym for the test UI only, never an authorization claim.
+export async function sessionTag(id) {
+  if (typeof id !== 'string' || !id) throw new Error('identity_missing');
+  const bytes = await crypto.subtle.digest('SHA-256',new TextEncoder().encode('CFT-005/test-identity/'+id));
+  return Array.from(new Uint8Array(bytes).slice(0,16),b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// The fixed unissued sentinel is not a credential. This ephemeral client cannot
+// overwrite the primary client's storage or revoke a real session.
+export async function probeInvalidRefresh(sdk, config, primaryClient, expectedId) {
+  const before = await currentUser(primaryClient);
+  if (!before) throw new Error('refresh_probe_no_primary');
+  const api = clientApi(sdk,config);
+  const probe = sdk.createClient(api.origin,config.publishableKey,{auth:{
+    flowType:'pkce',persistSession:false,autoRefreshToken:false,detectSessionInUrl:false,
+    storageKey:'cft005.oidc.invalid-refresh-probe'
+  }});
+  let error;
+  try { ({error} = await probe.auth.refreshSession({refresh_token:'CFT005-SYNTHETIC-UNISSUED-REFRESH'})); }
+  catch (caught) { error=caught; }
+  const after = await currentUser(primaryClient);
+  const same = Boolean(after && before.id===after.id && (!expectedId || before.id===expectedId));
+  const denied = error?.status===400 && (error?.code==='refresh_token_not_found' || /Invalid Refresh Token/i.test(error?.message || ''));
+  return {
+    result:denied && same?'PASS':(!same || !error?'FAIL':'BLOCKED'),
+    requestRejected:Boolean(error),expectedInvalidRefresh:denied,
+    httpStatus:Number.isInteger(error?.status)?error.status:null,
+    code:denied?'E_REFRESH_INVALID':error?'E_REFRESH_PROBE_UNAVAILABLE':'E_REFRESH_UNEXPECTED_SUCCESS',
+    primarySessionUnchanged:same
+  };
 }
 
 export async function signOutHere(client) {
@@ -116,5 +164,7 @@ export function authFailureMessage(error) {
   if (has(['AuthPKCECodeVerifierMissingError','invalid_flow_state','flow_state_not_found','flow_state_expired','bad_code_verifier'])) return 'O navegador perdeu a confirmação da entrada (E_PKCE). Recomece no mesmo navegador e aba.';
   if (code === 'supabase_sdk_missing' || code === 'sdk_unavailable') return 'A biblioteca de autenticação não carregou (E_SDK). Atualize a página.';
   if (code === 'publishable_key_missing' || code === 'config_missing' || code === 'provider_invalid') return 'Configuração pública do aplicativo incompleta (E_CONFIG).';
+  if (code === 'session_identity_changed') return 'A identidade mudou durante o teste (E_IDENTITY). Saia apenas desta ferramenta e recomece.';
+  if (code === 'refresh_probe_no_primary') return 'Entre na ferramenta antes de testar a falha de renovação (E_PROBE_SESSION).';
   return 'Não foi possível concluir a entrada (E_AUTH). Consulte o código de erro e os registros do servidor.';
 }
