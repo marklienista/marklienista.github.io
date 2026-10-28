@@ -10,12 +10,12 @@
     "syntheticLabel": "U1",
     "diagnostic": {
       "product": "A",
-      "started": 2,
-      "callbacks": 1,
-      "successes": 1,
+      "started": 4,
+      "callbacks": 2,
+      "successes": 2,
       "failures": 0,
       "last": {
-        "at": "2026-10-28T01:15:02.502Z",
+        "at": "2026-10-28T01:36:56.235Z",
         "result": "PASS",
         "stage": "authenticated"
       }
@@ -198,9 +198,9 @@
     }
   ],
   "limits": [
-    "Both U1 proof runs passed 11/11; first A transport-blocked attempt and prior B login failure preserved.",
-    "Only synthetic U1 has a positive real login; U2 positive login and reciprocal user separation still pending.",
-    "Local logout, reentry, independent sessions and original SPA refresh matrix require separate observation.",
+    "Both U1 proof runs passed 11/11; B repeated 11/11 after reported A-only logout without another B login.",
+    "Only U1 has a positive real login; U2 positive login and reciprocal user separation still pending.",
+    "Original SPA refresh matrix, provider cancellation and central logout require separate proof; functional A reentry observed.",
     "No JWT, OAuth code, subject, cookie, CSRF, secret or record contents captured.",
     "Published Supabase architecture S12 remains FAIL; CFT-005 OPEN."
   ],
@@ -313,6 +313,83 @@
       ],
       "finishedAt": "2026-10-28T01:31:48.320Z",
       "result": "PASS"
+    },
+    {
+      "startedAt": "2026-10-28T01:37:17.677Z",
+      "product": "B",
+      "user": "U1",
+      "cases": [
+        {
+          "id": "OWN-TOKEN-records:read",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-TOKEN-records:write",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-READ",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OWN-WRITE",
+          "expected": 200,
+          "actual": 200,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-READ",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-USER-WRITE",
+          "expected": 404,
+          "actual": 404,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-READ",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "OTHER-PRODUCT-WRITE",
+          "expected": 403,
+          "actual": 403,
+          "result": "PASS"
+        },
+        {
+          "id": "PEER-TOKEN-records:read",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "PEER-TOKEN-records:write",
+          "expected": 401,
+          "actual": 401,
+          "result": "PASS",
+          "bindingVerified": true
+        },
+        {
+          "id": "OTHER-USER-UNCHANGED",
+          "expected": true,
+          "actual": true,
+          "result": "PASS"
+        }
+      ],
+      "finishedAt": "2026-10-28T01:37:18.333Z",
+      "result": "PASS"
     }
   ],
   "bToATokenPolicy": {
@@ -326,5 +403,105 @@
     "expectedHttpStatus": 401,
     "observedHttpStatus": 401,
     "signatureAndOtherClientBindingVerified": true
+  },
+  "sessionChecks": {
+    "localLogoutAAndBContinuity": {
+      "result": "PASS",
+      "evidenceKind": "USER_UI_REPORT_AND_SERVER_CORROBORATION",
+      "userObservation": "A without local session; B remained U1 and passed proof",
+      "aReentryAt": "2026-10-28T01:36:56.235Z",
+      "bLoginSuccessesBefore": 1,
+      "bLoginSuccessesAfter": 1,
+      "bProofAfterLogout": {
+        "startedAt": "2026-10-28T01:37:17.677Z",
+        "product": "B",
+        "user": "U1",
+        "cases": [
+          {
+            "id": "OWN-TOKEN-records:read",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OWN-TOKEN-records:write",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OWN-READ",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OWN-WRITE",
+            "expected": 200,
+            "actual": 200,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-USER-READ",
+            "expected": 404,
+            "actual": 404,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-USER-WRITE",
+            "expected": 404,
+            "actual": 404,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-PRODUCT-READ",
+            "expected": 403,
+            "actual": 403,
+            "result": "PASS"
+          },
+          {
+            "id": "OTHER-PRODUCT-WRITE",
+            "expected": 403,
+            "actual": 403,
+            "result": "PASS"
+          },
+          {
+            "id": "PEER-TOKEN-records:read",
+            "expected": 401,
+            "actual": 401,
+            "result": "PASS",
+            "bindingVerified": true
+          },
+          {
+            "id": "PEER-TOKEN-records:write",
+            "expected": 401,
+            "actual": 401,
+            "result": "PASS",
+            "bindingVerified": true
+          },
+          {
+            "id": "OTHER-USER-UNCHANGED",
+            "expected": true,
+            "actual": true,
+            "result": "PASS"
+          }
+        ],
+        "finishedAt": "2026-10-28T01:37:18.333Z",
+        "result": "PASS"
+      },
+      "limit": "A logout UI state reported by user; server exposes no logout-event audit."
+    },
+    "reentryA": {
+      "result": "PASS_FUNCTIONAL",
+      "observedAt": "2026-10-28T01:36:56.235Z",
+      "passwordPrompt": "NOT_YET_REPORTED"
+    },
+    "browserSessionPersistenceB": {
+      "result": "PASS_WITHIN_RUNNING_BROWSER",
+      "observedFrom": "2026-10-28T01:31:41.486Z",
+      "observedThrough": "2026-10-28T01:37:18.333Z",
+      "newBLoginBetweenProofs": false,
+      "limit": "No browser restart or service restart tested."
+    }
   }
 }

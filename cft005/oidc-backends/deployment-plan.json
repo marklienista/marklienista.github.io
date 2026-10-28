@@ -106,7 +106,7 @@
       "evidence": "runtime-gate-evidence.json"
     }
   },
-  "nextStep": "Reenter A, log out only A, rerun B proof without B login; then U2 in separate context.",
+  "nextStep": "Log in as U2 in a separate browser context and run the proof in A and B; if unavailable, keep U2 BLOCKED.",
   "proofRunner": {
     "deployedOnBoth": true,
     "receiptPath": "/proof/results",
@@ -127,6 +127,8 @@
     "bToATokenPolicy": "PASS",
     "aProofPassed": 11,
     "bProofPassed": 11,
-    "independentSessionLogout": "BLOCKED_AWAITING_BROWSER"
+    "independentSessionLogout": "PASS_A_LOCAL_LOGOUT_B_CONTINUITY",
+    "reentryA": "PASS_FUNCTIONAL_PASSWORD_PROMPT_NOT_REPORTED",
+    "browserSessionPersistenceB": "PASS_WITHIN_RUNNING_BROWSER"
   }
 }

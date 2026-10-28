@@ -1,8 +1,14 @@
 # CFT-005 — Integração de dois backends confidenciais
 
-**27/10/2026: login real A/B com U1 PASS; prova de cada backend 11/11 PASS. JWT real A→B e B→A recusado após assinatura/azp para leitura/escrita. U2 e sessões independentes pendentes; CFT-005 ABERTO.**
+**27/10/2026: login real A/B com U1 PASS; prova de cada backend 11/11 PASS. JWT real A→B e B→A recusado após assinatura/azp para leitura/escrita. Logout local A e continuidade B PASS; U2 pendente. CFT-005 ABERTO.**
 
 O código de integração está preparado nesta branch; os resultados locais abaixo não comprovam emissão pelo Auth0. Esta pasta é independente de `oidc/` e `backend-proof/` e não substitui os aplicativos publicados.
+
+## Logout local A e continuidade B — 27/10/2026, 22:37 BRT
+
+O usuário confirmou A sem sessão e B ainda autenticado. O segundo recibo B/U1 terminou às 01:37:18.333Z de 28/10 com **11/11 PASS**, sem novo login B: o contador permaneceu em um sucesso e o último login continuou às 01:31:41.486Z. A nova entrada funcional do A passou às 01:36:56.235Z. A ausência de sessão A foi relatada na interface; não há auditoria de eventos de logout no servidor. A necessidade de senha na reentrada não foi informada.
+
+Isso comprova logout local A/continuidade B nesta rodada e persistência B durante a navegação no mesmo navegador aberto, por cerca de cinco minutos e meio. Não comprova persistência após reinício do navegador/serviço, logout central, refresh Supabase nem login positivo U2. Os recibos sanitizados e os limites estão em [real-login-evidence.json](real-login-evidence.json). Nenhum novo deploy foi necessário.
 
 ## Emissão real B e prova bidirecional U1 — 27/10/2026, 22:31 BRT
 
@@ -140,8 +146,8 @@ Durante a integração local, o emissor de teste inicialmente recusou Basic porq
 
 ## Limites e próximo passo
 
-Há dois serviços LIVE, health PASS e emissão administrativa validada. Ainda não há emissão humana A/B ou prova remota com JWT de usuário. Os testes locais não removem o FAIL de S12 na arquitetura publicada. Sessões/dados/recibos em memória são adequados apenas à prova de instância única, sem disponibilidade, durabilidade ou logout central. As rotas dos aplicativos existentes continuam fora desta mudança. Os recibos públicos são evidência sanitizada de teste, não um sistema de auditoria durável ou com atestação externa.
+Há dois serviços LIVE, emissão humana A/B com U1, prova criptográfica remota bidirecional e logout local A/continuidade B PASS. Falta login positivo U2 e a rodada completa de sessões. Esses resultados não removem o FAIL de S12 na arquitetura publicada. Sessões/dados/recibos em memória são adequados apenas à prova de instância única, sem disponibilidade, durabilidade ou logout central. As rotas dos aplicativos existentes continuam fora desta mudança. Os recibos públicos são evidência sanitizada de teste, não um sistema de auditoria durável ou com atestação externa.
 
-**Único próximo passo:** realizar nova entrada no A, sair apenas do A e repetir a prova B sem novo login B; conferir independência, depois conduzir U2 em contexto separado. Não enviar segredos por chat. A participação humana no login é necessária enquanto o controle autenticado do Chrome permanecer interrompido.
+**Único próximo passo:** entrar como U2 em contexto separado e executar a prova em A e B. Se a conta não estiver acessível, manter a rodada U2 BLOCKED. Não enviar segredos por chat. A participação humana no login é necessária enquanto o controle autenticado do Chrome permanecer interrompido.
 
 Referências: [openid-client](https://github.com/panva/openid-client), [Auth0: clientes confidenciais](https://auth0.com/docs/get-started/applications/confidential-and-public-applications), [Render: variáveis e segredos](https://render.com/docs/configure-environment-variables).
