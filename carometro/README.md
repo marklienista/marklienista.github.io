@@ -63,3 +63,16 @@ Se surgir erro de salvamento, **não apagar ou editar manualmente o JSON**. Regi
 Projeto Google Cloud: `784125401141`. Client ID OAuth Web público centralizado em `config.js`, origem autorizada `https://carometro-teste.onrender.com`, scope mínimo `https://www.googleapis.com/auth/drive.file`. Manter configuração de testes e adultos autorizados; a Google Picker API key pública restrita continua pendente. Nunca incluir `client_secret`, tokens de acesso ou fotos reais no repositório.
 
 A identidade B do ecossistema foi preservada. Nenhuma mudança neste fluxo altera Apertaquem, Som da Turma, MeEmpresta, ApertaLetra, Supabase ou a conta comum futura.
+
+
+## Preparação do Google Picker — 28/10/2026
+
+Marcelo informou que criou uma chave pública do Google Picker, mas **a chave ainda não está no aplicativo**: o salvamento automático da chave no repositório foi bloqueado pelo mecanismo de segurança da ferramenta. Não inserir Client Secret nem desativar proteções do GitHub/Google Cloud. `config.js` permanece com `googlePickerApiKey` vazia até a configuração pelo responsável.
+
+Foi preparada a seleção de cadastros compartilhados:
+- `picker.js` usa `DocsViewMode.LIST`, adequado ao escopo restrito `drive.file`;
+- quando o convite contém `?space=<id>`, o Picker usa `DocsView.setFileIds(id)` para apresentar o arquivo de cadastro pertinente, se a pessoa tiver autorização no Drive;
+- o arquivo selecionado deve ser `carometro.json`; a decisão de acesso continua com o Google;
+- fluxo validado com 9 checagens simuladas de seleção de arquivo, modo lista, número do projeto, origem e comportamento com chave ausente; **nenhum teste real com segunda conta realizado**.
+
+Próximo passo administrativo: o responsável cadastrar **somente a chave pública restrita** no campo `googlePickerApiKey` de `carometro/config.js`, na branch de testes, por um método autorizado. A chave precisa ser restrita aos referrers `https://carometro-teste.onrender.com/*` e `https://docs.google.com/*`, e às APIs Picker e Drive. Não divulgar nem armazenar credenciais privadas. Como autoDeploy no Render está desligado, o commit sozinho não publica: depois verificar a branch, fazer deploy explícito, confirmar `live` e então testar o Picker com duas contas adultas fictícias, inclusive acesso às fotografias, sem presumir que autorizar o JSON concede acesso a todos os arquivos.
