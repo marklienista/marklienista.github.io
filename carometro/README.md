@@ -1,70 +1,76 @@
-# FotoCrachá — laboratório 0.12: acesso amplo com limites operacionais
+# FotoCrachá — laboratório 0.13: carômetros simples e organização opcional
 
 Aplicativo de testes: https://carometro-teste.onrender.com
-Código: `marklienista/marklienista.github.io`, branch `carometro-lab-002`, pasta `carometro/`.
+Fonte única: `marklienista/marklienista.github.io`, branch `carometro-lab-002`, pasta `carometro/`.
 Condutor único: https://docs.google.com/document/d/1JSY62EjOjDT73UchbGdGqq3VdD5zs4eQ2UU6PRnb92k/edit
 
-## Decisão aprovada
+## Direção aprovada em 29/10/2026
 
-Marcelo aprovou em 28/10/2026 o uso do escopo `https://www.googleapis.com/auth/drive` para eliminar autorizações separadas do cadastro e das fotografias nas contas convidadas. Essa decisão substitui a hipótese de autorizar cada imagem pelo Picker, de armazenar imagens em planilhas ou de migrar para um pacote único. Os dados permanecem no Google Drive do responsável, com cadastro `carometro.json` e fotografias na subpasta `Fotos`. Nenhum arquivo existente precisa ser renomeado, convertido ou apagado.
+FotoCrachá é o nome do aplicativo. A unidade criada, aberta e compartilhada é **Carômetro**, não escola nem espaço de trabalho. Nome do carômetro e instituição são informações distintas e **opcionais**. Uma pessoa pode organizar um grupo pequeno, suas turmas, participantes de uma atividade ou vários conjuntos independentes. Repetir o nome de uma instituição não une cadastros nem concede acesso entre eles.
 
-**A permissão concedida pelo Google é ampla.** Ela pode permitir ver, criar, editar e excluir arquivos acessíveis à conta, inclusive fora da pasta do FotoCrachá. A aplicação implementa limites operacionais por espaço, mas eles NÃO restringem o alcance do token OAuth. Esse aviso aparece antes da conexão, durante o uso e em Ajuda e privacidade. A escolha exige novo consentimento das contas, não uma alteração silenciosa de autorização.
+Novos carômetros começam no modo simples: uma lista contínua de pessoas e fotografias, sem turma, ano ou atualização anual. É possível deixar todos os campos de identificação vazios e criar o carômetro. A interface usa “Carômetro sem nome” apenas como rótulo; o campo continua vazio no documento. Nome e identificação de cada pessoa também são opcionais. Fotos, nome, instituição e logo podem ser acrescentados posteriormente.
 
-## Funcionamento
+## Interface e operações
 
-Antes do login a interface fica vazia, sem estudantes demonstrativos. Depois da autorização, a pessoa escolhe o espaço, cola um link de pasta/arquivo ou abre o convite `?space=ID`. A aplicação lê cadastro e fotos diretamente, sem Google Picker e sem selecionar cada fotografia. A lista inicial busca apenas metadados de arquivos chamados `carometro.json`; não baixa o conteúdo dos demais documentos do Drive.
+- **Meus carômetros / Novo carômetro:** título e instituição separados. A lista usa os rótulos do cadastro e um identificador curto para distinguir carômetros sem nome. Quando existe apenas um carômetro acessível e não há convite específico, o login tenta abri-lo diretamente. “Meus carômetros” continua abrindo a lista por ação explícita.
+- **Pessoas:** inclusão, edição, fotografia, seleção e captura em sequência funcionam sem criar turmas artificiais. O aplicativo não carrega exemplos automaticamente.
+- **Configurar carômetro:** permite ativar “Organizar em turmas ou grupos” e, separadamente, “Usar anos e passagem anual”. Nenhuma dessas opções é marcada no novo carômetro simples. Grupos podem existir sem ano e sem professor/responsável.
+- **Continuidade:** desativar grupos ou anos só altera a apresentação. Turmas, professores, vínculos e histórico existentes permanecem no cadastro. Reativar não duplica os registros. A passagem anual só aparece quando a organização anual está ativada, exige um ano escolhido e continua dependente de confirmação humana.
+- **Importar lista:** leitura de XLSX/CSV existente preservada. No modo simples, uma coluna Nome basta; não se exige uma turma. A comparação continua mostrando prévia e jamais exclui quem está ausente. Uma coluna de turma não cria grupos automaticamente quando o modo simples está ativo.
+- **Imprimir:** carômetros e crachás usam a mesma lista, por seleção, pessoas em exibição ou conjunto do período. Instituição, grupo, responsável e ano não preenchidos/desativados são omitidos. Não se imprime “Escola”, “Turma não informada” nem “Pessoa sem nome” como substitutos de dados ausentes. No carômetro, o título vazio usa apenas a identificação genérica “Carômetro”.
+- **Crachás:** mantidos os modelos com foto ou só nome, oito cartões de 86 × 54 mm por A4 e impressão pelo navegador. A nota adicional do lote permanece temporária; não é persistida no Drive. Medidas físicas ainda dependem da configuração da impressora.
 
-A pasta continua sendo compartilhada pelo Google com papéis Leitor/Editor. Uma conta sem acesso à pasta não recebe acesso por causa do escopo amplo. Quem recebeu apenas leitura não vê controles de edição e o adaptador também recusa gravações. O uso de nova conta durante uma reconexão é bloqueado enquanto existe um espaço ativo, para não gravar alterações em nome de outra pessoa por engano.
+## Modelo e compatibilidade
 
-O salvamento automático é agrupado após aproximadamente 1,2 segundo sem alterações e serializado na mesma aba. A interface mostra salvamento, confirmação ou erro. Erros interrompem novas tentativas automáticas; reconexão e reabertura são ações explícitas. Atualizações feitas durante um envio permanecem pendentes para a próxima gravação. Não se promete coedição em tempo real: a proteção de versão/conteúdo é de melhor esforço, não uma transação atômica entre contas. Evitar alterações simultâneas.
+O arquivo continua `carometro.json`, com `schema_version: 1`. Os campos internos `school`, `classes`, `students` e `enrollments` são preservados para não quebrar os cadastros já existentes; na interface eles representam instituição, turmas/grupos e pessoas. Foram acrescentados `title`, `settings.groupsEnabled` e `settings.annualEnabled`.
 
-## Limites operacionais implementados
+Ao abrir um cadastro anterior que não possua as novas opções, a existência de turmas/anos permite preservar sua apresentação escolar. O título inicial desse cadastro usa o nome institucional anterior; a pessoa poderá diferenciá-los depois. O carregamento não grava automaticamente essa normalização e não apaga ou converte arquivos remotos. Novo cadastro sem vínculo não gera uma turma oculta.
 
-O adaptador `drive-files.js` mantém internamente o manifesto e as pastas vinculadas ao espaço aberto, e verifica a hierarquia real retornada pelo Google:
+O título e a instituição também são registrados como rótulos curtos `fcTitle` e `fcInstitution` em `appProperties` do manifesto no Drive. Isso permite listar carômetros pelo nome atual sem baixar todos os dados pessoais. Os rótulos respeitam o limite de bytes da API e são atualizados no mesmo envio multipart do JSON. Pastas e fotografias existentes não são movidas ou renomeadas, e o identificador do manifesto permanece o mesmo. Esses rótulos não são um novo banco nem um controle paralelo.
 
-- O manifesto deve ter nome `carometro.json`, MIME JSON, schema 1 e tamanho permitido. Seu `drive.folderId` deve coincidir com a pasta-pai real.
-- A pasta de fotografias deve pertencer à pasta principal. O código não segue um identificador que redirecione para outra pasta.
-- Uma fotografia só é baixada se estiver referenciada no espaço ou tiver sido enviada por esta sessão. Antes de obter o conteúdo, o código confirma pasta-pai, tipo JPG/PNG/WEBP, tamanho e permissão de download.
-- Uploads só podem criar fotografias e logotipo na subpasta de fotos vinculada. O manifesto só é criado/atualizado na pasta correspondente ao espaço ativo.
-- Compartilhamento e revogação pelo aplicativo só atuam na pasta do espaço ativo, respeitam `canShare` e não removem a propriedade do arquivo.
-- Não há operação de exclusão de arquivos no aplicativo. Retirar uma foto do cadastro não apaga automaticamente o arquivo anterior no Drive.
-- Token OAuth só fica na memória da página. Não é salvo em URL, localStorage, GitHub, Supabase ou servidor de dados do FotoCrachá. O Client ID e a chave pública do Picker permanecem na configuração, mas o Picker não faz mais parte do fluxo atual.
+## Acesso amplo e privacidade — decisão mantida
 
-Essas verificações reduzem erros de implementação, mas não equivalem à segurança de um token limitado por pasta. Comprometimento do código ou do token continua sendo um risco compatível com a autorização ampla. Não afirmar ao usuário que o Google impõe acesso somente à pasta.
+Permanece o escopo aprovado `https://www.googleapis.com/auth/drive`. O Google concede acesso amplo aos arquivos acessíveis à conta; **a limitação à pasta do carômetro é implementada pelo nosso código e não restringe o alcance do token OAuth**. O aviso antes de conectar e a ajuda deixam essa distinção explícita. Quem recebe um convite também autoriza sua própria conta. O aplicativo recusa tokens que concedam apenas o antigo `drive.file`.
 
-## Google Cloud: configuração administrativa a conferir
+O token fica só na memória da página; nunca em URL, localStorage, GitHub, banco ou servidor próprio de dados. Fotos e cadastros são processados no navegador e armazenados diretamente no Drive escolhido. O código continua verificando pasta-pai real do manifesto, subpasta Fotos, referências de imagens, tipo e tamanho antes de ler conteúdo; gravação e gestão de permissões ficam vinculadas ao carômetro aberto. Não há exclusão de arquivos de estudantes pelo aplicativo. Retirar uma referência de foto não apaga o arquivo anterior.
 
-Projeto Google Cloud existente: número `784125401141`; manter o Client ID OAuth Web já configurado e a origem `https://carometro-teste.onrender.com`. Não criar novas credenciais nem publicar Client Secret.
+A pasta Google é a fonte dos papéis Leitor e Editor. Compartilhar o carômetro concede acesso ao conjunto, não apenas ao grupo selecionado. Controles e adaptador bloqueiam escrita de Leitores. Convites públicos ou para domínio inteiro geram alerta. O nome institucional não representa autoridade formal sobre uma escola.
 
-Em Google Auth Platform → Data Access, declarar `https://www.googleapis.com/auth/drive`. Em Audience, manter o aplicativo em Testing e as contas adultas utilizadas na validação como testadoras. A configuração administrativa não foi editada automaticamente pelo código; a autorização efetiva depende da conta Google e de suas políticas organizacionais. O aplicativo solicita o novo escopo e rejeita respostas que concedam apenas `drive.file`.
+Nenhum novo Supabase, backend, OAuth Client ID ou API key foi criado nesta revisão. O Google Picker permanece fora do fluxo normal. Manter conta segura, permissões individuais e finalidade/autorização apropriadas, especialmente para dados de crianças. Nunca editar `carometro.json` manualmente nem mover ou apagar as imagens utilizadas.
 
-Antes de disponibilidade pública, preparar política de privacidade e submeter o acesso restrito à verificação aplicável do Google. Aprovação desta arquitetura por Marcelo, deploy live e testes simulados não equivalem à aprovação pelo Google nem à autorização institucional para tratar dados reais de estudantes.
+## Salvamento e colaboração
 
-Referências oficiais:
-- https://developers.google.com/workspace/drive/api/guides/api-specific-auth
-- https://developers.google.com/identity/oauth2/web/reference/js-reference
-- https://developers.google.com/workspace/guides/configure-oauth-consent
-- https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification
+O salvamento automático continua agrupado após cerca de 1,2 segundo e serializado por aba. Edições realizadas durante um envio seguem pendentes para a próxima gravação. Erros interrompem novas tentativas automáticas e oferecem recuperação explícita. Mudança remota de conteúdo detectada antes de gravar bloqueia a sobrescrita; alteração só de metadados não é tratada como conflito de conteúdo.
 
-## Privacidade e continuidade
+Não há coedição em tempo real, sincronização periódica nem novo aviso automático entre contas nesta revisão. O controle de conflitos é de melhor esforço, não transação atômica entre navegadores. Evitar edições simultâneas e reabrir para obter mudanças de outra conta. Esse tema continua separado da mudança de nomenclatura e campos opcionais.
 
-A aplicação continua estática, com processamento de dados no navegador e armazenamento direto no Google Drive escolhido. Não foi criado servidor intermediário ou banco de estudantes. Recomendam-se conta institucional autorizada ou privada segura, autenticação em duas etapas e convites apenas para pessoas específicas. Quem recebe o convite também concede acesso amplo à própria conta; uma conta dedicada apenas do proprietário não elimina a exposição dos convidados.
+## Testes executados em 29/10/2026
 
-Mantenha os dados íntegros: não edite manualmente `carometro.json`, não mova a pasta de fotos e não apague imagens usadas pelo cadastro. Não torne a pasta pública. O Google pode manter seu próprio histórico de revisões; o FotoCrachá não cria um controle paralelo de versões.
+- **22 testes de modelo:** criação inteiramente vazia, nomes opcionais, foto sem turma, importação simples, duplicatas, ativar/desativar organização, compatibilidade dos registros anteriores, ano opcional, preservação de histórico e promoção anual.
+- **9 testes de armazenamento com Google simulado:** manifesto vazio, salvamento de título/instituição no índice, mesmo ID ao atualizar, imagem sem grupo, papel Leitor, rejeição de foto externa, conflitos e limites UTF-8 dos rótulos.
+- **24 verificações de interface em Chromium sem rede:** entrada, formulários opcionais, criação, pessoa/foto sem grupo, CSV, crachás sem metadados inventados, nota temporária, segunda conta simulada, leitura, cadastro anterior, toggles sem perda e grupo sem ano.
 
-O modelo de dados, cadastro de professor, promoção anual, lista piloto CSV/XLSX, captura de imagens, carômetros, crachás e nota temporária de impressão foram preservados. A nota do crachá não entra no cadastro. Nenhuma outra ferramenta do ecossistema ou Supabase foi alterada. `styles.css` permanece como identidade visual base; `access.css` destaca os avisos adicionais.
+Os testes de navegador foram DOM isolado com autenticação/Drive simulados, imagem sintética, CSS de apoio local e leitor CSV de teste. Não constituem homologação da URL pública, da impressão física nem do salvamento na conta real; o leitor XLSX e o CSS original da aplicação não foram substituídos. Nenhum arquivo ou fotografia real de estudante foi usado nos testes ou alterado.
 
-## Testes desta revisão
+Testes reproduzíveis do modelo/adaptador:
 
-Foram executados testes locais com dados e imagens sintéticos e Google simulado:
-- 8 verificações de OAuth: escopo amplo, recusa do escopo anterior, identificação da conta, cancelamento e token em memória.
-- 20 verificações do adaptador: leitura de cadastro/foto, papéis Leitor/Editor, criação única, conflitos reais versus alterações de metadados, rejeição de pastas/fotos externas e recusa após retirada de permissão.
-- 15 verificações funcionais em Chromium com DOM isolado: entrada vazia, aviso antes do login, abertura de cadastro e foto, salvamento de professor/novo estudante/nova foto, segunda conta lendo fotos antigas e novas, bloqueio de edição para Leitor e prévia de crachás com nota não persistida.
+```sh
+node --test carometro/tests/simple-carometro.test.mjs carometro/tests/simple-storage.test.mjs
+```
 
-As APIs Google nesses testes são simuladas. Não houve teste de novo consentimento real ou tráfego com tokens das contas do usuário. A navegação automática na URL real depende do ambiente e não deve ser confundida com o teste DOM isolado. Nenhuma fotografia real de criança foi acessada ou publicada.
+A suíte `tests/access-smoke.test.mjs` anterior foi preservada. A identidade visual base em `styles.css` e os avisos em `access.css` foram mantidos, com `simple.css` apenas para os controles novos.
 
-## Próxima validação real
+## Publicação e próximo teste real
 
-Depois de confirmar o deploy, atualizar a página para 0.12 e usar uma conta adulta testadora. Aceitar o novo acesso amplo, abrir o mesmo espaço existente e conferir a fotografia antiga. Acrescentar uma foto fictícia com a conta Editora, aguardar Tudo salvo e reabrir com a conta convidada. Confirmar que as duas imagens aparecem sem Picker. Testar leitura/edição e retirada de acesso em sequência, sem edições simultâneas. Qualquer bloqueio Google deve ser registrado com a mensagem exata; não desativar proteções nem ignorar alertas para forçar o acesso.
+Serviço Render existente `carometro-teste`, branch de laboratório, autoDeploy desligado. Esta revisão deve ser publicada só após conferir todos os módulos 0.13 e seus testes. A publicação técnica não significa lançamento.
 
-Esta versão continua sendo laboratório, não lançamento.
+Próximo teste: na conta Google adulta já autorizada, clicar **Novo carômetro → Criar carômetro** sem preencher nada; adicionar uma pessoa/foto fictícia; aguardar “Tudo salvo”; reabrir e imprimir crachá. Conferir também o carômetro escolar antigo sem alterar seus dados. Não recadastrar nem reenviar fotos existentes.
+
+Configuração Google Cloud anterior mantida: projeto `784125401141`, origem `https://carometro-teste.onrender.com`, consentimento do escopo amplo e contas testadoras. A verificação pública do aplicativo pelo Google e os requisitos institucionais de privacidade continuam separados.
+
+Referências técnicas oficiais usadas nesta revisão:
+- https://developers.google.com/workspace/drive/api/guides/properties
+- https://developers.google.com/workspace/drive/api/reference/rest/v3/files/update
+- https://developers.google.com/workspace/drive/api/guides/manage-uploads
+
+O FotoCrachá continua em desenvolvimento, sem decisão de lançamento.
