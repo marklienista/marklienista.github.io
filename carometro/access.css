@@ -1,0 +1,9 @@
+/* Aviso do acesso amplo aprovado: complemento à identidade B existente. */
+.broad-notice{padding:18px 20px;background:#fff4d9;border-left:4px solid var(--terra);margin:20px 0}
+.broad-notice h2{font-size:21px;color:var(--deep);margin:0 0 10px}
+.broad-notice p{font-size:14px;line-height:1.55;margin:8px 0}
+.broad-notice a{text-decoration:underline}
+#photoWarning[hidden]{display:none!important}
+.photo-warning{padding:14px 18px;margin:0 0 18px;background:#fff0d7;border-left:4px solid var(--terra)}
+.photo-warning p{margin:0 0 10px;font-size:14px}
+@media print{.broad-notice,.photo-warning{display:none!important}}
