@@ -1,0 +1,14 @@
+/* FotoCrachá 0.13 — controles opcionais, sobre a identidade autoral existente. */
+[hidden]{display:none!important}
+.optional-organization{margin:18px 0;padding:15px;border:1px solid var(--line,#b9c8bb);border-radius:7px;background:#f5f6f0}
+.optional-organization legend{padding:0 6px;font-weight:700;color:var(--deep,#163f34)}
+.optional-organization .check-inline{display:flex;align-items:center;gap:10px;margin:9px 0;font-weight:500}
+.optional-organization input[type=checkbox]{width:19px;height:19px;flex:0 0 auto}
+.optional-organization .sub{margin:10px 0 0;line-height:1.5}
+#institutionLine{font-weight:600;color:var(--deep,#163f34);margin:6px 0}
+#organizeBtn{font-size:13px}
+#classList{flex-wrap:wrap}
+.print-institution{margin:3px 0}
+.badge-text:empty{display:none}
+.badge-item-main{min-height:0}
+@media(max-width:640px){#view-turmas .split{gap:16px}#view-turmas .inline{flex-wrap:wrap}#organizationPanel .inline{width:100%}dialog{max-width:calc(100vw - 24px);max-height:calc(100dvh - 32px);overflow:auto}}
