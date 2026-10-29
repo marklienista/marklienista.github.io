@@ -1,6 +1,8 @@
 # CFT-005 — Contrato de homologação por produto, versão 1
 
-Adendo atual: [integração BFF/banco preparada e bloqueio TLS real](./INTEGRACAO-BFF-BANCO.md). Credenciais exclusivas salvas; nenhum backend integrado chegou a LIVE. Alternativa externa com certificado verificável e allowlist temporária exata preparada, aguardando confirmação de rede. As declarações originais abaixo preservam o histórico v1; os 24 gates completos continuam BLOCKED.
+**Adendo atual — 29/10/2026:** [integração BFF/PostgreSQL comprovada](./INTEGRACAO-BFF-BANCO.md): 52 controles HTTP reais PASS com U1/U2, quatro conferências de preservação, TLS verificado e rede temporária fechada ao término. A alternativa persistente está provada nesse escopo; o contrato completo continua BLOCKED por perfis independentes e demais dependências, inclusive coordenador/revogação/SSO. Próximo passo: H01/H02 com P1/U1 e P2/U2 separados. Os adendos e a versão 1 abaixo são históricos; não representam a situação atual de provisionamento/integração.
+
+Adendo anterior: [integração BFF/banco preparada e bloqueio TLS real](./INTEGRACAO-BFF-BANCO.md). Credenciais exclusivas salvas; nenhum backend integrado chegou a LIVE. Alternativa externa com certificado verificável e allowlist temporária exata preparada, aguardando confirmação de rede. As declarações originais abaixo preservam o histórico v1; os 24 gates completos continuam BLOCKED.
 
 Adendo mais recente: [banco criado, papéis exclusivos e RLS comprovados em 84 controles SQL](./BANCO-RLS-RESULTADO.md). Sem conexão dos BFFs ao banco ou homologação publicada. Declarações originais de recurso não provisionado abaixo permanecem como histórico v1.
 

@@ -1,5 +1,17 @@
 # CFT-005 — Matriz consolidada, 28/10/2026
 
+## Adendo de 29/10/2026 — alternativa persistente por produto
+
+| Escopo | Estado | Evidência e limite |
+|---|---|---|
+| BFF A/U1, B/U1, A/U2, B/U2 com PostgreSQL real | PASS | 13 controles em cada combinação, 52/52: próprias 200, outro usuário 404 com caminho SQL/RLS, outro produto 403, JWT estrangeiro 401 após assinatura/azp, corpo owner/product 400 e releitura própria. |
+| Preservação por proprietário autenticado | PASS | Quatro conferências: U2 continua revisão 2 após U1; U1 confirma revisão 3 esperada após sua única escrita própria e tentativas U2. U2 confirma suas escritas próprias na revisão 3. |
+| Transporte verificado e fechamento da janela | PASS | A/B LIVE com health postgres 200; endpoint externo fixo com TLS/certificado/hostname validados. Só duas redes regionais compartilhadas autorizadas. Ambas removidas ao fim; API vazia/painel bloqueado, health 503 esperado. Não é sonda TCP independente. |
+| H01–H24 completos | BLOCKED | Um único perfil Chrome com alternância U1/U2; faltam perfis independentes, coordenador durável, revogação/corrida/SSO e demais critérios integrais. Subcontroles PASS não removem dependências. |
+| S01–S14 originais | 9 PASS / 3 BLOCKED / 2 FAIL | Estados da tabela original abaixo preservados. S12/S13 publicados continuam FAIL; não houve mudança em produção ou Apertaquem. |
+
+[Relatório atual](../homologacao/INTEGRACAO-BFF-BANCO.md), [recibos/releituras/rede/hashes](../homologacao/postgres-http-real-evidence.json) e [corroboração pública dos mesmos recibos](../homologacao/postgres-http-server-receipts.json). As tabelas BFF/SPA históricas abaixo mantêm seus escopos. **CFT-005 ABERTO. Único próximo passo: H01/H02 em perfis persistentes independentes P1/U1 e P2/U2.**
+
 **CFT-005 ABERTO.** A prova dos backends confidenciais usa apenas U1/U2 e registros sintéticos próprios, em serviços novos. Não homologa os aplicativos publicados nem substitui os casos de dados/armazenamento dos clientes SPA/Supabase originais. A indisponibilidade da identidade U2 do formulário foi superada na prova BFF: a identidade Google já autorizada foi localizada no painel Auth0 por filtro exato, seu subject distinto foi confirmado e configurado somente nos ambientes protegidos de teste. Não houve vínculo por e-mail, criação de conta ou redefinição de senha. Autorização continua exigindo assinatura, issuer, audience, subject exato, azp e escopo.
 
 ## Prova isolada dos backends A/B

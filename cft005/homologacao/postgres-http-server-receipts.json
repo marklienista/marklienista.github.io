@@ -1,0 +1,398 @@
+{
+  "schemaVersion": 1,
+  "kind": "PUBLIC_SANITIZED_RECEIPT_CORROBORATION",
+  "notIndependentAttestation": true,
+  "scope": "synthetic-only",
+  "products": [
+    {
+      "product": "A",
+      "receipts": [
+        {
+          "startedAt": "2026-10-29T10:59:20.558Z",
+          "product": "A",
+          "user": "U1",
+          "storage": "postgres",
+          "cases": [
+            {
+              "id": "OWN-TOKEN-records:read",
+              "expected": 200,
+              "actual": 200,
+              "result": "PASS"
+            },
+            {
+              "id": "OWN-TOKEN-records:write",
+              "expected": 200,
+              "actual": 200,
+              "result": "PASS"
+            },
+            {
+              "id": "OWN-READ",
+              "expected": 200,
+              "actual": 200,
+              "result": "PASS",
+              "databaseRowCheck": true
+            },
+            {
+              "id": "OWN-WRITE",
+              "expected": 200,
+              "actual": 200,
+              "result": "PASS",
+              "databaseRowCheck": true
+            },
+            {
+              "id": "OTHER-USER-READ",
+              "expected": 404,
+              "actual": 404,
+              "result": "PASS",
+              "databaseRowCheck": true
+            },
+            {
+              "id": "OTHER-USER-WRITE",
+              "expected": 404,
+              "actual": 404,
+              "result": "PASS",
+              "databaseRowCheck": true
+            },
+            {
+              "id": "OTHER-PRODUCT-READ",
+              "expected": 403,
+              "actual": 403,
+              "result": "PASS"
+            },
+            {
+              "id": "OTHER-PRODUCT-WRITE",
+              "expected": 403,
+              "actual": 403,
+              "result": "PASS"
+            },
+            {
+              "id": "PEER-TOKEN-records:read",
+              "expected": 401,
+              "actual": 401,
+              "result": "PASS",
+              "bindingVerified": true
+            },
+            {
+              "id": "PEER-TOKEN-records:write",
+              "expected": 401,
+              "actual": 401,
+              "result": "PASS",
+              "bindingVerified": true
+            },
+            {
+              "id": "OWN-RECORD-PERSISTED",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "FORGED-OWNER-BODY",
+              "expected": 400,
+              "actual": 400,
+              "result": "PASS"
+            },
+            {
+              "id": "FORGED-PRODUCT-BODY",
+              "expected": 400,
+              "actual": 400,
+              "result": "PASS"
+            }
+          ],
+          "otherOwnerPreservation": "Requires independent recheck by the other authenticated owner",
+          "finishedAt": "2026-10-29T10:59:21.616Z",
+          "result": "PASS"
+        },
+        {
+          "startedAt": "2026-10-29T11:01:32.912Z",
+          "product": "A",
+          "user": "U2",
+          "storage": "postgres",
+          "cases": [
+            {
+              "id": "OWN-TOKEN-records:read",
+              "expected": 200,
+              "actual": 200,
+              "result": "PASS"
+            },
+            {
+              "id": "OWN-TOKEN-records:write",
+              "expected": 200,
+              "actual": 200,
+              "result": "PASS"
+            },
+            {
+              "id": "OWN-READ",
+              "expected": 200,
+              "actual": 200,
+              "result": "PASS",
+              "databaseRowCheck": true
+            },
+            {
+              "id": "OWN-WRITE",
+              "expected": 200,
+              "actual": 200,
+              "result": "PASS",
+              "databaseRowCheck": true
+            },
+            {
+              "id": "OTHER-USER-READ",
+              "expected": 404,
+              "actual": 404,
+              "result": "PASS",
+              "databaseRowCheck": true
+            },
+            {
+              "id": "OTHER-USER-WRITE",
+              "expected": 404,
+              "actual": 404,
+              "result": "PASS",
+              "databaseRowCheck": true
+            },
+            {
+              "id": "OTHER-PRODUCT-READ",
+              "expected": 403,
+              "actual": 403,
+              "result": "PASS"
+            },
+            {
+              "id": "OTHER-PRODUCT-WRITE",
+              "expected": 403,
+              "actual": 403,
+              "result": "PASS"
+            },
+            {
+              "id": "PEER-TOKEN-records:read",
+              "expected": 401,
+              "actual": 401,
+              "result": "PASS",
+              "bindingVerified": true
+            },
+            {
+              "id": "PEER-TOKEN-records:write",
+              "expected": 401,
+              "actual": 401,
+              "result": "PASS",
+              "bindingVerified": true
+            },
+            {
+              "id": "OWN-RECORD-PERSISTED",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "FORGED-OWNER-BODY",
+              "expected": 400,
+              "actual": 400,
+              "result": "PASS"
+            },
+            {
+              "id": "FORGED-PRODUCT-BODY",
+              "expected": 400,
+              "actual": 400,
+              "result": "PASS"
+            }
+          ],
+          "otherOwnerPreservation": "Requires independent recheck by the other authenticated owner",
+          "finishedAt": "2026-10-29T11:01:33.844Z",
+          "result": "PASS"
+        }
+      ]
+    },
+    {
+      "product": "B",
+      "receipts": [
+        {
+          "startedAt": "2026-10-29T10:59:29.236Z",
+          "product": "B",
+          "user": "U1",
+          "storage": "postgres",
+          "cases": [
+            {
+              "id": "OWN-TOKEN-records:read",
+              "expected": 200,
+              "actual": 200,
+              "result": "PASS"
+            },
+            {
+              "id": "OWN-TOKEN-records:write",
+              "expected": 200,
+              "actual": 200,
+              "result": "PASS"
+            },
+            {
+              "id": "OWN-READ",
+              "expected": 200,
+              "actual": 200,
+              "result": "PASS",
+              "databaseRowCheck": true
+            },
+            {
+              "id": "OWN-WRITE",
+              "expected": 200,
+              "actual": 200,
+              "result": "PASS",
+              "databaseRowCheck": true
+            },
+            {
+              "id": "OTHER-USER-READ",
+              "expected": 404,
+              "actual": 404,
+              "result": "PASS",
+              "databaseRowCheck": true
+            },
+            {
+              "id": "OTHER-USER-WRITE",
+              "expected": 404,
+              "actual": 404,
+              "result": "PASS",
+              "databaseRowCheck": true
+            },
+            {
+              "id": "OTHER-PRODUCT-READ",
+              "expected": 403,
+              "actual": 403,
+              "result": "PASS"
+            },
+            {
+              "id": "OTHER-PRODUCT-WRITE",
+              "expected": 403,
+              "actual": 403,
+              "result": "PASS"
+            },
+            {
+              "id": "PEER-TOKEN-records:read",
+              "expected": 401,
+              "actual": 401,
+              "result": "PASS",
+              "bindingVerified": true
+            },
+            {
+              "id": "PEER-TOKEN-records:write",
+              "expected": 401,
+              "actual": 401,
+              "result": "PASS",
+              "bindingVerified": true
+            },
+            {
+              "id": "OWN-RECORD-PERSISTED",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "FORGED-OWNER-BODY",
+              "expected": 400,
+              "actual": 400,
+              "result": "PASS"
+            },
+            {
+              "id": "FORGED-PRODUCT-BODY",
+              "expected": 400,
+              "actual": 400,
+              "result": "PASS"
+            }
+          ],
+          "otherOwnerPreservation": "Requires independent recheck by the other authenticated owner",
+          "finishedAt": "2026-10-29T10:59:30.216Z",
+          "result": "PASS"
+        },
+        {
+          "startedAt": "2026-10-29T11:01:38.259Z",
+          "product": "B",
+          "user": "U2",
+          "storage": "postgres",
+          "cases": [
+            {
+              "id": "OWN-TOKEN-records:read",
+              "expected": 200,
+              "actual": 200,
+              "result": "PASS"
+            },
+            {
+              "id": "OWN-TOKEN-records:write",
+              "expected": 200,
+              "actual": 200,
+              "result": "PASS"
+            },
+            {
+              "id": "OWN-READ",
+              "expected": 200,
+              "actual": 200,
+              "result": "PASS",
+              "databaseRowCheck": true
+            },
+            {
+              "id": "OWN-WRITE",
+              "expected": 200,
+              "actual": 200,
+              "result": "PASS",
+              "databaseRowCheck": true
+            },
+            {
+              "id": "OTHER-USER-READ",
+              "expected": 404,
+              "actual": 404,
+              "result": "PASS",
+              "databaseRowCheck": true
+            },
+            {
+              "id": "OTHER-USER-WRITE",
+              "expected": 404,
+              "actual": 404,
+              "result": "PASS",
+              "databaseRowCheck": true
+            },
+            {
+              "id": "OTHER-PRODUCT-READ",
+              "expected": 403,
+              "actual": 403,
+              "result": "PASS"
+            },
+            {
+              "id": "OTHER-PRODUCT-WRITE",
+              "expected": 403,
+              "actual": 403,
+              "result": "PASS"
+            },
+            {
+              "id": "PEER-TOKEN-records:read",
+              "expected": 401,
+              "actual": 401,
+              "result": "PASS",
+              "bindingVerified": true
+            },
+            {
+              "id": "PEER-TOKEN-records:write",
+              "expected": 401,
+              "actual": 401,
+              "result": "PASS",
+              "bindingVerified": true
+            },
+            {
+              "id": "OWN-RECORD-PERSISTED",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "FORGED-OWNER-BODY",
+              "expected": 400,
+              "actual": 400,
+              "result": "PASS"
+            },
+            {
+              "id": "FORGED-PRODUCT-BODY",
+              "expected": 400,
+              "actual": 400,
+              "result": "PASS"
+            }
+          ],
+          "otherOwnerPreservation": "Requires independent recheck by the other authenticated owner",
+          "finishedAt": "2026-10-29T11:01:39.012Z",
+          "result": "PASS"
+        }
+      ]
+    }
+  ]
+}

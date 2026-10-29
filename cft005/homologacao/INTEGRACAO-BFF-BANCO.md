@@ -1,5 +1,38 @@
 # CFT-005 — Integração BFF e PostgreSQL de homologação
 
+## Resultado atual — 29/10/2026, 08:05 BRT: 52 controles HTTP reais PASS
+
+**PASS na alternativa sintética BFF/PostgreSQL; CFT-005 ABERTO.** A/B executaram Authorization Code confidencial real com as duas identidades autorizadas, por seleção de conta no provedor, sem leitura de token, código OAuth, senha, cookie ou armazenamento. Cada combinação A/U1, B/U1, A/U2 e B/U2 passou **13/13**, total **52 PASS, zero FAIL e zero BLOCKED**, com `storage=postgres`. Os mesmos quatro recibos foram corroborados pela rota pública sanitizada; isso não é atestação independente.
+
+O usuário salvou as duas redes temporárias. A API confirmou exclusivamente `74.220.49.0/24` e `74.220.57.0/24`; não foi acrescentado IP pessoal ou acesso administrativo. A versão `449d11a95739941b77b228875d36cac988066764` ficou LIVE em A (`dep-dbhhqtgm7kps73ev3i40`, 10:19:04Z) e B (`dep-dbhhquuc6qcc73ffb920`, 10:19:12Z). Antes dos logins, health 200 em ambos confirmou `ready=true` e `storage=postgres`. A prontidão do adaptador verifica papel de produto sem bypass, owner separado, RLS habilitada/forçada e conexão TLS. O endpoint externo exato usa certificado e hostname verificados; não foi reduzida essa validação.
+
+| Grupo de controles reais | Quantidade PASS | Evidência e limite |
+|---|---:|---|
+| Permissões do token próprio | 8 | records:read/write validados no servidor nas quatro combinações |
+| Leitura/escrita próprias | 8 | HTTP 200; consulta/UPDATE realmente alcançou o PostgreSQL |
+| Outro usuário, mesmo produto | 8 | HTTP 404; marcador de execução da consulta RLS presente nos oito controles |
+| Outro produto, mesma pessoa | 8 | HTTP 403 nas rotas do BFF, com a sessão válida e CSRF correto |
+| JWT real do outro cliente | 8 | HTTP 401; assinatura e azp do outro cliente validados antes da recusa; sonda não acessa dados |
+| Releitura própria dentro do runner | 4 | Valor sintético escrito conferido no PostgreSQL |
+| Campos owner/product adicionais no corpo | 8 | HTTP 400; corpo não pode selecionar identidade ou produto |
+| **Total HTTP** | **52** | Quatro recibos de 13 controles; não somar com os 44 históricos como se fosse a mesma rodada |
+
+Além dos 52, houve **quatro conferências de preservação por sessão autenticada do proprietário**. U2 leu A/B na revisão 2 antes da prova U1 e, depois dela, confirmou valor e revisão 2 idênticos. U1 leu a revisão 2 antes de sua própria prova; ao retornar depois das tentativas U2, confirmou o valor sintético próprio e revisão 3, calculada como baseline 2 mais exatamente uma escrita própria bem-sucedida do runner. Esse segundo método confere a revisão esperada pela escrita controlada, não usa um snapshot intermediário pós-escrita. U2 também confirmou suas duas escritas próprias na revisão 3. Os quatro IDs continuam exclusivamente HML-A-U1, HML-A-U2, HML-B-U1 e HML-B-U2; não houve INSERT, seed, migração ou consulta a registro real nesta rodada.
+
+A identificação do produto continua fixa no servidor e vinculada ao cliente OIDC validado. O owner da transação deriva somente do principal OIDC permitido. A etiqueta da URL seleciona a linha, não muda o contexto; por isso o teste negativo realmente chega à RLS. Origin/CSRF complementam a sessão e não concedem produto. A separação de grants A/B e a RLS já tinham passado em 84 controles SQL reais; esta rodada comprova a integração HTTP dessa fronteira com o principal verificado, sem usar administrador.
+
+O plano gratuito exibiu SERVICE WAKING UP após a interrupção da execução; a rodada prosseguiu apenas com ambos os backends disponíveis. As leituras iniciais foram refeitas em sessões novas e os recibos finais são de 07:59–08:01 BRT. Uma captura de página inteira excedeu o prazo do navegador; a captura de viewport funcionou, sem alterar ou repetir controles. Nenhum desses eventos foi convertido em PASS de teste de perfis, reinício ou corrida.
+
+**Rede fechada ao término:** as duas regras temporárias foram removidas e Block All Inbound IPs confirmado. Às 11:05:36Z (08:05:36 BRT), API com allowlist vazia e painel com bloqueio específico do banco. A regra genérica do workspace foi preservada. Depois, health A/B retornou **503/database_unavailable**, conforme a indisponibilidade esperada quando a conexão externa é fechada. Os backends de teste ficam sem acesso ao banco; isso não é falha de um produto publicado. Esta observação não substitui uma sonda TCP externa independente nem garante encerramento imediato de toda conexão antiga.
+
+Evidências: [recibos, baselines, releituras, rede e hashes](postgres-http-real-evidence.json) e [corroboração pública dos mesmos recibos](postgres-http-server-receipts.json). SHA-256 de sete fontes/lockfile normalizadas para LF e commit implantado estão registrados; não houve novo executável ou alteração Auth0 nesta rodada. Os 60 testes locais anteriores e a auditoria então feita das 17 dependências permanecem separados, sem nova execução desnecessária. Capturas locais em `D:/Dev/cft005-evidencias/` mostram apenas recibos/estado de rede; não contêm credenciais.
+
+**Limites consolidados:** os 44 controles BFF anteriores em memória, 84 SQL e 35 testes SPA locais ficam preservados. A matriz original continua **9 PASS, 3 BLOCKED, 2 FAIL**. Os 24 gates completos H01–H24 permanecem BLOCKED pelas dependências do contrato: a rodada usou um único perfil Chrome e alternou U1/U2; não prova perfis independentes, coordenador durável, revogação, corrida/reinício ou logout SSO isolado. Os subcontroles HTTP novos são PASS sem promover automaticamente esses gates. S12/S13 publicados continuam FAIL; esta alternativa não integra nem homologa os aplicativos publicados. Produção, Apertaquem, Supabase compartilhado, dados reais, usuários, clientes Auth0 e TTL global foram preservados.
+
+**Único próximo passo:** executar H01/H02 em dois perfis persistentes independentes, P1/U1 e P2/U2, antes de promover os gates integrados que dependem dessa separação. Preparar a próxima janela de banco apenas quando a nova rodada estiver pronta; esta janela já está encerrada.
+
+As seções datadas abaixo preservam tentativas e estados anteriores; não descrevem o estado atual.
+
 ## Adendo de 28/10/2026, 23:09 BRT — confirmação recebida; Save humano pendente
 
 O usuário confirmou expressamente a liberação temporária apenas de `74.220.49.0/24` e `74.220.57.0/24`. As duas regras estão preenchidas no painel do banco novo, sem salvar. A revisão automática recusou duas vezes o clique em Save por ampliação da allowlist, alegando ausência de confirmação no momento da ação. A recusa foi preservada e não foi contornada por API, terminal ou outro canal. A API continua com allowlist vazia; o banco segue fechado externamente.
