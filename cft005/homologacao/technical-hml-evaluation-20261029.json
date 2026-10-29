@@ -1,0 +1,159 @@
+{
+  "contractVersion": "CFT005-HML-1",
+  "runId": "HML-20261029-TECHNICAL-V2",
+  "scope": "synthetic-only",
+  "state": "BLOCKED",
+  "counts": {
+    "PASS": 12,
+    "FAIL": 0,
+    "BLOCKED": 12
+  },
+  "cases": [
+    {
+      "id": "H01",
+      "gate": "S02",
+      "state": "PASS",
+      "reason": "CRITERIA_MET"
+    },
+    {
+      "id": "H02",
+      "gate": "S02",
+      "state": "PASS",
+      "reason": "CRITERIA_MET"
+    },
+    {
+      "id": "H03",
+      "gate": "S11",
+      "state": "PASS",
+      "reason": "CRITERIA_MET"
+    },
+    {
+      "id": "H04",
+      "gate": "S11",
+      "state": "PASS",
+      "reason": "CRITERIA_MET"
+    },
+    {
+      "id": "H05",
+      "gate": "S11",
+      "state": "PASS",
+      "reason": "CRITERIA_MET"
+    },
+    {
+      "id": "H06",
+      "gate": "S11",
+      "state": "PASS",
+      "reason": "CRITERIA_MET"
+    },
+    {
+      "id": "H07",
+      "gate": "S12",
+      "state": "PASS",
+      "reason": "CRITERIA_MET"
+    },
+    {
+      "id": "H08",
+      "gate": "S12",
+      "state": "PASS",
+      "reason": "CRITERIA_MET"
+    },
+    {
+      "id": "H09",
+      "gate": "S12",
+      "state": "PASS",
+      "reason": "CRITERIA_MET"
+    },
+    {
+      "id": "H10",
+      "gate": "S12",
+      "state": "BLOCKED",
+      "reason": "NOT_EXECUTED"
+    },
+    {
+      "id": "H11",
+      "gate": "S12",
+      "state": "PASS",
+      "reason": "CRITERIA_MET"
+    },
+    {
+      "id": "H12",
+      "gate": "S11/S12",
+      "state": "PASS",
+      "reason": "CRITERIA_MET"
+    },
+    {
+      "id": "H13",
+      "gate": "S11",
+      "state": "PASS",
+      "reason": "CRITERIA_MET"
+    },
+    {
+      "id": "H14",
+      "gate": "S13",
+      "state": "BLOCKED",
+      "reason": "PREREQUISITE_MISSING"
+    },
+    {
+      "id": "H15",
+      "gate": "S13",
+      "state": "BLOCKED",
+      "reason": "PREREQUISITE_MISSING"
+    },
+    {
+      "id": "H16",
+      "gate": "S13",
+      "state": "BLOCKED",
+      "reason": "PREREQUISITE_MISSING"
+    },
+    {
+      "id": "H17",
+      "gate": "S13",
+      "state": "BLOCKED",
+      "reason": "PREREQUISITE_MISSING"
+    },
+    {
+      "id": "H18",
+      "gate": "S13",
+      "state": "BLOCKED",
+      "reason": "PREREQUISITE_MISSING"
+    },
+    {
+      "id": "H19",
+      "gate": "S13",
+      "state": "BLOCKED",
+      "reason": "PREREQUISITE_MISSING"
+    },
+    {
+      "id": "H20",
+      "gate": "S14",
+      "state": "BLOCKED",
+      "reason": "PREREQUISITE_MISSING"
+    },
+    {
+      "id": "H21",
+      "gate": "S14",
+      "state": "BLOCKED",
+      "reason": "PREREQUISITE_MISSING"
+    },
+    {
+      "id": "H22",
+      "gate": "S14",
+      "state": "BLOCKED",
+      "reason": "PREREQUISITE_MISSING"
+    },
+    {
+      "id": "H23",
+      "gate": "S14",
+      "state": "BLOCKED",
+      "reason": "PREREQUISITE_MISSING"
+    },
+    {
+      "id": "H24",
+      "gate": "S12/S13",
+      "state": "BLOCKED",
+      "reason": "PREREQUISITE_MISSING"
+    }
+  ],
+  "publishedHomologation": "NOT_GRANTED",
+  "limit": "Executor observations only; no independent attestation or promotion of S01-S14"
+}

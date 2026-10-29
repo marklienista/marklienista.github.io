@@ -1,0 +1,58 @@
+{
+  "scope": "synthetic-BFF-only",
+  "reviewedAt": "2026-10-29T13:29:58.348Z",
+  "commit": "bbd9410a35275d7a24aa81aa0eff5cadea78799e",
+  "dataRouteIdenticalToPriorPositiveHttpVersion": true,
+  "dataRouteSha256": "29b46e0ae5b97392c62385cf0f3925a4b1f51b96ef560df849d080ee3a413d07",
+  "noWebSocketUpgradeHandler": true,
+  "surfaces": {
+    "REST": {
+      "enabled": true,
+      "path": "/api/products/[AB]/records/U[12]",
+      "policy": "verified OIDC principal, product and PostgreSQL RLS"
+    },
+    "GraphQL": {
+      "enabled": false,
+      "probe": [
+        "GET /graphql/v1",
+        "POST /graphql/v1"
+      ]
+    },
+    "RPC": {
+      "enabled": false,
+      "probe": [
+        "GET /rpc/cft005_audit",
+        "POST /rest/v1/rpc/cft005_audit"
+      ]
+    },
+    "views": {
+      "enabled": false,
+      "evidence": "current catalog checks in technical receipts"
+    },
+    "Storage": {
+      "enabled": false,
+      "probe": [
+        "GET /storage/v1/object"
+      ]
+    },
+    "Realtime": {
+      "enabled": false,
+      "probe": [
+        "GET /realtime/v1"
+      ],
+      "limit": "HTTP probe plus source review of no upgrade handler; no live WebSocket handshake claim"
+    }
+  },
+  "sourceIntegrity": {
+    "backend.mjs": "eca0e8dccd80e68ab6bcbfaa3cc1367f0529713ca57b05ee9e31491b0ebc951a",
+    "config.mjs": "d5dbfa9edd8864d4bb72d0d0a7277408f7f8fdf085b2abf7ff51b376d9f2d4a5",
+    "provider.mjs": "161a9d2b3abffa3dce9b464fb0552d25c316d1bf410ac3741c96372e871e5ed2",
+    "record-store.mjs": "8df1afed0611ed58838a2649bdd24d32352dcf3d7effaca1546d9f182a6d7baa",
+    "technical-audit.mjs": "e0377ce818b41c15034b1c4f65d251468bafceab10b6f0aadbfdde34dfd36abc",
+    "technical-proof.mjs": "46963b94e88f767fca78f1061a4faf9c088d57cbf5909213fdf9d2c781dc6502",
+    "start.mjs": "d0fbdca5949864c1dc8a3dc054eafa658e93f67fc28e12e9facea49536bb5f14",
+    "package.json": "33f7d97960507f1314c9358d2cb01eb4db08de4c73670292e2af42b7ee6d9da2",
+    "pnpm-lock.yaml": "655e06782cfd65af01223e2beb09b1eb18182c40d74264e20d45f2e445b504e3"
+  },
+  "limit": "Static review must be combined with current real receipts; not a hosted test by itself"
+}

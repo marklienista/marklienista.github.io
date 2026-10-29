@@ -1,0 +1,1236 @@
+{
+  "at": "2026-10-29T13:26:12.7169358Z",
+  "commit": "9fdc9a5e07ed2ef8b01f0b08ba3f8fddf1014190",
+  "observations": [
+    {
+      "product": "a",
+      "receipts": [
+        {
+          "version": 1,
+          "startedAt": "2026-10-29T13:18:28.871Z",
+          "product": "A",
+          "user": "U1",
+          "storage": "postgres",
+          "cases": [
+            {
+              "id": "DB-initialContextEmpty",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-exactRuntimeRole",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-restrictedRole",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-forcedRls",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noCustomTriggers",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-tls",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-identityConstraint",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-productConstraint",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownerDomainConstraint",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-idPrimaryKey",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-exactOwnRow",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noExtraVisibleRows",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noExtraRowsProvenForContext",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-otherReadFiltered",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownUpdateReached",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-otherUpdateFiltered",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-withCheckOwnerDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-withCheckProductDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-otherSchemaDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-otherRoleDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownerRoleDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-bypassDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noViewsOrForeignTables",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noSecurityDefiner",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noPublicFunctionExecute",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-publicCreateDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-peerSchemaUsageDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownRowPreservedInsideTransaction",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noPublicRelations",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-fixedPrivateTables",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownerDefaultExecuteRevoked",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noPublications",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-afterRollbackContextEmpty",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-sameConnectionThroughRollback",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownRowPreservedAfterRollback",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-afterCommitContextEmpty",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-sameConnectionThroughCommit",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "OWN-READ-WITHOUT-ORIGIN",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "PRODUCT-ABSENT-ORIGIN",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "PRODUCT-FORGED-ORIGIN",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "BROWSER-REAL-BEARER-DENIED",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-LEGACY-REST",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-GRAPHQL",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-RPC",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-STORAGE",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-REALTIME",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-GRAPHQL-POST",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-RPC-POST",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            }
+          ],
+          "connectionReuse": {
+            "previousVerifiedOwnerDifferent": false,
+            "samePhysicalConnection": false
+          },
+          "sharedSupabaseJwtRealTest": false,
+          "finishedAt": "2026-10-29T13:18:30.219Z",
+          "result": "PASS",
+          "limit": "Synthetic technical checks only; no genuine Supabase JWT or durable-session/production homologation claim"
+        },
+        {
+          "version": 1,
+          "startedAt": "2026-10-29T13:20:27.433Z",
+          "product": "A",
+          "user": "U2",
+          "storage": "postgres",
+          "cases": [
+            {
+              "id": "DB-initialContextEmpty",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-exactRuntimeRole",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-restrictedRole",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-forcedRls",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noCustomTriggers",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-tls",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-identityConstraint",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-productConstraint",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownerDomainConstraint",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-idPrimaryKey",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-exactOwnRow",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noExtraVisibleRows",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noExtraRowsProvenForContext",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-otherReadFiltered",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownUpdateReached",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-otherUpdateFiltered",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-withCheckOwnerDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-withCheckProductDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-otherSchemaDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-otherRoleDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownerRoleDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-bypassDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noViewsOrForeignTables",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noSecurityDefiner",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noPublicFunctionExecute",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-publicCreateDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-peerSchemaUsageDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownRowPreservedInsideTransaction",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noPublicRelations",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-fixedPrivateTables",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownerDefaultExecuteRevoked",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noPublications",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-afterRollbackContextEmpty",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-sameConnectionThroughRollback",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownRowPreservedAfterRollback",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-afterCommitContextEmpty",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-sameConnectionThroughCommit",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "OWN-READ-WITHOUT-ORIGIN",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "PRODUCT-ABSENT-ORIGIN",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "PRODUCT-FORGED-ORIGIN",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "BROWSER-REAL-BEARER-DENIED",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-LEGACY-REST",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-GRAPHQL",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-RPC",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-STORAGE",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-REALTIME",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-GRAPHQL-POST",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-RPC-POST",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            }
+          ],
+          "connectionReuse": {
+            "previousVerifiedOwnerDifferent": true,
+            "samePhysicalConnection": true
+          },
+          "sharedSupabaseJwtRealTest": false,
+          "finishedAt": "2026-10-29T13:20:28.312Z",
+          "result": "PASS",
+          "limit": "Synthetic technical checks only; no genuine Supabase JWT or durable-session/production homologation claim"
+        }
+      ]
+    },
+    {
+      "product": "b",
+      "receipts": [
+        {
+          "version": 1,
+          "startedAt": "2026-10-29T13:23:25.07Z",
+          "product": "B",
+          "user": "U1",
+          "storage": "postgres",
+          "cases": [
+            {
+              "id": "DB-initialContextEmpty",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-exactRuntimeRole",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-restrictedRole",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-forcedRls",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noCustomTriggers",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-tls",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-identityConstraint",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-productConstraint",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownerDomainConstraint",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-idPrimaryKey",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-exactOwnRow",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noExtraVisibleRows",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noExtraRowsProvenForContext",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-otherReadFiltered",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownUpdateReached",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-otherUpdateFiltered",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-withCheckOwnerDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-withCheckProductDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-otherSchemaDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-otherRoleDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownerRoleDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-bypassDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noViewsOrForeignTables",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noSecurityDefiner",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noPublicFunctionExecute",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-publicCreateDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-peerSchemaUsageDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownRowPreservedInsideTransaction",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noPublicRelations",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-fixedPrivateTables",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownerDefaultExecuteRevoked",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noPublications",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-afterRollbackContextEmpty",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-sameConnectionThroughRollback",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownRowPreservedAfterRollback",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-afterCommitContextEmpty",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-sameConnectionThroughCommit",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "OWN-READ-WITHOUT-ORIGIN",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "PRODUCT-ABSENT-ORIGIN",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "PRODUCT-FORGED-ORIGIN",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "BROWSER-REAL-BEARER-DENIED",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-LEGACY-REST",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-GRAPHQL",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-RPC",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-STORAGE",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-REALTIME",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-GRAPHQL-POST",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-RPC-POST",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            }
+          ],
+          "connectionReuse": {
+            "previousVerifiedOwnerDifferent": false,
+            "samePhysicalConnection": false
+          },
+          "sharedSupabaseJwtRealTest": false,
+          "finishedAt": "2026-10-29T13:23:25.92Z",
+          "result": "PASS",
+          "limit": "Synthetic technical checks only; no genuine Supabase JWT or durable-session/production homologation claim"
+        },
+        {
+          "version": 1,
+          "startedAt": "2026-10-29T13:25:22.37Z",
+          "product": "B",
+          "user": "U2",
+          "storage": "postgres",
+          "cases": [
+            {
+              "id": "DB-initialContextEmpty",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-exactRuntimeRole",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-restrictedRole",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-forcedRls",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noCustomTriggers",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-tls",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-identityConstraint",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-productConstraint",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownerDomainConstraint",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-idPrimaryKey",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-exactOwnRow",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noExtraVisibleRows",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noExtraRowsProvenForContext",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-otherReadFiltered",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownUpdateReached",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-otherUpdateFiltered",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-withCheckOwnerDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-withCheckProductDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-otherSchemaDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-otherRoleDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownerRoleDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-bypassDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noViewsOrForeignTables",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noSecurityDefiner",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noPublicFunctionExecute",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-publicCreateDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-peerSchemaUsageDenied",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownRowPreservedInsideTransaction",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noPublicRelations",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-fixedPrivateTables",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownerDefaultExecuteRevoked",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-noPublications",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-afterRollbackContextEmpty",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-sameConnectionThroughRollback",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-ownRowPreservedAfterRollback",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-afterCommitContextEmpty",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DB-sameConnectionThroughCommit",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "OWN-READ-WITHOUT-ORIGIN",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "PRODUCT-ABSENT-ORIGIN",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "PRODUCT-FORGED-ORIGIN",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "BROWSER-REAL-BEARER-DENIED",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-LEGACY-REST",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-GRAPHQL",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-RPC",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-STORAGE",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-REALTIME",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-GRAPHQL-POST",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            },
+            {
+              "id": "DISABLED-RPC-POST",
+              "expected": true,
+              "actual": true,
+              "result": "PASS"
+            }
+          ],
+          "connectionReuse": {
+            "previousVerifiedOwnerDifferent": true,
+            "samePhysicalConnection": true
+          },
+          "sharedSupabaseJwtRealTest": false,
+          "finishedAt": "2026-10-29T13:25:23.169Z",
+          "result": "PASS",
+          "limit": "Synthetic technical checks only; no genuine Supabase JWT or durable-session/production homologation claim"
+        }
+      ]
+    }
+  ]
+}

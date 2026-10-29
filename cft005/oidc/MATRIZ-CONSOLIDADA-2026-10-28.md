@@ -1,5 +1,14 @@
 # CFT-005 — Matriz consolidada, 28/10/2026
 
+## Atualização técnica de 29/10/2026
+
+| Matriz | PASS | FAIL | BLOCKED | Escopo |
+|---|---:|---:|---:|---|
+| Contrato H01–H24 | 12 | 0 | 12 | H01–H09 e H11–H13 PASS; H10 e H14–H24 BLOCKED. |
+| Clientes SPA originais S01–S14 | 9 | 2 | 3 | Preservados; sem homologação publicada. |
+
+[Sonda real: 196 controles finais e quatro registros preservados](../homologacao/SONDA-TECNICA-RESULTADO-20261029.md). Papéis/colunas/RLS, schema/SET ROLE, Origin e superfícies, contexto e mesma conexão verificados. H10 não passou sem JWT Supabase genuíno de teste. A versão inicial de 192 controles é histórico separado, não casos adicionais do contrato. Rede fechada; conexões existentes responderam 200 inicialmente e, após ociosidade, health 503. Próximo passo único: preparar registro durável de sessões/revogação somente HML. CFT-005 ABERTO; adendos abaixo preservados como histórico.
+
 ## Atualização de 29/10/2026 — nova rodada nos dois perfis
 
 | Matriz | PASS | FAIL | BLOCKED | Limite |
