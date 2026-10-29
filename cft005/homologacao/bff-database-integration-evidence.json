@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-10-29T01:56:41Z",
+  "scope": "synthetic-only",
+  "databaseId": "dpg-dbh8tghsrm7s73f4tc9g-a",
+  "result": "BLOCKED",
+  "runtimeCredentialLogins": {"A": true, "B": true, "externalTlsVerified": true},
+  "protectedEnvironmentSaved": {"A": true, "B": true, "key": "HML_DATABASE_URL", "endpoint": "internal"},
+  "externalNetworkClosed": {"apiAllowlistCount": 0, "dashboardBlockedMessage": true},
+  "deploymentAttempts": [
+    {"product":"A", "commit":"7e620506bcc23b53b0006bc894acc6d73e3d2c63", "id":"dep-dbhacfgn74is73cqe2a0", "status":"update_failed"},
+    {"product":"B", "commit":"7e620506bcc23b53b0006bc894acc6d73e3d2c63", "id":"dep-dbhacgifngtc73b3hnl0", "status":"update_failed"},
+    {"product":"A", "commit":"f988af753aa06661cea626e64af1aeb7af33947c", "id":"dep-dbhadb142hec73bsskeg", "status":"update_failed", "safeFailureCategory":"database_tls_validation"}
+  ],
+  "previousRuntime": {"healthStatusA":200,"healthStatusB":200,"postgresStorageReported":false,"replacementLive":false},
+  "localTests": {"totalIncludingParent":60,"pass":60,"fail":0,"protocolFixture":true,"databaseMock":true,"realIssuer":false},
+  "dependencyAudit": {"total":17,"knownAdvisories":0},
+  "postgresHttpControlsExecuted": 0,
+  "recordsChangedByConfiguration": 0,
+  "certificateVerificationDisabled": false,
+  "preparedAlternative": {
+    "endpoint":"external-fixed-verified",
+    "allowedNetworks":["74.220.49.0/24","74.220.57.0/24"],
+    "networksSharedWithOtherRegionalServices":true,
+    "runtimeRolesUnchanged":true,
+    "networkChangeApplied":false,
+    "confirmationRequiredBeforeNetworkChange":true,
+    "closeNetworkAfterTestRound":true
+  },
+  "preservation": {"publishedAppsUnchanged":true,"apertaquemUnchanged":true,"realDataUntouched":true,"globalTtlUnchanged":true,"auth0Unchanged":true},
+  "limits": ["No integrated HTTP PASS","No PostgreSQL-backed login proof","Historical SQL and Map-backed HTTP controls remain separate","No separate browser-profile proof","No durable session ledger or central logout","Provider retention not attested"],
+  "publishedHomologation":"NOT_GRANTED"
+}

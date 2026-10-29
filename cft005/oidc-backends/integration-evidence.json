@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "scope": "LOCAL-OIDC-PROTOCOL-FIXTURE-NOT-AUTH0",
-  "generatedAt": "2026-10-29T01:40:29.991Z",
+  "generatedAt": "2026-10-29T01:56:44.425Z",
   "node": "v24.19.0",
   "realAuth0Issuance": "BLOCKED",
   "deployedBackends": 0,
@@ -13,10 +13,10 @@
     "backend.mjs": "6edcfd47d74cc8a0c73493b01f85d038cdc284478fcdf48ef858d2d3a23cdc5d",
     "provider.mjs": "161a9d2b3abffa3dce9b464fb0552d25c316d1bf410ac3741c96372e871e5ed2",
     "config.mjs": "d5dbfa9edd8864d4bb72d0d0a7277408f7f8fdf085b2abf7ff51b376d9f2d4a5",
-    "start.mjs": "3a65af1265f4e84bf487d3ff7724add46aaa68fbedb99cb22fcf9f6a634b5480",
+    "start.mjs": "d0fbdca5949864c1dc8a3dc054eafa658e93f67fc28e12e9facea49536bb5f14",
     "protocol-fixture.mjs": "1b0b8fa9adb10c3bca77588a224131957ee58099ba4b4bb6682de4ac2d7f645e",
     "integration.test.mjs": "23016e1b53293ab68eaaeef244ea9479d48f564d32c17a25fe12267856dd7f1c",
-    "package.json": "dc12ce2650ed4aeb9417aa0e7163b01c5e3ebcc3d3b97b8f603b41a4106ea0bd",
+    "package.json": "6e4ee727dcc279469f38ff54a7c4944e491a63e18e134fa6b505a18046b99581",
     "pnpm-lock.yaml": "655e06782cfd65af01223e2beb09b1eb18182c40d74264e20d45f2e445b504e3"
   },
   "total": 51,

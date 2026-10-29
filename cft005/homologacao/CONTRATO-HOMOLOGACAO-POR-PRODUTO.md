@@ -1,5 +1,7 @@
 # CFT-005 — Contrato de homologação por produto, versão 1
 
+Adendo atual: [integração BFF/banco preparada e bloqueio TLS real](./INTEGRACAO-BFF-BANCO.md). Credenciais exclusivas salvas; nenhum backend integrado chegou a LIVE. Alternativa externa com certificado verificável e allowlist temporária exata preparada, aguardando confirmação de rede. As declarações originais abaixo preservam o histórico v1; os 24 gates completos continuam BLOCKED.
+
 Adendo mais recente: [banco criado, papéis exclusivos e RLS comprovados em 84 controles SQL](./BANCO-RLS-RESULTADO.md). Sem conexão dos BFFs ao banco ou homologação publicada. Declarações originais de recurso não provisionado abaixo permanecem como histórico v1.
 
 Adendo posterior: [banco HML identificado](./ESCOLHA-BANCO-HML.md) — candidato novo Render Postgres Free, My Workspace/Virginia, ainda não provisionado. As referências abaixo a destino não escolhido descrevem a preparação original v1, preservada no commit 66828da0e0bca0bb37e232404222987e0090717d. A fronteira de segurança não mudou; a capacidade real dos papéis/grants/RLS continua BLOCKED.

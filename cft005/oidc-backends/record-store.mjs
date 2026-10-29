@@ -16,9 +16,9 @@ export function databaseFailureCategory(error){
 export function databaseOptions(product,connectionString){
   let url;try{url=new URL(connectionString);}catch{throw unavailable('configuration');}
   const user='cft005_hml_'+product?.toLowerCase();
-  if(!['A','B'].includes(product)||!['postgres:','postgresql:'].includes(url.protocol)||url.hostname!==HOST||
+  if(!['A','B'].includes(product)||!['postgres:','postgresql:'].includes(url.protocol)||![HOST,TLS_NAME].includes(url.hostname)||
     url.pathname!=='/'+DATABASE||decodeURIComponent(url.username)!==user||!url.password||url.search||url.hash||url.port&&url.port!=='5432')throw unavailable('configuration');
-  return {host:HOST,port:5432,database:DATABASE,user,password:decodeURIComponent(url.password),
+  return {host:url.hostname,port:5432,database:DATABASE,user,password:decodeURIComponent(url.password),
     ssl:{rejectUnauthorized:true,servername:TLS_NAME},max:1,connectionTimeoutMillis:8000,
     statement_timeout:5000,idle_in_transaction_session_timeout:5000,idleTimeoutMillis:30000,application_name:'cft005-bff-'+product};
 }

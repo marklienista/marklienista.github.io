@@ -1,5 +1,7 @@
 # CFT-005 — Integração de dois backends confidenciais
 
+**Estado atual, 28/10/2026, 22:56 BRT:** adaptador PostgreSQL preparado; 60 testes locais PASS. Credenciais exclusivas salvas nos dois serviços; acesso externo do banco fechado. Deploy integrado BLOCKED por validação TLS do certificado interno autoassinado. A versão anterior continua servindo dados em memória. [Resultado e alternativa restrita com certificado verificável](../homologacao/INTEGRACAO-BFF-BANCO.md). Os estados abaixo são históricos; não atribuir PASS PostgreSQL aos 44 controles BFF anteriores. CFT-005 ABERTO.
+
 **28/10/2026: login real A/B com U1 PASS; prova de cada backend 11/11 PASS. JWT real A→B e B→A recusado após assinatura/azp para leitura/escrita. Logout local A e continuidade B PASS. U2 BLOCKED por credencial da identidade prevista indisponível. CFT-005 ABERTO.**
 
 O código de integração está preparado nesta branch; os resultados locais abaixo não comprovam emissão pelo Auth0. Esta pasta é independente de `oidc/` e `backend-proof/` e não substitui os aplicativos publicados.

@@ -9,9 +9,14 @@ function fixture({fail=false,ready=true}={}){
   class Pool{on(){}async connect(){connected++;return {query:async(sql,args=[])=>{calls.push({sql,args});if(sql.startsWith('SELECT record_id')||sql.startsWith('UPDATE')){if(fail)throw Error('raw-private-error');return {rows:[]};}return {rows:[]};},release(){released++;}};}async query(){return {rows:[{login_ok:ready,tls:ready,rls:ready}]};}async end(){}}
   return {store:createPostgresStore(cfg,url,{Pool}),calls,get connected(){return connected;},get released(){return released;}};
 }
-test('only exact internal database and product role accepted, TLS verification fixed',()=>{
+test('only exact database endpoints and product role accepted, TLS verification fixed',()=>{
   const o=databaseOptions('A',url);assert.equal(o.ssl.rejectUnauthorized,true);assert.equal(o.ssl.servername,'dpg-dbh8tghsrm7s73f4tc9g-a.virginia-postgres.render.com');assert.equal(o.max,1);
   for(const wrong of [url.replace('hml_a:','hml_b:'),url.replace('hml_a:','hml_db_teste_user:'),url.replace('dpg-dbh8tghsrm7s73f4tc9g-a/','untrusted.invalid/'),url+'?sslmode=disable',url.replace('/cft005_hml_db_teste','/other')])assert.throws(()=>databaseOptions('A',wrong),{message:'E_DATABASE_UNAVAILABLE'});
+});
+test('external endpoint alternative keeps exact target, certificate and hostname checks',()=>{
+  const external=url.replace('@dpg-dbh8tghsrm7s73f4tc9g-a/','@dpg-dbh8tghsrm7s73f4tc9g-a.virginia-postgres.render.com/');
+  const o=databaseOptions('A',external);assert.equal(o.host,o.ssl.servername);assert.equal(o.ssl.rejectUnauthorized,true);
+  assert.throws(()=>databaseOptions('A',external.replace('.virginia-postgres.render.com','.other.invalid')));
 });
 test('requested U2 cannot become the transaction owner of verified U1',async()=>{
   const f=fixture();assert.equal(await f.store.read(principal,'U2'),null);
