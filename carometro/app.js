@@ -3,6 +3,7 @@ import {prepareGoogleIdentity} from './drive.js?v=0.12';
 import {addClass,renameClass,addStudent,editStudent,moveStudent,markStudentInactive,classStudents,studentClass,planPromotion,applyPromotion,mapPilotRows,comparePilot,applyPilot,parseDelimited,exportCsv,configureSpace,hasGroups,hasYears,peopleFor,classesFor,carometroTitle,personName,className,optionalYear,ALL,UNGROUPED} from './model.js?v=0.13';
 import {readPilotFile} from './xlsx.js?v=0.11';
 import {renderClassBar,renderStudentCards,renderPrintSheet,renderBadgeSheet,notify,presentModal,closeModal,fillSelect} from './view.js?v=0.13';
+import {mountPdfImport} from './pilot-ui.mjs?v=0.14';
 const $=id=>document.getElementById(id),S=new Session();
 let timer=null,saving=null,saveError=null,savedAt=null,pilot=[],promotion=[],captureId=null;
 const report=(text,kind='info')=>notify(text,kind);
@@ -173,3 +174,5 @@ function start(){
   window.addEventListener('beforeunload',e=>{if(S.dirty||saving){e.preventDefault();e.returnValue=''}});window.addEventListener('focus',()=>{if(S.hasSpace()&&!S.isCloud())render()});
 }
 start();
+mountPdfImport({session:S,flush,report,afterApply:()=>{resetPrint();render()}});
+const versionLabel=document.querySelector('.version');if(versionLabel)versionLabel.textContent='LABORATÓRIO 0.14 · NÃO LANÇADO';
