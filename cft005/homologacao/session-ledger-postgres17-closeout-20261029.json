@@ -1,0 +1,101 @@
+{
+  "schema": "CFT005-LOCAL-PG17-CLOSEOUT-1",
+  "recordedAt": "2026-10-29T16:37:39.400Z",
+  "scope": "local-synthetic-only",
+  "baseCommit": "c45a1655b5abf0699f30f81ab694e7c1febb7005",
+  "nativeValidation": {
+    "version": "17.11",
+    "serverVersionNum": 170011,
+    "counts": {
+      "PASS": 38,
+      "FAIL": 0
+    },
+    "postgresRestarted": true,
+    "realDistinctDbLogins": true,
+    "host": "127.0.0.1",
+    "port": 57517,
+    "tlsCertificateVerified": true,
+    "fsync": true,
+    "fullPageWrites": true,
+    "oidc": false,
+    "browser": false,
+    "httpsCoordinator": false,
+    "outageWasAdapterFaultInjection": true
+  },
+  "regression": {
+    "PASS": 94,
+    "FAIL": 0
+  },
+  "attempts": {
+    "startup": {
+      "result": "FAIL",
+      "category": "INVALID_LOG_OPTION",
+      "sqlControlsStarted": false
+    },
+    "first": {
+      "PASS": 26,
+      "FAIL": 1
+    },
+    "second": {
+      "PASS": 26,
+      "FAIL": 1
+    },
+    "third": {
+      "PASS": 32,
+      "FAIL": 1,
+      "reason": "Restart control interrupted; no durability conclusion"
+    },
+    "final": {
+      "PASS": 38,
+      "FAIL": 0
+    }
+  },
+  "correction": "Preserve trusted ledgerDenied instead of classifying revoked session as unavailable; never grants access on failure",
+  "cleanup": {
+    "testClustersChecked": 5,
+    "postmasterPidFilesPresent": 0,
+    "initialPasswordFilesPresent": 0,
+    "privateKeyFilesPresent": 0,
+    "localPortListening": false,
+    "privateClusterDirectoriesRetained": true
+  },
+  "hosted": {
+    "databaseId": "dpg-dbh8tghsrm7s73f4tc9g-a",
+    "confirmedIpAllowList": [],
+    "sqlAccessed": false,
+    "migrationApplied": false,
+    "serviceCreated": false,
+    "deployed": false,
+    "credentialsRead": false
+  },
+  "runtimeUnchanged": {
+    "cft005/oidc-backends/backend.mjs": true,
+    "cft005/oidc-backends/record-store.mjs": true,
+    "cft005/oidc-backends/provider.mjs": true,
+    "cft005/oidc-backends/config.mjs": true,
+    "cft005/oidc-backends/start.mjs": true,
+    "cft005/oidc-backends/technical-audit.mjs": true,
+    "cft005/oidc-backends/technical-proof.mjs": true,
+    "cft005/oidc-backends/package.json": true,
+    "cft005/oidc-backends/pnpm-lock.yaml": true
+  },
+  "contract": {
+    "counts": {
+      "PASS": 12,
+      "FAIL": 0,
+      "BLOCKED": 12
+    },
+    "publishedHomologation": "NOT_GRANTED",
+    "newRealIntegratedGatePasses": 0,
+    "sessionLedger": false
+  },
+  "safeguards": {
+    "productionUnchanged": true,
+    "apertaquemUnchanged": true,
+    "realDataUntouched": true,
+    "auth0Unchanged": true,
+    "globalTtlUnchanged": true,
+    "externalSecretsExported": false
+  },
+  "nextStep": "Integrate authenticated HTTPS coordinator transport and ledger into the two test BFFs before real browser proofs; keep hosted network closed while developing"
+}

@@ -1,0 +1,157 @@
+{
+  "schema": "CFT005-LOCAL-POSTGRES17-1",
+  "recordedAt": "2026-10-29T16:26:52.884Z",
+  "scope": "local-synthetic-only",
+  "mode": "native-postgresql",
+  "serverVersionNum": 170011,
+  "realOidc": false,
+  "realBrowserSessions": false,
+  "hostedDatabaseAccessed": false,
+  "hostedNetworkChanged": false,
+  "runtimeIntegrated": false,
+  "counts": {
+    "PASS": 26,
+    "FAIL": 1
+  },
+  "cases": [
+    {
+      "id": "PG17-TLS-LOCAL-BOUNDARY",
+      "result": "PASS"
+    },
+    {
+      "id": "MIGRATION-UNREVIEWED-REFUSED",
+      "result": "PASS"
+    },
+    {
+      "id": "MIGRATION-EXACT-SQL-APPLIED-LOCAL",
+      "result": "PASS"
+    },
+    {
+      "id": "MIGRATION-SECOND-APPLICATION-REFUSED",
+      "result": "PASS"
+    },
+    {
+      "id": "SCHEMA-OWNER-FORCE-RLS-NO-PUBLIC",
+      "result": "PASS"
+    },
+    {
+      "id": "A-REAL-LOGIN-RESTRICTED-TLS",
+      "result": "PASS"
+    },
+    {
+      "id": "A-CROSS-PRODUCT-RECORDS-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "A-NO-EPOCH-SESSION-MUTATION-OR-NONCES",
+      "result": "PASS"
+    },
+    {
+      "id": "A-NO-ROLE-ESCALATION-OR-DDL",
+      "result": "PASS"
+    },
+    {
+      "id": "A-NO-CONTEXT-NO-METADATA",
+      "result": "PASS"
+    },
+    {
+      "id": "A-U1-REGISTER-LOCK-AND-POSITIVE-READ",
+      "result": "PASS"
+    },
+    {
+      "id": "A-U2-REGISTER-LOCK-AND-POSITIVE-READ",
+      "result": "PASS"
+    },
+    {
+      "id": "A-METADATA-RLS-OWNER-PRODUCT-AND-LOCK-PAD",
+      "result": "PASS"
+    },
+    {
+      "id": "A-OTHER-USER-RECORD-FILTERED",
+      "result": "PASS"
+    },
+    {
+      "id": "B-REAL-LOGIN-RESTRICTED-TLS",
+      "result": "PASS"
+    },
+    {
+      "id": "B-CROSS-PRODUCT-RECORDS-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "B-NO-EPOCH-SESSION-MUTATION-OR-NONCES",
+      "result": "PASS"
+    },
+    {
+      "id": "B-NO-ROLE-ESCALATION-OR-DDL",
+      "result": "PASS"
+    },
+    {
+      "id": "B-NO-CONTEXT-NO-METADATA",
+      "result": "PASS"
+    },
+    {
+      "id": "B-U1-REGISTER-LOCK-AND-POSITIVE-READ",
+      "result": "PASS"
+    },
+    {
+      "id": "B-U2-REGISTER-LOCK-AND-POSITIVE-READ",
+      "result": "PASS"
+    },
+    {
+      "id": "B-METADATA-RLS-OWNER-PRODUCT-AND-LOCK-PAD",
+      "result": "PASS"
+    },
+    {
+      "id": "B-OTHER-USER-RECORD-FILTERED",
+      "result": "PASS"
+    },
+    {
+      "id": "COORDINATOR-NO-PRODUCT-DATA-OR-DDL",
+      "result": "PASS"
+    },
+    {
+      "id": "REPLAY-UNIQUE-NONCE-DURABLE",
+      "result": "PASS"
+    },
+    {
+      "id": "WRONG-PRODUCT-SIGNED-COMMAND-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "LOCAL-LOGOUT-LEAVES-PEER-AND-U2",
+      "result": "FAIL",
+      "category": "ASSERTION_OR_SQL"
+    }
+  ],
+  "diagnostics": [
+    {
+      "phase": "A-METADATA-RLS-OWNER-PRODUCT-AND-LOCK-PAD",
+      "sqlState": "23514",
+      "kind": "UPDATE"
+    },
+    {
+      "phase": "B-METADATA-RLS-OWNER-PRODUCT-AND-LOCK-PAD",
+      "sqlState": "23514",
+      "kind": "UPDATE"
+    },
+    {
+      "phase": "REPLAY-UNIQUE-NONCE-DURABLE",
+      "sqlState": "23505",
+      "kind": "INSERT"
+    }
+  ],
+  "sourceSha256": {
+    "001-ledger.DRAFT.sql": "0894fdf25946eee43964c7cc67898e784e55ab2dd50695ca42296319c3d0c50f",
+    "002-rollback.DRAFT.sql": "92849aaea292ab787c9dc8f588fcc399322a6e5bef128807d636d3671b2da8b1",
+    "transactions.mjs": "034d4e8866fabc0fcd13777ab99a84b4ae05a3f629c820faccb9a3c3a1250a6d",
+    "protocol.mjs": "926a7db09ff84b70b156a7a9bd5fd20fb07aa39ef0a2533912e1d5467f737fa8",
+    "local-baseline.sql": "cfc19ae3f57a4ab1c686b552b8b85f6b6c8659b0a452916d08bc84fd2422f8c5",
+    "postgres-validation.mjs": "fde01bebd16f7f4bbcafb1a1e7f3aea029093fa7e45367478a20e76c7259fec9",
+    "run-local-postgres.ps1": "91d0b1f187413127322c51ac9def1488457ee4e120f7d73f193cb5eb27473ba1",
+    "control-local-postgres.ps1": "81f071035ce9d626d0bd60d52c19b590e9dc09b1be8d5015ac67297526147940"
+  },
+  "publishedHomologation": "NOT_GRANTED",
+  "newHmlGatePasses": 0,
+  "firstFailure": "LOCAL-LOGOUT-LEAVES-PEER-AND-U2"
+}

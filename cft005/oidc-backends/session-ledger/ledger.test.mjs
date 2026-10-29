@@ -123,7 +123,7 @@ test('local fixture: write already in flight finishes before revocation acknowle
   let ack=false;const revoke=f.run({action:'revoke',...binding()}).then(()=>{ack=true;});await tick();
   assert.equal(ack,false);assert.equal(f.revision,4);finish.resolve();await write;await revoke;
   assert.equal(f.revision,5);assert.equal(f.epochs.get('U1'),2);
-  await assert.rejects(f.op('A','U1'));await assert.rejects(f.op('B','U1'));assert.equal(f.revision,5);
+  await assert.rejects(f.op('A','U1'),{message:'E_LEDGER_DENIED'});await assert.rejects(f.op('B','U1'),{message:'E_LEDGER_DENIED'});assert.equal(f.revision,5);
   await f.op('B','U2');assert.equal(f.revision,6);assert.equal(f.epochs.get('U2'),1);
 });
 test('local fixture: revocation between online check and SQL check fences the stale operation',async()=>{
@@ -137,7 +137,7 @@ test('local fixture: unavailable coordinator denies every operation without cach
   await assert.rejects(f.op(),{message:'E_LEDGER_UNAVAILABLE'});await assert.rejects(f.op('B','U1'),{message:'E_LEDGER_UNAVAILABLE'});assert.equal(f.connections,n);
 });
 test('local fixture: logout only revokes the supplied session, not peer product or U2',async()=>{
-  const f=fixture();await f.run({action:'logout',...binding()});await assert.rejects(f.op());await f.op('B','U1');await f.op('A','U2');assert.equal(f.epochs.get('U1'),1);
+  const f=fixture();await f.run({action:'logout',...binding()});await assert.rejects(f.op(),{message:'E_LEDGER_DENIED'});await f.op('B','U1');await f.op('A','U2');assert.equal(f.epochs.get('U1'),1);
 });
 test('local fixture: signed B command cannot use an A session to revoke the user',async()=>{
   const f=fixture();await assert.rejects(f.run({action:'revoke',...binding()},'B'),{message:'E_LEDGER_DENIED'});assert.equal(f.epochs.get('U1'),1);assert.equal(f.nonces.size,0);

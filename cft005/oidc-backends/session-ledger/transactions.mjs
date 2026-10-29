@@ -82,7 +82,7 @@ export async function protectedTransaction({pool,coordinator,cfg,principal,bindi
   if(!['A','B'].includes(cfg?.product)||!principal||cfg.subjects?.[principal.subject]!==principal.label||
     !validBinding(binding)||principal.label!==binding.owner||typeof operation!=='function'||typeof coordinator?.authorize!=='function')throw denial();
   // Mandatory online authorization, never cached. HTTP/TLS adapter remains a gate.
-  let auth;try{auth=await coordinator.authorize({product:cfg.product,...binding});}catch{throw unavailable();}
+  let auth;try{auth=await coordinator.authorize({product:cfg.product,...binding});}catch(e){throw e?.ledgerDenied?denial():unavailable();}
   if(auth?.action!=='authorize'||auth.epoch!==binding.epoch)throw denial();
   return transaction(pool,'cft005_hml_'+cfg.product.toLowerCase(),async c=>{
     await c.query("SELECT set_config('cft005.owner',$1,true)",[principal.label]);
