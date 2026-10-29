@@ -1,0 +1,20 @@
+{
+  "schemaVersion":1,
+  "observedAt":"2026-10-29T11:41:17Z",
+  "scope":"synthetic-only",
+  "cases":[{"id":"H01","result":"BLOCKED"},{"id":"H02","result":"BLOCKED"}],
+  "connectedExternalChromeProfiles":1,
+  "secondProfileOpenedReportedByOperator":true,
+  "secondProfileAvailableToConnectedControl":false,
+  "managementCapability":{"normalWindowsOnly":true,"incognitoCreationSupported":false,"profileCreationExposed":false},
+  "manualExecutionOfferedByOperator":true,
+  "manualProcedurePrepared":true,
+  "verifiedSessionObservations":0,
+  "networkDraftCidrs":["74.220.49.0/24","74.220.57.0/24"],
+  "networkSaveClickedByAgent":false,
+  "activeNetworkRulesAtObservation":0,
+  "awaitingHumanNetworkSave":true,
+  "previousPostgresHttpControlsPreserved":52,
+  "safeguards":{"publishedAppsUnchanged":true,"apertaquemUnchanged":true,"realDataUntouched":true,"globalTtlUnchanged":true},
+  "limit":"No H01/H02 PASS before actual manual observations; browser counters alone do not attest profile separation"
+}
