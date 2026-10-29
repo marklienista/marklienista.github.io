@@ -6,7 +6,7 @@ import {createProvider} from './provider.mjs';
 import {startBackend} from './backend.mjs';
 
 // Local protocol fixture only. No real provider request, account or credential.
-export async function protocolFixture({recordStoreForTest}={}) {
+export async function protocolFixture({recordStoreForTest,sessionLedgerForTest}={}) {
   const key=await generateKeyPair('RS256',{extractable:false});
   const untrustedKey=await generateKeyPair('RS256',{extractable:false});
   const publicJwk=await exportJWK(key.publicKey);
@@ -66,7 +66,7 @@ export async function protocolFixture({recordStoreForTest}={}) {
     if(target.origin!==new URL(ISSUER).origin)throw new Error('fixture_external_request_forbidden');
     return fetch(`http://127.0.0.1:${issuerPort}`+target.pathname+target.search,options);
   };
-  const providers={},backends={};
+  const providers={},backends={},backendOptions={};
   try {
     for(const product of ['A','B']) {
       const actual=await createProvider(configs[product],{fetchForTest:fixtureFetch});
@@ -76,13 +76,14 @@ export async function protocolFixture({recordStoreForTest}={}) {
           throw error;
         }
       }};
-      backends[product]=await startBackend(configs[product],providers[product],{...(recordStoreForTest?{recordStore:recordStoreForTest(configs[product])}:{}),fetchProofForTest:async(url,options)=>{
+      backendOptions[product]={...(recordStoreForTest?{recordStore:recordStoreForTest(configs[product])}:{}),...(sessionLedgerForTest?{sessionLedger:sessionLedgerForTest(product)}:{}),fetchProofForTest:async(url,options)=>{
         const target=new URL(url);
         const destination=Object.keys(PROOF_ORIGINS).find(p=>PROOF_ORIGINS[p]===target.origin);
         if(!destination||target.search||target.hash)throw new Error('fixture_proof_destination');
         const r=await request(destination,{path:target.pathname,method:options.method,headers:options.headers,body:options.body});
         return new Response(r.text,{status:r.status,headers:{'Content-Type':'application/json'}});
-      }});
+      }};
+      backends[product]=await startBackend(configs[product],providers[product],backendOptions[product]);
     }
   }catch(error){issuerServer.closeAllConnections();issuerServer.close();throw error;}
   const request=async(product,{path='/',method='GET',jar=new Map(),body='',headers={}}={})=>new Promise((resolve,reject)=>{
@@ -117,6 +118,10 @@ export async function protocolFixture({recordStoreForTest}={}) {
     return {jar:transaction.jar,response};
   }
   return {request,begin,finish,login,providers,configs,stats,
+    async restartBackends(){
+      for(const b of Object.values(backends))await b.close();
+      for(const product of ['A','B'])backends[product]=await startBackend(configs[product],providers[product],{...backendOptions[product],...(recordStoreForTest?{recordStore:recordStoreForTest(configs[product])}:{})});
+    },
     async close(){for(const b of Object.values(backends))await b.close();await new Promise(resolve=>{issuerServer.close(resolve);issuerServer.closeAllConnections();});}
   };
 }

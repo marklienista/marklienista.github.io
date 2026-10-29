@@ -1,4 +1,4 @@
-// Prepared transaction boundary; deliberately not imported by start/backend/store.
+// HML transaction boundary, shared by coordinator and product data stores.
 import {verifyCommand,validEpoch} from './protocol.mjs';
 const DB='cft005_hml_db_teste',S='cft005_hml_auth';
 const denial=()=>Object.assign(new Error('E_LEDGER_DENIED'),{ledgerDenied:true});
@@ -81,7 +81,7 @@ export async function protectedTransaction({pool,coordinator,cfg,principal,bindi
   // Caller is trusted server code. No browser-selected principal or callback.
   if(!['A','B'].includes(cfg?.product)||!principal||cfg.subjects?.[principal.subject]!==principal.label||
     !validBinding(binding)||principal.label!==binding.owner||typeof operation!=='function'||typeof coordinator?.authorize!=='function')throw denial();
-  // Mandatory online authorization, never cached. HTTP/TLS adapter remains a gate.
+  // Mandatory online authorization, never cached; SQL locks close the later race.
   let auth;try{auth=await coordinator.authorize({product:cfg.product,...binding});}catch(e){throw e?.ledgerDenied?denial():unavailable();}
   if(auth?.action!=='authorize'||auth.epoch!==binding.epoch)throw denial();
   return transaction(pool,'cft005_hml_'+cfg.product.toLowerCase(),async c=>{

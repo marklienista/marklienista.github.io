@@ -178,10 +178,10 @@ test('local fixture: ambiguous commit has no success acknowledgment and destroys
 test('local fixture: failed rollback destroys the connection and hides internal errors',async()=>{
   const f=fixture();f.failRollback=true;await assert.rejects(f.run({action:'revoke',...binding(),epoch:2}),{message:'E_LEDGER_DENIED'});assert.equal(f.destroyed,1);
 });
-test('migration drafts are guarded, not wired into runtime, and do not grant record access',async()=>{
+test('migration drafts are guarded, never executed by startup, and do not grant record access',async()=>{
   const migration=await readFile(new URL('./001-ledger.DRAFT.sql',import.meta.url),'utf8');
   assert.match(migration,/cft005.reviewed_session_ledger/);assert.match(migration,/CREATE ROLE cft005_hml_coordinator NOLOGIN/);
   assert.doesNotMatch(migration.replace(/--[^\n]*/g,''),/SECURITY DEFINER|GRANT .* ON cft005_hml_[ab]\.records/i);
-  for(const name of ['../start.mjs','../backend.mjs','../record-store.mjs'])assert.doesNotMatch(await readFile(new URL(name,import.meta.url),'utf8'),/session-ledger/);
+  for(const name of ['../start.mjs','../backend.mjs','../record-store.mjs'])assert.doesNotMatch(await readFile(new URL(name,import.meta.url),'utf8'),/\.DRAFT\.sql/);
   const rollback=await readFile(new URL('./002-rollback.DRAFT.sql',import.meta.url),'utf8');assert.doesNotMatch(rollback,/\bDROP\s|\bDELETE\s|\bTRUNCATE\s/i);
 });

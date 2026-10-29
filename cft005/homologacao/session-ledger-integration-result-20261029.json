@@ -1,0 +1,321 @@
+{
+  "schema": "CFT005-LOCAL-HTTPS-LEDGER-INTEGRATION-1",
+  "recordedAt": "2026-10-29T17:06:19.751Z",
+  "scope": "local-synthetic-only",
+  "mode": "native-postgresql",
+  "serverVersionNum": 170011,
+  "realOidc": false,
+  "realBrowserSessions": false,
+  "hostedDatabaseAccessed": false,
+  "hostedNetworkChanged": false,
+  "runtimeIntegrated": true,
+  "coordinatorHttps": true,
+  "counts": {
+    "PASS": 64,
+    "FAIL": 0
+  },
+  "cases": [
+    {
+      "id": "PG17-TLS-LOCAL-BOUNDARY",
+      "result": "PASS"
+    },
+    {
+      "id": "MIGRATION-UNREVIEWED-REFUSED",
+      "result": "PASS"
+    },
+    {
+      "id": "MIGRATION-EXACT-SQL-APPLIED-LOCAL",
+      "result": "PASS"
+    },
+    {
+      "id": "MIGRATION-SECOND-APPLICATION-REFUSED",
+      "result": "PASS"
+    },
+    {
+      "id": "SCHEMA-OWNER-FORCE-RLS-NO-PUBLIC",
+      "result": "PASS"
+    },
+    {
+      "id": "A-REAL-LOGIN-RESTRICTED-TLS",
+      "result": "PASS"
+    },
+    {
+      "id": "A-CROSS-PRODUCT-RECORDS-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "A-NO-EPOCH-SESSION-MUTATION-OR-NONCES",
+      "result": "PASS"
+    },
+    {
+      "id": "A-NO-ROLE-ESCALATION-OR-DDL",
+      "result": "PASS"
+    },
+    {
+      "id": "A-NO-CONTEXT-NO-METADATA",
+      "result": "PASS"
+    },
+    {
+      "id": "A-U1-REGISTER-LOCK-AND-POSITIVE-READ",
+      "result": "PASS"
+    },
+    {
+      "id": "A-U2-REGISTER-LOCK-AND-POSITIVE-READ",
+      "result": "PASS"
+    },
+    {
+      "id": "A-METADATA-RLS-OWNER-PRODUCT-AND-LOCK-PAD",
+      "result": "PASS"
+    },
+    {
+      "id": "A-OTHER-USER-RECORD-FILTERED",
+      "result": "PASS"
+    },
+    {
+      "id": "B-REAL-LOGIN-RESTRICTED-TLS",
+      "result": "PASS"
+    },
+    {
+      "id": "B-CROSS-PRODUCT-RECORDS-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "B-NO-EPOCH-SESSION-MUTATION-OR-NONCES",
+      "result": "PASS"
+    },
+    {
+      "id": "B-NO-ROLE-ESCALATION-OR-DDL",
+      "result": "PASS"
+    },
+    {
+      "id": "B-NO-CONTEXT-NO-METADATA",
+      "result": "PASS"
+    },
+    {
+      "id": "B-U1-REGISTER-LOCK-AND-POSITIVE-READ",
+      "result": "PASS"
+    },
+    {
+      "id": "B-U2-REGISTER-LOCK-AND-POSITIVE-READ",
+      "result": "PASS"
+    },
+    {
+      "id": "B-METADATA-RLS-OWNER-PRODUCT-AND-LOCK-PAD",
+      "result": "PASS"
+    },
+    {
+      "id": "B-OTHER-USER-RECORD-FILTERED",
+      "result": "PASS"
+    },
+    {
+      "id": "COORDINATOR-NO-PRODUCT-DATA-OR-DDL",
+      "result": "PASS"
+    },
+    {
+      "id": "REPLAY-UNIQUE-NONCE-DURABLE",
+      "result": "PASS"
+    },
+    {
+      "id": "WRONG-PRODUCT-SIGNED-COMMAND-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "LOCAL-LOGOUT-LEAVES-PEER-AND-U2",
+      "result": "PASS"
+    },
+    {
+      "id": "A-REAL-CONCURRENT-WRITE-THEN-REVOCATION",
+      "result": "PASS"
+    },
+    {
+      "id": "B-REAL-CONCURRENT-WRITE-THEN-REVOCATION",
+      "result": "PASS"
+    },
+    {
+      "id": "CHECK-THEN-WRITE-RACE-FENCED",
+      "result": "PASS"
+    },
+    {
+      "id": "OLD-LOGIN-SNAPSHOT-AND-REACTIVATION-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "COORDINATOR-OUTAGE-FAILS-CLOSED",
+      "result": "PASS"
+    },
+    {
+      "id": "REAL-RESTART-PRESERVES-EPOCH-NONCE-AND-ROWS",
+      "result": "PASS"
+    },
+    {
+      "id": "A-U1-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "A-U2-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "B-U1-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "B-U2-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-HTTPS-UNSIGNED-COMMAND-REFUSED",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-TLS-HOSTNAME-VALIDATION",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U1-OIDC-SNAPSHOT-REGISTER-SESSION",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U1-POSITIVE-READ-WRITE-RLS",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U1-CROSS-USER-PRODUCT-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U2-OIDC-SNAPSHOT-REGISTER-SESSION",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U2-POSITIVE-READ-WRITE-RLS",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U2-CROSS-USER-PRODUCT-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U1-OIDC-SNAPSHOT-REGISTER-SESSION",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U1-POSITIVE-READ-WRITE-RLS",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U1-CROSS-USER-PRODUCT-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U2-OIDC-SNAPSHOT-REGISTER-SESSION",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U2-POSITIVE-READ-WRITE-RLS",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U2-CROSS-USER-PRODUCT-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-REVOKE-CSRF-AND-BROWSER-OWNER-BODY-REFUSED",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-LEGACY-AUDIT-DOES-NOT-BYPASS-LEDGER-LOCK",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-LOCAL-LOGOUT-PRESERVES-PEER-AND-U2",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-HTTP-WRITE-REVOCATION-ACK-ORDERED",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-PRE-REVOCATION-OIDC-CALLBACK-CANNOT-REACTIVATE",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-NEW-LOGIN-SURVIVES-UNEXPIRED-REPLAY",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-REAL-HTTPS-OUTAGE-FAILS-CLOSED-LOCAL-CLEANUP-WORKS",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-BFF-RESTART-DENIES-OLD-COOKIES-AND-RECOVERS-FRESH-LOGIN",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U1-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U2-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U1-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U2-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "RETIREMENT-EXACT-SQL-PRESERVES-LEDGER-DENIES-NEW-LOGIN",
+      "result": "PASS"
+    }
+  ],
+  "diagnostics": [
+    {
+      "phase": "A-METADATA-RLS-OWNER-PRODUCT-AND-LOCK-PAD",
+      "sqlState": "23514",
+      "kind": "UPDATE"
+    },
+    {
+      "phase": "B-METADATA-RLS-OWNER-PRODUCT-AND-LOCK-PAD",
+      "sqlState": "23514",
+      "kind": "UPDATE"
+    },
+    {
+      "phase": "REPLAY-UNIQUE-NONCE-DURABLE",
+      "sqlState": "23505",
+      "kind": "INSERT"
+    },
+    {
+      "phase": "restart-reconnect",
+      "sqlState": "23505",
+      "kind": "INSERT"
+    },
+    {
+      "phase": "INT-NEW-LOGIN-SURVIVES-UNEXPIRED-REPLAY",
+      "sqlState": "23505",
+      "kind": "INSERT"
+    }
+  ],
+  "sourceSha256": {
+    "001-ledger.DRAFT.sql": "81584f9b5c280ea29680c4aabd62362daeee7c488e864342564e91026f6b00aa",
+    "002-rollback.DRAFT.sql": "92849aaea292ab787c9dc8f588fcc399322a6e5bef128807d636d3671b2da8b1",
+    "transactions.mjs": "58865029a47d6aa387800e5730ee6b49f7174761f03d20914b3ad2131615ad79",
+    "protocol.mjs": "3d7a187e6d6c564a4fdbb1492fcf0f39c328aa1301a505227e161a1ae3d925bb",
+    "local-baseline.sql": "cfc19ae3f57a4ab1c686b552b8b85f6b6c8659b0a452916d08bc84fd2422f8c5",
+    "postgres-validation.mjs": "df5297fe3cb5f72cad4b6a6b6402b5289e589bf15374929350b3322d626d1166",
+    "run-local-postgres.ps1": "fb56afbd16b49b94a73c43432fb8aa9b47d6149e65ccc4bd2f11d8c675d758fb",
+    "control-local-postgres.ps1": "117cf8b5f4dded7721010c0b2ffebe71053d8288a58af789d91386538188f2d5",
+    "transport.mjs": "082ca25c8d699cd35033722fef292f34417ca866ae110625858d0907bdaf50dd",
+    "settings.mjs": "2d741fa51809f77b7a949abc3e90db487e28826ff22d1c93c51c43e72961f40a",
+    "integrated-postgres-proof.mjs": "34de2f22ea4af1c67665c29d6a742901b5bed2f1dcf54bb00a810f9ff905e05a",
+    "../backend.mjs": "775ee7f4702b7572e2279aca2b8daf1f54b22efb9e55e9c36b1bfd056bae8c3b",
+    "../record-store.mjs": "b5ea55ded985db2d5a8faddff85e7643b6e2417ed56b4b45e3aef3f713dc3387",
+    "../protocol-fixture.mjs": "4009f04d06564ac8d251b31552863909c6f7da6b58df032758e0f0eb419cf17c"
+  },
+  "publishedHomologation": "NOT_GRANTED",
+  "newHmlGatePasses": 0,
+  "firstFailure": null
+}

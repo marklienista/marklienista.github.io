@@ -1,3 +1,4 @@
+param([switch]$Integration)
 $ErrorActionPreference='Stop'
 $taskBin='C:/Program Files/PostgreSQL/17/bin'
 $taskNode='C:/Users/Dune/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe'
@@ -26,7 +27,7 @@ try {
   $taskRsa=[Security.Cryptography.RSA]::Create(2048)
   $taskRequest=[Security.Cryptography.X509Certificates.CertificateRequest]::new('CN=localhost',$taskRsa,[Security.Cryptography.HashAlgorithmName]::SHA256,[Security.Cryptography.RSASignaturePadding]::Pkcs1)
   $taskSan=[Security.Cryptography.X509Certificates.SubjectAlternativeNameBuilder]::new()
-  $taskSan.AddDnsName('localhost');$taskSan.AddIpAddress([Net.IPAddress]::Loopback)
+  $taskSan.AddDnsName('localhost');$taskSan.AddDnsName('cft005-session-ledger-teste.onrender.com');$taskSan.AddIpAddress([Net.IPAddress]::Loopback)
   $taskRequest.CertificateExtensions.Add($taskSan.Build())
   $taskCert=$taskRequest.CreateSelfSigned([DateTimeOffset]::UtcNow.AddMinutes(-5),[DateTimeOffset]::UtcNow.AddDays(1))
   [IO.File]::WriteAllText($taskKeyFile,$taskRsa.ExportRSAPrivateKeyPem())
@@ -64,12 +65,14 @@ host all all ::0/0 reject
   $env:CFT005_LOCAL_CLUSTER=$taskRoot
   $env:CFT005_LOCAL_ADMIN_PASSWORD=$taskAdminPassword
   $env:CFT005_LOCAL_PWSH=Join-Path $PSHOME 'pwsh.exe'
+  if ($Integration) { $env:CFT005_LOCAL_INTEGRATION='1' }
   & $taskNode "$PSScriptRoot/postgres-validation.mjs"
   if ($LASTEXITCODE -ne 0) { throw 'E_LOCAL_VALIDATION_FAILED' }
 } finally {
   Remove-Item Env:CFT005_LOCAL_ADMIN_PASSWORD -ErrorAction SilentlyContinue
   Remove-Item Env:CFT005_LOCAL_CLUSTER -ErrorAction SilentlyContinue
   Remove-Item Env:CFT005_LOCAL_PWSH -ErrorAction SilentlyContinue
+  Remove-Item Env:CFT005_LOCAL_INTEGRATION -ErrorAction SilentlyContinue
   $taskAdminPassword=$null
   try {
     if ($taskStarted -or (Test-Path -LiteralPath (Join-Path $taskRoot 'data/postmaster.pid'))) { & "$PSScriptRoot/control-local-postgres.ps1" -Cluster $taskRoot -Mode Stop }

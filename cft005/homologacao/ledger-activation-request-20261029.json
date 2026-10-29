@@ -1,0 +1,103 @@
+{
+  "schema": "CFT005-LEDGER-ACTIVATION-1",
+  "status": "PREPARED_NOT_APPLIED",
+  "scope": "synthetic-only",
+  "workspace": {
+    "name": "My Workspace"
+  },
+  "database": {
+    "name": "cft005_hml_db_teste",
+    "migration": "cft005/oidc-backends/session-ledger/001-ledger.DRAFT.sql",
+    "newRoles": [
+      "cft005_hml_session_owner",
+      "cft005_hml_coordinator"
+    ],
+    "newSchema": "cft005_hml_auth",
+    "newTables": [
+      "epochs",
+      "sessions",
+      "nonces"
+    ],
+    "recordDataOrGrantsChanged": false,
+    "coordinatorConnectGrant": true,
+    "coordinatorInitiallyNoLogin": true,
+    "adminCredentialInRuntime": false
+  },
+  "network": {
+    "currentIpAllowList": [],
+    "temporaryCidrs": [
+      "74.220.49.0/24",
+      "74.220.57.0/24"
+    ],
+    "finalIpAllowList": [],
+    "actionTimeConfirmationRequired": true,
+    "existingConnectionsMaySurviveAclChange": true
+  },
+  "coordinator": {
+    "name": "cft005-session-ledger-teste",
+    "runtime": "node",
+    "plan": "free",
+    "region": "virginia",
+    "repo": "https://github.com/marklienista/marklienista.github.io",
+    "branch": "cft005-oidc-dominios",
+    "autoDeploy": "no",
+    "buildCommand": "npx --yes pnpm@11.25.0 --dir cft005/oidc-backends install --frozen-lockfile --ignore-scripts",
+    "startCommand": "node cft005/oidc-backends/session-ledger/start.mjs",
+    "healthPath": "/health",
+    "publicOrigin": "https://cft005-session-ledger-teste.onrender.com",
+    "newSecretKeys": [
+      "HML_COORDINATOR_DATABASE_URL"
+    ],
+    "publicKeyFields": [
+      "HML_LEDGER_PUBLIC_KEY_A",
+      "HML_LEDGER_PUBLIC_KEY_B"
+    ],
+    "status": "PROPOSED_NOT_CREATED"
+  },
+  "backends": [
+    {
+      "product": "A",
+      "origin": "https://cft005-bff-a-teste.onrender.com",
+      "name": "cft005-bff-a-teste"
+    },
+    {
+      "product": "B",
+      "origin": "https://cft005-bff-b-teste.onrender.com",
+      "name": "cft005-bff-b-teste"
+    }
+  ],
+  "bffNewVariables": {
+    "HML_SESSION_LEDGER": "required-v1",
+    "HML_LEDGER_ORIGIN": "https://cft005-session-ledger-teste.onrender.com",
+    "HML_LEDGER_PRIVATE_KEY": "PROTECTED_DISTINCT_PKCS8_DER_BASE64_PER_PRODUCT"
+  },
+  "coordinatorNewVariables": {
+    "HML_SESSION_LEDGER": "required-v1",
+    "HML_LEDGER_PUBLIC_KEY_A": "SPKI_DER_BASE64_FROM_A",
+    "HML_LEDGER_PUBLIC_KEY_B": "SPKI_DER_BASE64_FROM_B",
+    "HML_COORDINATOR_DATABASE_URL": "PROTECTED_RESTRICTED_ROLE_ONLY"
+  },
+  "rollout": [
+    "Confirm exact database and temporary network window",
+    "Stop test traffic and legacy instances before claiming coordinated revocation",
+    "Apply guarded metadata migration and initialize restricted coordinator credential without logs",
+    "Create only the Free coordinator and save its restricted URL plus pinned public keys",
+    "Save distinct private keys and ledger settings only in protected A/B fields, preserving OIDC variables",
+    "Deploy and verify coordinator and both BFF source versions before any real session proof",
+    "Run positive controls and HML session scenarios with authorized U1/U2; never shared-tenant central logout",
+    "Close both temporary CIDRs and verify pool expiry and preserved synthetic records"
+  ],
+  "notAllowed": [
+    "paid plan or service",
+    "published application or Apertaquem change",
+    "real data or user deletion",
+    "global token TTL change",
+    "OAuth Server beta",
+    "shared-tenant or Google central logout",
+    "secret export to files, logs, screenshots, GitHub or Drive"
+  ],
+  "newRevisionRemoteHomologation": "NOT_EXECUTED",
+  "legacyTechnicalAuditInLedgerMode": "BLOCKED_REQUIRES_TRANSACTION_AND_INVENTORY_REVIEW",
+  "publishedHomologation": "NOT_GRANTED",
+  "exactInfrastructureIds": "Kept only in the existing CFT-005 and local activation request; not exported here"
+}

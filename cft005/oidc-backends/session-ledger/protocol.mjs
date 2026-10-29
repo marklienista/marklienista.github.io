@@ -1,9 +1,9 @@
-// Inactive HML candidate. No environment, network, credential or browser access.
+// HML command protocol. No environment, network, credential or browser access.
 import {createHash,randomBytes,sign,verify} from 'node:crypto';
 
 export const audience='CFT005-HML-LEDGER-1';
 export const path='/v1/command';
-// Proposed address only. No service has been created or contacted.
+// Fixed HML destination; never selected by browser input or environment.
 export const destination='https://cft005-session-ledger-teste.onrender.com'+path;
 const fail=()=>{throw new Error('E_LEDGER_COMMAND');};
 const plain=o=>o!==null&&typeof o==='object'&&!Array.isArray(o)&&Object.getPrototypeOf(o)===Object.prototype;

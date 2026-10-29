@@ -1,0 +1,121 @@
+{
+  "schema": "CFT005-LEDGER-INTEGRATION-CLOSEOUT-1",
+  "recordedAt": "2026-10-29T17:15:57.002Z",
+  "scope": "synthetic-only",
+  "baseCommit": "3e06c1a58223fc16615f767d536bdd2a6776ec32",
+  "local": {
+    "native": {
+      "PASS": 64,
+      "FAIL": 0
+    },
+    "coreRepeated": 38,
+    "httpAdded": 26,
+    "unit": {
+      "PASS": 102,
+      "FAIL": 0
+    },
+    "uiJavascriptParsed": true,
+    "oidc": "fixture-only",
+    "cookieJars": "synthetic in-process only",
+    "tls": "verified local HTTPS",
+    "database": "native PostgreSQL 17.11",
+    "realHttpsOutage": true,
+    "bffRestart": true,
+    "cleanup": {
+      "checkedAt": "2026-10-29T17:15:48.4312826Z",
+      "clustersChecked": 8,
+      "temporarySecretFilesPresent": 0,
+      "postmasterPidFilesPresent": 0,
+      "localListenerPresent": false
+    }
+  },
+  "hosted": {
+    "ipAllowListConfirmed": [],
+    "networkDraftPrepared": true,
+    "saveApplied": false,
+    "proposedCidrs": [
+      "74.220.49.0/24",
+      "74.220.57.0/24"
+    ],
+    "coordinatorId": null,
+    "migrationApplied": false,
+    "deployed": false,
+    "newPermanentKeysGenerated": false,
+    "autoDeployA": "no",
+    "autoDeployB": "no",
+    "workspaceName": "My Workspace",
+    "databaseName": "cft005_hml_db_teste",
+    "freeCapacityChecked": true,
+    "networkDraftCancelled": true
+  },
+  "contracts": {
+    "historicalHml": {
+      "PASS": 12,
+      "FAIL": 0,
+      "BLOCKED": 12
+    },
+    "newCandidate": {
+      "PASS": 0,
+      "FAIL": 0,
+      "BLOCKED": 24
+    },
+    "originalSpa": {
+      "PASS": 9,
+      "FAIL": 2,
+      "BLOCKED": 3
+    },
+    "publishedHomologation": "NOT_GRANTED"
+  },
+  "limits": [
+    "No real Auth0 or browser proof for this revision",
+    "Legacy technical audit disabled in ledger mode until a transaction/inventory-compatible review",
+    "H10/H18 and full security/retention gates still missing",
+    "Free sleep/cold start and expiring database remain operational limits"
+  ],
+  "preservedSource": {
+    "cft005/oidc-backends/provider.mjs": true,
+    "cft005/oidc-backends/config.mjs": true,
+    "cft005/oidc-backends/pnpm-lock.yaml": true
+  },
+  "sourceSha256": {
+    "backend.mjs": "775ee7f4702b7572e2279aca2b8daf1f54b22efb9e55e9c36b1bfd056bae8c3b",
+    "record-store.mjs": "b5ea55ded985db2d5a8faddff85e7643b6e2417ed56b4b45e3aef3f713dc3387",
+    "start.mjs": "7d41afe37ffad27edcd7756554c86104a55bfc5e1cf822bda31ef25a1367c0be",
+    "protocol-fixture.mjs": "4009f04d06564ac8d251b31552863909c6f7da6b58df032758e0f0eb419cf17c",
+    "package.json": "80e765a90237cfba616c29be0ccbb02ee60730df3fbf332d4abafed3153b5b35",
+    "session-ledger/protocol.mjs": "3d7a187e6d6c564a4fdbb1492fcf0f39c328aa1301a505227e161a1ae3d925bb",
+    "session-ledger/transactions.mjs": "58865029a47d6aa387800e5730ee6b49f7174761f03d20914b3ad2131615ad79",
+    "session-ledger/transport.mjs": "082ca25c8d699cd35033722fef292f34417ca866ae110625858d0907bdaf50dd",
+    "session-ledger/settings.mjs": "2d741fa51809f77b7a949abc3e90db487e28826ff22d1c93c51c43e72961f40a",
+    "session-ledger/start.mjs": "f35eee886457b14c67c9e4918e24344701590a6b40d429bc2d7d1be64b1b6ebc",
+    "session-ledger/transport.test.mjs": "5fbf0af061e5b395cb62a5249a6faa299056759c252bfcfb698df2f0dba03ee6",
+    "session-ledger/ledger.test.mjs": "21d6f64747bf3df042d13d8df1c95fbf77a57589a6638ef9df3ff42b4487c8f2"
+  },
+  "networkDraftScreenshotSha256": "8a6301906f0a2cc1cf772f224a108014b1bc66a6c81c99af73c9d22fdd549f6d",
+  "safeguards": {
+    "productionUnchanged": true,
+    "apertaquemUnchanged": true,
+    "realDataUntouched": true,
+    "auth0Unchanged": true,
+    "globalTtlUnchanged": true,
+    "noExternalSecretExport": true,
+    "noPaidService": true
+  },
+  "nextStep": "Apply the exact HML activation request after action-time confirmation for the temporary network window; close the two CIDRs at the end",
+  "publication": {
+    "status": "BLOCKED_PENDING_EXPLICIT_APPROVAL",
+    "attempts": 2,
+    "remoteCommitCreated": false,
+    "files": 23,
+    "publicDestination": "https://github.com/marklienista/marklienista.github.io",
+    "branch": "cft005-oidc-dominios",
+    "workspaceServiceIdsRemoved": true,
+    "usageDetailsRemoved": true,
+    "remainingExposure": [
+      "previously-public fixed synthetic database hostname",
+      "test BFF origins",
+      "proposed coordinator endpoint",
+      "implementation details"
+    ]
+  }
+}

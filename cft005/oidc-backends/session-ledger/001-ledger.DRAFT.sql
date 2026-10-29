@@ -16,6 +16,7 @@ END $guard$;
 
 CREATE ROLE cft005_hml_session_owner NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS NOINHERIT;
 CREATE ROLE cft005_hml_coordinator NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS NOINHERIT CONNECTION LIMIT 2;
+GRANT CONNECT ON DATABASE cft005_hml_db_teste TO cft005_hml_coordinator;
 -- Administrative ownership only; never grant this membership to runtime A/B/coordinator.
 GRANT cft005_hml_session_owner TO CURRENT_USER;
 CREATE SCHEMA cft005_hml_auth AUTHORIZATION cft005_hml_session_owner;

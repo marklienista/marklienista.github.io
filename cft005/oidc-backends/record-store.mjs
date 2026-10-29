@@ -1,5 +1,6 @@
 import pg from 'pg';
 import {auditDatabase} from './technical-audit.mjs';
+import {protectedTransaction} from './session-ledger/transactions.mjs';
 
 const HOST='dpg-dbh8tghsrm7s73f4tc9g-a';
 const DATABASE='cft005_hml_db_teste';
@@ -24,7 +25,7 @@ export function databaseOptions(product,connectionString){
     statement_timeout:5000,idle_in_transaction_session_timeout:5000,idleTimeoutMillis:120000,application_name:'cft005-bff-'+product};
 }
 
-export function createPostgresStore(cfg,connectionString,{Pool=pg.Pool}={}){
+export function createPostgresStore(cfg,connectionString,{Pool=pg.Pool,ledger}={}){
   const pool=new Pool(databaseOptions(cfg.product,connectionString));
   pool.on('error',()=>{}); // No raw database errors or credentials in application logs.
   const schema='cft005_hml_'+cfg.product.toLowerCase(),table=schema+'.records';
@@ -35,6 +36,7 @@ export function createPostgresStore(cfg,connectionString,{Pool=pg.Pool}={}){
   }
   async function execute(principal,sql,values){
     const label=principalLabel(principal);let client,destroy=false;
+    if(ledger)return protectedTransaction({pool,coordinator:ledger,cfg,principal,binding:principal.ledgerBinding,operation:c=>c.query(sql,values)});
     try{
       client=await pool.connect();await client.query('BEGIN');
       await client.query("SELECT set_config('cft005.owner',$1,true)",[label]);
@@ -45,7 +47,7 @@ export function createPostgresStore(cfg,connectionString,{Pool=pg.Pool}={}){
     }finally{client?.release(destroy);}
   }
   function view(row){return row?{id:row.record_id,value:row.value,revision:row.revision}:null;}
-  return Object.freeze({kind:'postgres',
+  return Object.freeze({kind:'postgres',ledgerRequired:Boolean(ledger),
     async ready(){
       try{
         const r=await pool.query(`SELECT current_user=$1 AND session_user=$1 AND NOT rolsuper AND NOT rolcreatedb AND NOT rolcreaterole AND NOT rolbypassrls AS login_ok,
@@ -55,8 +57,14 @@ export function createPostgresStore(cfg,connectionString,{Pool=pg.Pool}={}){
         if(!r.rows[0]?.login_ok)throw unavailable('role_policy');
         if(!r.rows[0].tls)throw unavailable('tls_required');
         if(!r.rows[0].rls)throw unavailable('rls_policy');
+        if(ledger){
+          const metadata=await pool.query(`SELECT count(*)=2 AND bool_and(c.relrowsecurity AND c.relforcerowsecurity AND pg_get_userbyid(c.relowner)='cft005_hml_session_owner') AS ok
+            FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='cft005_hml_auth' AND c.relname IN ('epochs','sessions') AND c.relkind='r'`);
+          if(metadata.rows[0]?.ok!==true)throw unavailable('rls_policy');
+        }
       }catch(error){throw error?.storeFailure?error:unavailable(databaseFailureCategory(error));}
     },
+    async authorize(principal){if(!ledger)throw unavailable();await execute(principal,'SELECT 1',[]);},
     async read(principal,requested){
       if(!['U1','U2'].includes(requested))return null;
       const r=await execute(principal,`SELECT record_id,value,revision FROM ${table} WHERE record_id=$1`,[`HML-${cfg.product}-${requested}`]);return view(r.rows[0]);
@@ -66,6 +74,9 @@ export function createPostgresStore(cfg,connectionString,{Pool=pg.Pool}={}){
       const r=await execute(principal,`UPDATE ${table} SET value=$1,revision=revision+1 WHERE record_id=$2 RETURNING record_id,value,revision`,[value,`HML-${cfg.product}-${requested}`]);return view(r.rows[0]);
     },
     async audit(principal){
+      // Legacy audit opens/rolls back its own transactions. It cannot run through
+      // this lock boundary; require an explicit ledger-aware audit before reuse.
+      if(ledger)throw unavailable('unknown');
       const label=principalLabel(principal);let client,reuse=false;
       try{
         client=await pool.connect();
