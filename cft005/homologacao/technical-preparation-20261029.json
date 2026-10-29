@@ -1,0 +1,75 @@
+{
+  "schema": "CFT005-TECHNICAL-PREPARATION-1",
+  "recordedAt": "2026-10-29T13:00:39.544Z",
+  "scope": "synthetic-only",
+  "localTests": {
+    "PASS": 69,
+    "FAIL": 0,
+    "realProvider": false,
+    "realDatabase": false
+  },
+  "hostedState": "BLOCKED_NETWORK_CLOSED",
+  "newRealGatePasses": 0,
+  "contractCounts": {
+    "PASS": 6,
+    "FAIL": 0,
+    "BLOCKED": 18
+  },
+  "fix": "Discard pooled connection when rollback fails; never reuse uncertain transaction context",
+  "changes": {
+    "newAuthenticatedTechnicalEndpoint": true,
+    "publicSanitizedReceiptsSeparate": true,
+    "sqlFixedAndRollbackOnly": true,
+    "readOnlyCommitOnly": true,
+    "principalFromOidc": true,
+    "rawPidNotExported": true,
+    "idleConnectionSeconds": 120,
+    "previousIdleConnectionSeconds": 30,
+    "maxPool": 1,
+    "sessionTtlChanged": false,
+    "newDependencies": false,
+    "newDeployment": false
+  },
+  "sourceIntegrity": {
+    "lineEndings": "LF-normalized",
+    "sha256": {
+      "backend.mjs": "eca0e8dccd80e68ab6bcbfaa3cc1367f0529713ca57b05ee9e31491b0ebc951a",
+      "record-store.mjs": "8df1afed0611ed58838a2649bdd24d32352dcf3d7effaca1546d9f182a6d7baa",
+      "technical-audit.mjs": "ffda194c051b0f349faccbb804d03170bcfc38939313cc876cc8e1ca965d4e55",
+      "technical-proof.mjs": "12db75e7a09b848d2ec7ad7aaddaaaa02f604a3ce31e2dbe26aa0cef7880f77f",
+      "technical-audit.test.mjs": "e9514ab4788d43364b4000b5e7671acd0944c9eb7242d1728984f74fad0d95a9",
+      "record-store.test.mjs": "87a668823efedf2321df51e24f82b936c8afaea8f4ca877c37571d075feb1cf9",
+      "protocol-fixture.mjs": "a5ca7111abb2611d8d92726540b4627c5818e29fc1a8e415968e3d151a7c41fc",
+      "package.json": "33f7d97960507f1314c9358d2cb01eb4db08de4c73670292e2af42b7ee6d9da2",
+      "pnpm-lock.yaml": "655e06782cfd65af01223e2beb09b1eb18182c40d74264e20d45f2e445b504e3"
+    }
+  },
+  "limitations": [
+    "Mocks/fixtures do not prove remote SQL or Auth0",
+    "Genuine Supabase JWT test still unavailable without shared/published token access",
+    "Connection reuse requires actual different verified principals on same physical connection",
+    "No production homologation or durable revocation claim"
+  ],
+  "network": {
+    "id": "dpg-dbh8tghsrm7s73f4tc9g-a",
+    "confirmedIpAllowList": [],
+    "proposedTemporaryCidrs": [
+      "74.220.49.0/24",
+      "74.220.57.0/24"
+    ],
+    "finalSaveRequiresHumanActionTimeConfirmation": true,
+    "draftPrepared": true,
+    "saveApplied": false,
+    "finalEmptyAllowListReconfirmed": true,
+    "localScreenshot": "D:/Dev/cft005-evidencias/technical-network-pending-20261029.png"
+  },
+  "safeguards": {
+    "publishedAppsUnchanged": true,
+    "apertaquemUnchanged": true,
+    "realDataUntouched": true,
+    "auth0Unchanged": true,
+    "globalTtlUnchanged": true,
+    "secretsRead": false
+  },
+  "publishedHomologation": "NOT_GRANTED"
+}

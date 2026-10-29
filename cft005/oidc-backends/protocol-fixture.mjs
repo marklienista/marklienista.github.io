@@ -6,7 +6,7 @@ import {createProvider} from './provider.mjs';
 import {startBackend} from './backend.mjs';
 
 // Local protocol fixture only. No real provider request, account or credential.
-export async function protocolFixture() {
+export async function protocolFixture({recordStoreForTest}={}) {
   const key=await generateKeyPair('RS256',{extractable:false});
   const untrustedKey=await generateKeyPair('RS256',{extractable:false});
   const publicJwk=await exportJWK(key.publicKey);
@@ -76,7 +76,7 @@ export async function protocolFixture() {
           throw error;
         }
       }};
-      backends[product]=await startBackend(configs[product],providers[product],{fetchProofForTest:async(url,options)=>{
+      backends[product]=await startBackend(configs[product],providers[product],{...(recordStoreForTest?{recordStore:recordStoreForTest(configs[product])}:{}),fetchProofForTest:async(url,options)=>{
         const target=new URL(url);
         const destination=Object.keys(PROOF_ORIGINS).find(p=>PROOF_ORIGINS[p]===target.origin);
         if(!destination||target.search||target.hash)throw new Error('fixture_proof_destination');

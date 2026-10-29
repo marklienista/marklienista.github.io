@@ -1,4 +1,5 @@
 import pg from 'pg';
+import {auditDatabase} from './technical-audit.mjs';
 
 const HOST='dpg-dbh8tghsrm7s73f4tc9g-a';
 const DATABASE='cft005_hml_db_teste';
@@ -20,27 +21,28 @@ export function databaseOptions(product,connectionString){
     url.pathname!=='/'+DATABASE||decodeURIComponent(url.username)!==user||!url.password||url.search||url.hash||url.port&&url.port!=='5432')throw unavailable('configuration');
   return {host:url.hostname,port:5432,database:DATABASE,user,password:decodeURIComponent(url.password),
     ssl:{rejectUnauthorized:true,servername:TLS_NAME},max:1,connectionTimeoutMillis:8000,
-    statement_timeout:5000,idle_in_transaction_session_timeout:5000,idleTimeoutMillis:30000,application_name:'cft005-bff-'+product};
+    statement_timeout:5000,idle_in_transaction_session_timeout:5000,idleTimeoutMillis:120000,application_name:'cft005-bff-'+product};
 }
 
 export function createPostgresStore(cfg,connectionString,{Pool=pg.Pool}={}){
   const pool=new Pool(databaseOptions(cfg.product,connectionString));
   pool.on('error',()=>{}); // No raw database errors or credentials in application logs.
   const schema='cft005_hml_'+cfg.product.toLowerCase(),table=schema+'.records';
+  let previousAudit;
   function principalLabel(principal){
     if(!principal||!Object.hasOwn(cfg.subjects,principal.subject)||cfg.subjects[principal.subject]!==principal.label)throw unavailable();
     return principal.label;
   }
   async function execute(principal,sql,values){
-    const label=principalLabel(principal);let client;
+    const label=principalLabel(principal);let client,destroy=false;
     try{
       client=await pool.connect();await client.query('BEGIN');
       await client.query("SELECT set_config('cft005.owner',$1,true)",[label]);
       const result=await client.query(sql,values);await client.query('COMMIT');return result;
     }catch{
-      if(client)try{await client.query('ROLLBACK');}catch{}
+      if(client)try{await client.query('ROLLBACK');}catch{destroy=true;}
       throw unavailable();
-    }finally{client?.release();}
+    }finally{client?.release(destroy);}
   }
   function view(row){return row?{id:row.record_id,value:row.value,revision:row.revision}:null;}
   return Object.freeze({kind:'postgres',
@@ -62,6 +64,17 @@ export function createPostgresStore(cfg,connectionString,{Pool=pg.Pool}={}){
     async write(principal,requested,value){
       if(!['U1','U2'].includes(requested)||typeof value!=='string'||value.length>128)throw unavailable();
       const r=await execute(principal,`UPDATE ${table} SET value=$1,revision=revision+1 WHERE record_id=$2 RETURNING record_id,value,revision`,[value,`HML-${cfg.product}-${requested}`]);return view(r.rows[0]);
+    },
+    async audit(principal){
+      const label=principalLabel(principal);let client,reuse=false;
+      try{
+        client=await pool.connect();
+        const {checks,next}=await auditDatabase(client,cfg.product,label,previousAudit);
+        reuse=Boolean(next&&checks.afterRollbackContextEmpty&&checks.afterCommitContextEmpty);
+        previousAudit=reuse?next:undefined;
+        return checks;
+      }catch{previousAudit=undefined;throw unavailable('unknown');}
+      finally{client?.release(!reuse);}
     },
     async close(){await pool.end();}
   });

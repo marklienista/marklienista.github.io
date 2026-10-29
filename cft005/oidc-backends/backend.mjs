@@ -2,6 +2,7 @@ import {createServer} from 'node:http';
 import {randomBytes,timingSafeEqual} from 'node:crypto';
 import {PROOF_ORIGINS} from './config.mjs';
 import {createMemoryFixtureStore} from './record-store.mjs';
+import {runTechnicalProof} from './technical-proof.mjs';
 
 const SESSION='__Host-cft005-session',TRANSACTION='__Host-cft005-transaction';
 const LOGIN_STAGES=new Set(['client_authentication','code_exchange','provider_denied','provider_connection','oidc_response_validation',
@@ -32,15 +33,15 @@ async function read(req,limit=16384) {
   for await(const chunk of req){size+=chunk.length;if(size>limit)throw new Error('E_BODY');chunks.push(chunk);}
   return Buffer.concat(chunks).toString('utf8');
 }
-const PAGE='<!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>CFT-005 — Backend de teste</title><h1>Backend isolado de teste</h1><p>Somente contas e dados sintéticos autorizados.</p><p>A prova altera somente seu registro sintético. Os resultados sanitizados ficam disponíveis para auditoria.</p><a href="/auth/login">Entrar</a><button id="read">Ler registro de teste</button><button id="proof">Executar prova de isolamento</button><button id="leave">Sair apenas daqui</button><pre id="status" role="status">Verificando…</pre><script src="/client.js" defer></script></html>';
-const SCRIPT=`let session;const status=document.getElementById('status');const messages={transaction_cookie_missing:'O navegador não devolveu o cookie temporário de entrada.',transaction_missing:'A tentativa expirou ou o serviço reiniciou; entre novamente.',callback_format:'O retorno de entrada veio em formato inesperado.',client_authentication:'O provedor recusou a credencial deste serviço.',code_exchange:'O provedor recusou a troca do código de entrada.',provider_denied:'A entrada foi cancelada ou recusada no provedor.',provider_connection:'Não foi possível contatar o provedor.',oidc_response_validation:'O retorno do provedor não passou na validação OIDC.',id_token_validation:'A identidade recebida não passou na validação.',subject_allowlist:'A conta recebida não corresponde às contas de teste autorizadas.',access_token_profile:'O perfil do token recebido não corresponde ao previsto.',access_token_scope:'A permissão de leitura não veio no token.',access_token_client:'O token pertence ao outro cliente de teste.',access_token_validation:'O token de acesso não passou na validação.',subject_binding:'A identidade não corresponde ao token de acesso.',session_creation:'Não foi possível criar a sessão local.'};async function check(){const r=await fetch('/session');session=r.ok?await r.json():null;status.textContent=session?'Produto '+session.product+' · '+session.user:'Sem sessão local';if(!session){const d=await(await fetch('/auth/status')).json();if(d.last?.result==='FAIL'){status.textContent+=' — '+(messages[d.last.stage]||'A entrada não foi confirmada.');if(d.last.phase==='token_endpoint')status.textContent+=' Etapa: troca do código no servidor.';if(d.last.phase==='authorization_response')status.textContent+=' Etapa: autorização no provedor.';}}}document.getElementById('read').onclick=async()=>{if(!session)return;const r=await fetch('/api/products/'+session.product+'/records/'+session.user);status.textContent=JSON.stringify(await r.json());};document.getElementById('proof').onclick=async()=>{if(!session)return;status.textContent='Executando prova entre os servidores…';try{const r=await fetch('/proof/run',{method:'POST',headers:{'X-CFT005-CSRF':session.csrf}});status.textContent=JSON.stringify(await r.json(),null,2);}catch{status.textContent='Falha na prova; tente novamente';}};document.getElementById('leave').onclick=async()=>{if(!session)return;await fetch('/logout',{method:'POST',headers:{'X-CFT005-CSRF':session.csrf}});await check();};check().catch(()=>{status.textContent='Falha na verificação';});`;
+const PAGE='<!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>CFT-005 — Backend de teste</title><h1>Backend isolado de teste</h1><p>Somente contas e dados sintéticos autorizados.</p><p>A prova altera somente seu registro sintético. Os resultados sanitizados ficam disponíveis para auditoria.</p><a href="/auth/login">Entrar</a><button id="read">Ler registro de teste</button><button id="proof">Executar prova de isolamento</button><button id="technical">Executar verificação técnica</button><button id="leave">Sair apenas daqui</button><pre id="status" role="status">Verificando…</pre><script src="/client.js" defer></script></html>';
+const SCRIPT=`let session;const status=document.getElementById('status');const messages={transaction_cookie_missing:'O navegador não devolveu o cookie temporário de entrada.',transaction_missing:'A tentativa expirou ou o serviço reiniciou; entre novamente.',callback_format:'O retorno de entrada veio em formato inesperado.',client_authentication:'O provedor recusou a credencial deste serviço.',code_exchange:'O provedor recusou a troca do código de entrada.',provider_denied:'A entrada foi cancelada ou recusada no provedor.',provider_connection:'Não foi possível contatar o provedor.',oidc_response_validation:'O retorno do provedor não passou na validação OIDC.',id_token_validation:'A identidade recebida não passou na validação.',subject_allowlist:'A conta recebida não corresponde às contas de teste autorizadas.',access_token_profile:'O perfil do token recebido não corresponde ao previsto.',access_token_scope:'A permissão de leitura não veio no token.',access_token_client:'O token pertence ao outro cliente de teste.',access_token_validation:'O token de acesso não passou na validação.',subject_binding:'A identidade não corresponde ao token de acesso.',session_creation:'Não foi possível criar a sessão local.'};async function check(){const r=await fetch('/session');session=r.ok?await r.json():null;status.textContent=session?'Produto '+session.product+' · '+session.user:'Sem sessão local';if(!session){const d=await(await fetch('/auth/status')).json();if(d.last?.result==='FAIL'){status.textContent+=' — '+(messages[d.last.stage]||'A entrada não foi confirmada.');if(d.last.phase==='token_endpoint')status.textContent+=' Etapa: troca do código no servidor.';if(d.last.phase==='authorization_response')status.textContent+=' Etapa: autorização no provedor.';}}}document.getElementById('read').onclick=async()=>{if(!session)return;const r=await fetch('/api/products/'+session.product+'/records/'+session.user);status.textContent=JSON.stringify(await r.json());};document.getElementById('proof').onclick=async()=>{if(!session)return;status.textContent='Executando prova entre os servidores…';try{const r=await fetch('/proof/run',{method:'POST',headers:{'X-CFT005-CSRF':session.csrf}});status.textContent=JSON.stringify(await r.json(),null,2);}catch{status.textContent='Falha na prova; tente novamente';}};document.getElementById('technical').onclick=async()=>{if(!session)return;status.textContent='Executando verificação técnica…';try{const r=await fetch('/proof/technical/run',{method:'POST',headers:{'X-CFT005-CSRF':session.csrf}});status.textContent=JSON.stringify(await r.json(),null,2);}catch{status.textContent='Falha na verificação técnica; informe ao executor antes de repetir';}};document.getElementById('leave').onclick=async()=>{if(!session)return;await fetch('/logout',{method:'POST',headers:{'X-CFT005-CSRF':session.csrf}});await check();};check().catch(()=>{status.textContent='Falha na verificação';});`;
 
 /** Single-instance test BFF. Resource data and credential-bearing sessions stay private. */
 export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchProofForTest,recordStore}={}) {
   if(!recordStore&&host!=='127.0.0.1')throw new Error('E_DATABASE_REQUIRED');
   const store=recordStore??createMemoryFixtureStore(cfg);
   await store.ready();
-  const sessions=new Map(),transactions=new Map(),receipts=[];
+  const sessions=new Map(),transactions=new Map(),receipts=[],technicalReceipts=[];
   const loginStatus={started:0,callbacks:0,successes:0,failures:0,last:null};
   const noteLogin=(result,stage,detail)=>{
     if(result==='PASS')loginStatus.successes++;
@@ -84,6 +85,7 @@ export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchPr
       if(req.method==='GET'&&url.pathname==='/auth/status')return send(res,200,{product:cfg.product,...loginStatus});
       // Public audit summaries contain only synthetic labels, timestamps and verdicts; no records or credentials.
       if(req.method==='GET'&&url.pathname==='/proof/results')return send(res,200,{product:cfg.product,receipts});
+      if(req.method==='GET'&&url.pathname==='/proof/technical/results')return send(res,200,{product:cfg.product,receipts:technicalReceipts});
       if(req.method==='GET'&&['/auth/login','/auth/login/choose'].includes(url.pathname)){
         if(transactions.size>=512)return fail(503,'capacity');
         if(sid)sessions.delete(sid);
@@ -129,6 +131,15 @@ export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchPr
       if(req.method!=='GET'){
         // Origin and CSRF supplement the authenticated server session; neither grants access.
         if(req.headers.origin!==cfg.origin||!same(req.headers['x-cft005-csrf'],session.csrf))return fail(403,'csrf_required');
+      }
+      if(req.method==='POST'&&url.pathname==='/proof/technical/run'){
+        if(proofRunning||now-(session.lastTechnical??0)<15)return fail(429,'proof_busy');
+        proofRunning=true;session.lastTechnical=now;
+        let receipt;
+        try{receipt=await runTechnicalProof({cfg,principal,session,sid,store,proofFetch});}
+        finally{proofRunning=false;}
+        technicalReceipts.push(receipt);if(technicalReceipts.length>8)technicalReceipts.shift();
+        return send(res,200,receipt);
       }
       if(req.method==='POST'&&url.pathname==='/proof/run'){
         if(proofRunning||now-(session.lastProof??0)<15)return fail(429,'proof_busy');

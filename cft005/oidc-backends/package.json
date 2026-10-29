@@ -5,6 +5,6 @@
   "type": "module",
   "engines": {"node": ">=22"},
   "packageManager": "pnpm@11.25.0",
-  "scripts": {"start": "node start.mjs", "test": "node --test integration.test.mjs record-store.test.mjs"},
+  "scripts": {"start": "node start.mjs", "test": "node --test integration.test.mjs record-store.test.mjs technical-audit.test.mjs"},
   "dependencies": {"jose": "6.2.13", "openid-client": "6.8.8", "pg":"8.23.1"}
 }
