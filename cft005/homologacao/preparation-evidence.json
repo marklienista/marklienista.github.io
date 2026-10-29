@@ -218,5 +218,6 @@
     "Shared Auth0 SSO logout not executed",
     "No production homologation granted"
   ],
-  "preparedReceiptCliExitCode": 2
+  "preparedReceiptCliExitCode": 2,
+  "artifactSnapshotCommit": "66828da0e0bca0bb37e232404222987e0090717d"
 }

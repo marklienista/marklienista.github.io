@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "localDate": "2026-10-28",
+  "checkedAtUtc": "2026-10-29 00:01:24 UTC",
+  "kind": "READ_ONLY_DATABASE_IDENTIFICATION",
+  "baseCommit": "66828da0e0bca0bb37e232404222987e0090717d",
+  "selection": {
+    "provider": "Render Postgres",
+    "status": "SELECTED_NOT_PROVISIONED",
+    "proposedName": "cft005-hml-db-teste",
+    "workspaceName": "My Workspace",
+    "workspaceId": "tea-dattm47lk1mc73cu74bg",
+    "connectionLabel": "Primary",
+    "region": "virginia",
+    "plan": "free",
+    "postgresMajor": 17,
+    "storageGb": 1,
+    "databaseId": null,
+    "createdAt": null,
+    "expiresAt": null
+  },
+  "observed": {
+    "renderPostgresCount": 0,
+    "renderWorkspaceMatched": true,
+    "bffA": {
+      "id": "srv-dbftdpvf3r2c73bflvjg",
+      "region": "virginia",
+      "plan": "free",
+      "autoDeploy": "no"
+    },
+    "bffB": {
+      "id": "srv-dbftdt3l550s739sao1g",
+      "region": "virginia",
+      "plan": "free",
+      "autoDeploy": "no"
+    },
+    "supabaseActiveProjects": 2,
+    "supabaseOrganizations": 1,
+    "supabaseBillingPlanVerified": false,
+    "supabaseThirdProjectFreeEligibilityVerified": false
+  },
+  "documentedLimits": {
+    "expiresAfterDays": 30,
+    "upgradeGraceDays": 14,
+    "maxFreePostgresPerWorkspace": 1,
+    "storageGb": 1,
+    "automaticBackups": false,
+    "managedPooling": false,
+    "maxConnections": 100,
+    "ramMb": 256,
+    "cpu": 0.1
+  },
+  "permissions": {
+    "platformDocumentsSqlCreatedUsers": true,
+    "adminCreateRoleVerified": false,
+    "productLoginsCreated": 0,
+    "productGrantsVerified": false,
+    "rlsVerified": false,
+    "externalAccessDisabledVerified": false,
+    "privateNetworkIsProductBoundary": false
+  },
+  "gates": [
+    {
+      "id": "DB-CHOICE",
+      "state": "PASS",
+      "scope": "Provider candidate selected from metadata and current documentation only"
+    },
+    {
+      "id": "DB-PROVISION",
+      "state": "BLOCKED",
+      "scope": "No database creation attempted"
+    },
+    {
+      "id": "DB-ROLES",
+      "state": "BLOCKED",
+      "scope": "CREATE ROLE privilege, runtime logins, grants and RLS not tested"
+    },
+    {
+      "id": "DB-NETWORK",
+      "state": "BLOCKED",
+      "scope": "Internal connectivity and external denial not configured or tested"
+    }
+  ],
+  "integration": {
+    "executed": 0,
+    "PASS": 0,
+    "FAIL": 0,
+    "BLOCKED": 24,
+    "publishedHomologation": "NOT_GRANTED"
+  },
+  "mutations": {
+    "databaseObjects": 0,
+    "databaseRows": 0,
+    "serviceDeploys": 0,
+    "serviceEnvironment": 0,
+    "auth0Objects": 0,
+    "supabaseConfiguration": 0,
+    "publishedApps": 0,
+    "apertaquem": 0,
+    "globalTtl": 0
+  },
+  "limits": [
+    "Temporary free database; not perpetual free storage",
+    "Empty inventory is not a reservation or guarantee of creation eligibility",
+    "Managed default credential rotation is not least-privilege separation",
+    "No actual CREATE ROLE or SQL query executed",
+    "Private workspace network is shared; credentials and grants remain mandatory",
+    "Supabase quota/billing eligibility of a third project not independently attested",
+    "No new account, paid plan, upgrade or automation created"
+  ],
+  "sources": [
+    "https://render.com/docs/free",
+    "https://render.com/docs/compute-plans",
+    "https://render.com/docs/postgresql-creating-connecting",
+    "https://render.com/docs/postgresql-credentials",
+    "https://render.com/docs/private-network",
+    "https://www.postgresql.org/docs/17/sql-createrole.html",
+    "https://supabase.com/docs/guides/platform/billing-on-supabase",
+    "https://supabase.com/pricing"
+  ]
+}
