@@ -1,0 +1,142 @@
+/* FotoCrachá 0.15 — tela inicial da ferramenta e área de trabalho focada. */
+[hidden]{display:none!important}
+.top-actions{flex-wrap:wrap;justify-content:flex-end;gap:4px}
+.top-actions .version{width:100%;text-align:right;font-size:10px;letter-spacing:.03em}
+.top-actions button[aria-current="page"]{background:#e4ece3;color:var(--deep)}
+#entryGate{max-width:none;margin:0 auto 32px}
+#entryGate .hero{margin-bottom:26px}
+#entryGate .entry-panel{padding:26px}
+#entryGate .entry-panel h2{font-size:26px}
+#entryGate .entry-lead{font-size:16px}
+#entryChooseTitle{margin-top:6px}
+.home-connection{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:14px 0 22px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.home-connection #entryAccount{flex:1 1 240px;overflow-wrap:anywhere}
+.spaces-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:14px}
+.carometro-card{min-width:0;border:1px solid var(--line);border-radius:6px;padding:20px;background:var(--white);display:flex;flex-direction:column;gap:12px}
+.carometro-card h3{font-size:21px;color:var(--deep);margin:0;overflow-wrap:anywhere}
+.carometro-card .sub{overflow-wrap:anywhere}
+.carometro-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:5px}
+.folder-shortcut{display:inline-flex;min-height:44px;align-items:center;padding:6px 3px;font-size:12px;font-weight:600}
+.resume-carometro{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 18px;margin:0 0 18px;background:#eaf1e9;border-left:4px solid var(--leaf)}
+.resume-carometro p{margin:0;overflow-wrap:anywhere}
+details.folder-access{display:block;margin:22px 0 0;padding:16px;background:#f6f1e7}
+.folder-access summary{cursor:pointer;min-height:44px;align-content:center;font-weight:700;color:var(--deep);font-size:14px}
+.folder-access-fields{display:flex;align-items:flex-end;gap:10px;margin:12px 0}
+.folder-access-fields label{flex:1}
+#workspaceApp .workspace-head{padding:8px 0 14px;min-height:0;display:block}
+.workspace-head h1{font-size:30px;color:var(--deep);line-height:1.18;overflow-wrap:anywhere;margin:4px 0 7px;letter-spacing:-.7px}
+.workspace-head .eyebrow{margin:0;font-size:10px}
+.workspace-head .save-status{margin-top:8px;font-size:12px;font-weight:600}
+#workspaceApp .navtabs{margin-top:3px;gap:4px}
+#workspaceApp .navtabs button{min-width:88px}
+#settingsForm{display:flex;flex-direction:column;gap:16px}
+.settings-fields{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.settings-fields label:last-child{grid-column:1 / -1}
+#settingsForm input[type=text]{width:100%}
+#settingsForm .optional-organization{max-width:760px}
+#settingsForm .dialog-buttons{justify-content:flex-start}
+#settingsReadonly{border-left:3px solid var(--terra);padding:10px}
+#shareDialog{max-width:700px}
+#shareDialog h2{font-size:24px;overflow-wrap:anywhere}
+#shareNotice:empty{display:none}
+#permissionsList .permission{align-items:center;font-size:13px}
+#permissionsList .permission span{overflow-wrap:anywhere;min-width:0}
+.selection-actions{display:flex;flex-wrap:wrap;gap:8px}
+.person-more-controls{display:flex;flex-wrap:wrap;justify-content:center;gap:4px}
+.person-more{width:100%}
+.person-more summary{list-style:none;cursor:pointer;color:var(--deep);font-size:12px;border:1px solid #b6cbb8;background:#fff;border-radius:4px;min-height:38px;align-content:center;padding:8px}
+.person-more summary::-webkit-details-marker{display:none}
+.person-more summary:focus-visible{outline:3px solid #174c9d;outline-offset:3px}
+.person-more[open] summary{margin-bottom:5px}
+.mobile-group{display:none}
+@media(min-width:641px){.person-more summary{display:none}}
+@media(max-width:640px){
+  .topbar{padding:10px 12px;gap:8px;align-items:center;flex-wrap:wrap}
+  .brand{gap:7px}.brand strong{font-size:20px}.brand small{font-size:10px}
+  .brand-mark{width:32px;height:34px;font-size:25px}
+  .top-actions{gap:0;flex:1 1 auto}.top-actions .version{display:none}
+  .top-actions button{padding:8px;min-height:42px;font-size:12px}
+  #helpBtn{font-size:11px;max-width:85px}
+  .container{padding:12px}
+  #entryGate .hero{padding:22px 19px;margin:0 0 18px}
+  #entryGate .hero h1{font-size:29px}
+  #entryGate .entry-panel{padding:18px 14px}
+  #entryChoose>.split{flex-direction:row;align-items:center;gap:8px}
+  #entryChooseTitle{font-size:24px!important}
+  #entryChoose>.split .eyebrow{display:none}
+  #entryNewBtn{padding:10px;font-size:12px}
+  .home-connection{gap:4px;margin-bottom:16px}
+  .home-connection #entryAccount{flex-basis:100%;font-size:12px}
+  .home-connection button{font-size:12px}
+  .carometro-card{padding:16px}.carometro-card h3{font-size:20px}
+  .resume-carometro{align-items:stretch;flex-direction:column;gap:8px;font-size:13px}
+  .folder-access-fields{display:block}.folder-access-fields button{margin-top:10px;width:100%}
+  .workspace-head h1{font-size:24px;margin-bottom:5px}
+  #institutionLine{font-size:11px;line-height:1.4}
+  #workspaceApp .workspace-head{padding:2px 0 8px}
+  #workspaceApp .workspace-head .eyebrow{display:none}
+  #workspaceApp .navtabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0 0 14px;padding:0;gap:0;overflow:visible}
+  #workspaceApp .navtabs button{min-width:0;white-space:normal;padding:9px 4px;min-height:46px;font-size:12px;line-height:1.2}
+  #organizationPanel{padding:10px 12px;margin-bottom:10px}
+  #organizationPanel>div:first-child{display:none}
+  #organizationPanel>.inline{width:100%;gap:5px;align-items:center}
+  #organizationPanel button{font-size:11px;padding:7px;min-height:40px}
+  #yearControls{flex:1 1 80px;font-size:11px}
+  #yearSelect{width:100%;min-height:40px;padding:7px}
+  #classList{display:none!important}
+  .mobile-group{display:flex;gap:5px;margin:0 0 12px;font-size:12px}
+  .mobile-group select{width:100%;background:var(--white)}
+  .people-panel{padding:12px}
+  .people-panel>.split{gap:10px}
+  #currentClassMeta{display:none}
+  #currentClassTitle{font-size:21px;margin:0 0 4px}
+  #studentCount,#currentClassTeacher{font-size:11px}
+  .people-actions{display:flex;width:100%;gap:6px}
+  #captureModeBtn{order:-1;flex:1 1 auto;min-height:48px;font-size:14px}
+  #addStudentBtn{min-height:48px;font-size:12px}
+  #organizeBtn,#renameClassBtn{font-size:11px;padding:7px;min-height:38px}
+  .filters{gap:8px;margin:12px 0;padding:10px 0}
+  .filters .search{flex-basis:100%}
+  .filters .search input{width:100%;font-size:16px}
+  .filters .check-inline{min-height:36px;font-size:12px}
+  .selection-actions{width:100%;gap:6px}
+  .selection-actions button{flex:1;font-size:11px;min-height:38px;padding:7px}
+  .students-grid{gap:9px;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .student-card{padding:9px 6px;gap:6px}
+  .student-card .photo{width:min(100%,120px);height:140px;margin-top:4px}
+  .student-card h3{font-size:13px;min-height:0;line-height:1.3}
+  .student-card .mini-actions{gap:6px;margin-top:4px}
+  .student-card .mini-actions>label{width:100%;min-height:46px;font-size:13px}
+  .person-more summary{min-height:40px}
+  .person-more-controls{flex-direction:column}
+  .person-more-controls button{width:100%;min-height:42px}
+  .settings-fields{grid-template-columns:1fr;gap:14px}
+  .settings-fields input,.settings-fields select{font-size:16px}
+  #captureDialog{width:calc(100vw - 20px);padding:20px 16px;max-height:94dvh}
+  #capturePrompt{font-size:20px;line-height:1.4;font-weight:700;color:var(--deep)}
+  #captureFile{font-size:16px;min-height:54px}
+  #shareDialog{width:calc(100vw - 20px);padding:18px 14px}
+  #shareDialog .soft{padding:12px}
+}
+@media print{.topbar,#entryGate,.mobile-group,.resume-carometro,#shareDialog,#view-configuracao{display:none!important}}
+
+/* Na captura móvel, a administração opcional sai da frente das fotografias. */
+.mobile-organization-tools{display:none}
+.selection-options>summary{display:none}
+@media(max-width:640px){
+  .mobile-organization-tools{display:block;border-top:1px solid var(--line);margin-top:24px;padding-top:14px}
+  #organizationPanel[data-annual="false"]{display:none!important}
+  #organizationPanel #newClassBtn,#organizationPanel #promoteBtn,#renameClassBtn,#organizeBtn{display:none!important}
+  #organizationPanel .inline{justify-content:flex-start}
+  #yearControls{flex:0 1 180px}
+  #currentClassTitle{display:none}
+  .people-panel>.split>div:first-child{width:100%}
+  .people-actions{flex-wrap:nowrap}
+  #captureModeBtn{min-width:0;font-size:13px}
+  .filters .search{font-size:0;gap:0}
+  .selection-options{margin-left:auto;font-size:11px;flex:0 1 auto}
+  .selection-options>summary{display:block;list-style:none;cursor:pointer;min-height:36px;align-content:center;font-weight:700;color:var(--deep)}
+  .selection-options[open]{flex-basis:100%}
+  .selection-options[open]>summary{margin-bottom:6px}
+  body[data-selecting="false"] .student-card>.selector{display:none}
+}
