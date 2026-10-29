@@ -1,5 +1,7 @@
 # CFT-005 — Roteiro dos gates restantes
 
+**Atualização — 29/10/2026:** H01/H02 foram executados manualmente pelo operador e passaram no candidato BFF/PostgreSQL; [recibo e limites](H01-H02-RESULTADO.md). Restam 22 gates BLOCKED. Próximo bloco H03–H13 exige nova baseline positiva e os critérios completos de cada caso. Não reabrir a janela de rede encerrada até a rodada estar pronta. A preparação abaixo é histórica; não constitui resultado corrente.
+
 Preparação em 28/10/2026; versão CFT005-HML-1. Todos os casos abaixo começam **BLOCKED**, sem recibo da nova integração persistente. Os resultados anteriores da matriz S01–S14 não mudam. A fonte exata dos critérios é [plan.mjs](./plan.mjs); o [contrato](./CONTRATO-HOMOLOGACAO-POR-PRODUTO.md) define a fronteira.
 
 ## Ordem de execução no ambiente isolado

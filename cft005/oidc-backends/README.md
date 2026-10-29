@@ -1,5 +1,7 @@
 # CFT-005 — Integração de dois backends confidenciais
 
+**Atualização — 29/10/2026, 09:16 BRT:** H01/H02 PASS por execução manual do operador em dois perfis U1/U2. Quatro sessões preservadas após recarga/reabertura, intervalo aproximado de 11 minutos; [resultado e limites](../homologacao/H01-H02-RESULTADO.md). Contrato: 2 PASS, 0 FAIL, 22 BLOCKED. Janela externa do banco novamente fechada, health 503 esperado. Sem novo executável/deploy, sem renovação ou revogação central demonstrada nesta rodada. CFT-005 ABERTO; estados abaixo são históricos.
+
 **Estado atual — 29/10/2026, 08:05 BRT:** alternativa PostgreSQL executada com U1/U2 nos dois BFFs: **52/52 controles HTTP reais PASS**, mais quatro conferências de preservação por proprietário. TLS/certificado e hostname verificados, papéis A/B exclusivos e owner derivado do principal OIDC. Rede temporária fechada ao fim; health dos backends agora 503/database_unavailable por essa restrição. [Resultado, matriz e limites](../homologacao/INTEGRACAO-BFF-BANCO.md). Um único perfil Chrome foi usado sequencialmente; não homologa os gates completos nem produtos publicados. CFT-005 ABERTO. As seções datadas abaixo são históricas.
 
 **28/10/2026, 23:09 BRT:** autorização temporária recebida; host externo com TLS verificável salvo nos campos protegidos de A/B, sem deploy. As duas redes estão preenchidas, mas Save foi bloqueado pela revisão automática; banco continua fechado. Falta o clique humano em Save para executar a rodada. [Adendo e limites](../homologacao/INTEGRACAO-BFF-BANCO.md). Sem novo PASS HTTP PostgreSQL.

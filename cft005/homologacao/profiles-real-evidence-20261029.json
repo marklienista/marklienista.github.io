@@ -1,0 +1,153 @@
+{
+  "schema": "CFT005-HML-PROFILES-EVIDENCE-1",
+  "scope": "synthetic-only",
+  "deployedCommit": "449d11a95739941b77b228875d36cac988066764",
+  "executableChanged": false,
+  "newDeploy": false,
+  "provenance": {
+    "browserExecutor": "human-operator",
+    "connectedProfilesAvailableToAgent": 1,
+    "independentAutomatedProfileAttestation": false,
+    "operatorConfirmedSeparateProfiles": true,
+    "operatorReportedReloadDelayMinutesApprox": 11,
+    "operatorReportedAllFourLabelsPreservedOnReloadAndReopen": true,
+    "reportedPersistenceInterpretedAsNoNewLogin": true,
+    "exactActionTimestampsKnown": false,
+    "observationTimestampMeaning": "corroboration-and-recording"
+  },
+  "labels": [
+    "P1/A/U1",
+    "P1/B/U1",
+    "P2/A/U2",
+    "P2/B/U2"
+  ],
+  "baseline": {
+    "observedAtUtc": "2026-10-29T11:47:39.6985596Z",
+    "phase": "before-manual-H01",
+    "observations": [
+      {
+        "product": "a",
+        "status": 200,
+        "receipt": {
+          "product": "A",
+          "started": 0,
+          "callbacks": 0,
+          "successes": 0,
+          "failures": 0,
+          "last": null
+        }
+      },
+      {
+        "product": "b",
+        "status": 200,
+        "receipt": {
+          "product": "B",
+          "started": 0,
+          "callbacks": 0,
+          "successes": 0,
+          "failures": 0,
+          "last": null
+        }
+      }
+    ]
+  },
+  "afterReport": {
+    "observedAtUtc": "2026-10-29T12:14:57.0553380Z",
+    "phase": "after-human-H01-H02-report",
+    "observations": [
+      {
+        "product": "a",
+        "status": 200,
+        "receipt": {
+          "product": "A",
+          "started": 2,
+          "callbacks": 2,
+          "successes": 2,
+          "failures": 0,
+          "last": {
+            "at": "2026-10-29T11:59:39.43Z",
+            "result": "PASS",
+            "stage": "authenticated"
+          }
+        }
+      },
+      {
+        "product": "b",
+        "status": 200,
+        "receipt": {
+          "product": "B",
+          "started": 3,
+          "callbacks": 2,
+          "successes": 2,
+          "failures": 0,
+          "last": {
+            "at": "2026-10-29T11:59:49.587Z",
+            "result": "PASS",
+            "stage": "authenticated"
+          }
+        }
+      }
+    ]
+  },
+  "limits": [
+    "B has one additional started login without callback; cause and timing unknown",
+    "No intermediate counter snapshot between H01 and H02",
+    "Counters do not attest identities, profiles or absence of every new login start",
+    "Approximate interval only; no full browser/process restart or token renewal claim",
+    "No new data writes or negative probes in this round",
+    "No production homologation or central revocation claim"
+  ],
+  "network": {
+    "temporaryCidrs": [
+      "74.220.49.0/24",
+      "74.220.57.0/24"
+    ],
+    "openedByHuman": true,
+    "closedByAgent": true,
+    "finalIpAllowList": [],
+    "panelSpecificDbBlocked": true,
+    "workspaceGenericRuleUnchanged": true,
+    "independentTcpProbe": false,
+    "allOldConnectionsTerminatedAttested": false,
+    "healthAfterClose": {
+      "at": "2026-10-29T12:16:31.4812662Z",
+      "checks": [
+        {
+          "product": "a",
+          "status": 503,
+          "body": "{\"error\":\"database_unavailable\"}"
+        },
+        {
+          "product": "b",
+          "status": 503,
+          "body": "{\"error\":\"database_unavailable\"}"
+        }
+      ]
+    },
+    "localScreenshot": "D:/Dev/cft005-evidencias/h01-h02-network-closed-20261029.png"
+  },
+  "safeguards": {
+    "publishedAppsUnchanged": true,
+    "apertaquemUnchanged": true,
+    "realDataUntouched": true,
+    "globalTtlUnchanged": true,
+    "auth0Unchanged": true,
+    "credentialsInspected": false
+  },
+  "result": {
+    "H01": "PASS",
+    "H02": "PASS",
+    "remainingGates": "BLOCKED",
+    "counts": {
+      "PASS": 2,
+      "FAIL": 0,
+      "BLOCKED": 22
+    },
+    "originalSpaCounts": {
+      "PASS": 9,
+      "FAIL": 2,
+      "BLOCKED": 3
+    },
+    "publishedHomologation": "NOT_GRANTED"
+  }
+}

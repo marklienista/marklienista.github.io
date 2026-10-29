@@ -1,0 +1,45 @@
+{
+  "contractVersion": "CFT005-HML-1",
+  "runId": "HML-20261029-PROFILES-MANUAL",
+  "mode": "real",
+  "scope": "synthetic-only",
+  "safeguards": {
+    "publishedAppsUnchanged": true,
+    "apertaquemUnchanged": true,
+    "realDataUntouched": true,
+    "globalTtlUnchanged": true
+  },
+  "prerequisites": {
+    "isolatedTarget": true,
+    "separateProfiles": true,
+    "database": true,
+    "surfaceInventory": false,
+    "sessionLedger": false,
+    "isolatedSso": false,
+    "securityInventory": false
+  },
+  "observations": [
+    {
+      "id": "H01",
+      "at": "2026-10-29T12:14:57.055Z",
+      "source": "browser",
+      "checks": {
+        "verifiedSessions": 4,
+        "profilesSeparated": true,
+        "identitiesDistinct": true,
+        "noPersonalAccountUsed": true
+      }
+    },
+    {
+      "id": "H02",
+      "at": "2026-10-29T12:14:57.055Z",
+      "source": "browser",
+      "checks": {
+        "reloadsVerified": 4,
+        "reopenedTabsVerified": 4,
+        "identityPreserved": true,
+        "noNewLogin": true
+      }
+    }
+  ]
+}

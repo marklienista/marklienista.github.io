@@ -1,5 +1,14 @@
 # CFT-005 — Matriz consolidada, 28/10/2026
 
+## Atualização de 29/10/2026 — perfis do candidato BFF
+
+| Escopo | PASS | FAIL | BLOCKED | Evidência e limite |
+|---|---:|---:|---:|---|
+| Contrato H01–H24 | 2 | 0 | 22 | H01/H02 por observação manual nos dois perfis; quatro identidades preservadas na recarga/reabertura após cerca de 11 minutos. |
+| Matriz original S01–S14 | 9 | 2 | 3 | Preservada: teste BFF não reexecuta a SPA original nem resolve os limites publicados. |
+
+[Resultado e proveniência](../homologacao/H01-H02-RESULTADO.md). Rede temporária encerrada; os 52 controles HTTP anteriores não foram repetidos. Contadores corroboram quatro autenticações; B possui um início adicional sem callback, sem instante/causa determinados. Próximo passo único: H03–H13 com nova baseline em dois perfis. CFT-005 ABERTO; as seções abaixo preservam estados anteriores.
+
 ## Adendo de 29/10/2026 — alternativa persistente por produto
 
 | Escopo | Estado | Evidência e limite |
