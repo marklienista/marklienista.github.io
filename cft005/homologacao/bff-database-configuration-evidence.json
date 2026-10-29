@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "kind": "EXCLUSIVE_RUNTIME_PASSWORD_CONFIGURATION",
+  "at": "2026-10-29T01:43:30.747Z",
+  "databaseId": "dpg-dbh8tghsrm7s73f4tc9g-a",
+  "logins": [
+    {
+      "product": "A",
+      "actualLogin": true,
+      "tlsVerified": true
+    },
+    {
+      "product": "B",
+      "actualLogin": true,
+      "tlsVerified": true
+    }
+  ],
+  "result": "PASS",
+  "recordsChanged": 0,
+  "ddlOrGrantsChanged": 0,
+  "transport": "RSA-3072 OAEP-SHA256 one-use ciphertext deleted before SQL; no plaintext file",
+  "limit": "External login check only; internal BFF connectivity and protected env save verified separately"
+}

@@ -1,6 +1,7 @@
 import {createServer} from 'node:http';
 import {randomBytes,timingSafeEqual} from 'node:crypto';
 import {PROOF_ORIGINS} from './config.mjs';
+import {createMemoryFixtureStore} from './record-store.mjs';
 
 const SESSION='__Host-cft005-session',TRANSACTION='__Host-cft005-transaction';
 const LOGIN_STAGES=new Set(['client_authentication','code_exchange','provider_denied','provider_connection','oidc_response_validation',
@@ -35,8 +36,11 @@ const PAGE='<!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>CFT-0
 const SCRIPT=`let session;const status=document.getElementById('status');const messages={transaction_cookie_missing:'O navegador não devolveu o cookie temporário de entrada.',transaction_missing:'A tentativa expirou ou o serviço reiniciou; entre novamente.',callback_format:'O retorno de entrada veio em formato inesperado.',client_authentication:'O provedor recusou a credencial deste serviço.',code_exchange:'O provedor recusou a troca do código de entrada.',provider_denied:'A entrada foi cancelada ou recusada no provedor.',provider_connection:'Não foi possível contatar o provedor.',oidc_response_validation:'O retorno do provedor não passou na validação OIDC.',id_token_validation:'A identidade recebida não passou na validação.',subject_allowlist:'A conta recebida não corresponde às contas de teste autorizadas.',access_token_profile:'O perfil do token recebido não corresponde ao previsto.',access_token_scope:'A permissão de leitura não veio no token.',access_token_client:'O token pertence ao outro cliente de teste.',access_token_validation:'O token de acesso não passou na validação.',subject_binding:'A identidade não corresponde ao token de acesso.',session_creation:'Não foi possível criar a sessão local.'};async function check(){const r=await fetch('/session');session=r.ok?await r.json():null;status.textContent=session?'Produto '+session.product+' · '+session.user:'Sem sessão local';if(!session){const d=await(await fetch('/auth/status')).json();if(d.last?.result==='FAIL'){status.textContent+=' — '+(messages[d.last.stage]||'A entrada não foi confirmada.');if(d.last.phase==='token_endpoint')status.textContent+=' Etapa: troca do código no servidor.';if(d.last.phase==='authorization_response')status.textContent+=' Etapa: autorização no provedor.';}}}document.getElementById('read').onclick=async()=>{if(!session)return;const r=await fetch('/api/products/'+session.product+'/records/'+session.user);status.textContent=JSON.stringify(await r.json());};document.getElementById('proof').onclick=async()=>{if(!session)return;status.textContent='Executando prova entre os servidores…';try{const r=await fetch('/proof/run',{method:'POST',headers:{'X-CFT005-CSRF':session.csrf}});status.textContent=JSON.stringify(await r.json(),null,2);}catch{status.textContent='Falha na prova; tente novamente';}};document.getElementById('leave').onclick=async()=>{if(!session)return;await fetch('/logout',{method:'POST',headers:{'X-CFT005-CSRF':session.csrf}});await check();};check().catch(()=>{status.textContent='Falha na verificação';});`;
 
 /** Single-instance test BFF. Resource data and credential-bearing sessions stay private. */
-export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchProofForTest}={}) {
-  const sessions=new Map(),transactions=new Map(),records=new Map(),receipts=[];
+export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchProofForTest,recordStore}={}) {
+  if(!recordStore&&host!=='127.0.0.1')throw new Error('E_DATABASE_REQUIRED');
+  const store=recordStore??createMemoryFixtureStore(cfg);
+  await store.ready();
+  const sessions=new Map(),transactions=new Map(),receipts=[];
   const loginStatus={started:0,callbacks:0,successes:0,failures:0,last:null};
   const noteLogin=(result,stage,detail)=>{
     if(result==='PASS')loginStatus.successes++;
@@ -48,7 +52,6 @@ export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchPr
   };
   const proofFetch=fetchProofForTest??fetch;
   let proofRunning=false;
-  for(const label of Object.values(cfg.subjects)) records.set(label,`synthetic-${label}-${cfg.product}`);
   const server=createServer({requestTimeout:10000,headersTimeout:10000,maxHeaderSize:16384},async(req,res)=>{
     const fail=(status,error)=>send(res,status,{error});
     try {
@@ -74,7 +77,7 @@ export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchPr
       for(const [key,value]of transactions)if(value.exp<=now)transactions.delete(key);
       const jar=cookies(req);
       const sid=jar.get(SESSION),session=sessions.get(sid);
-      if(req.method==='GET'&&url.pathname==='/health')return send(res,200,{ready:true,product:cfg.product});
+      if(req.method==='GET'&&url.pathname==='/health'){await store.ready();return send(res,200,{ready:true,product:cfg.product,storage:store.kind});}
       if(req.method==='GET'&&url.pathname==='/')return send(res,200,PAGE,{'Content-Type':'text/html; charset=utf-8'});
       if(req.method==='GET'&&url.pathname==='/client.js')return send(res,200,SCRIPT,{'Content-Type':'text/javascript; charset=utf-8'});
       // Fixed diagnostic categories only, shared by this synthetic test instance. No raw errors or identifiers.
@@ -130,10 +133,9 @@ export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchPr
       if(req.method==='POST'&&url.pathname==='/proof/run'){
         if(proofRunning||now-(session.lastProof??0)<15)return fail(429,'proof_busy');
         proofRunning=true;session.lastProof=now;
-        const receipt={startedAt:new Date().toISOString(),product:cfg.product,user:session.label,cases:[]};
+        const receipt={startedAt:new Date().toISOString(),product:cfg.product,user:session.label,storage:store.kind,cases:[],otherOwnerPreservation:'Requires independent recheck by the other authenticated owner'};
         const observe=(id,expected,actual,extra={})=>receipt.cases.push({id,expected,actual,result:expected===actual?'PASS':'FAIL',...extra});
         const other=cfg.product==='A'?'B':'A',otherUser=session.label==='U1'?'U2':'U1';
-        const untouched=records.get(otherUser);
         try{
           for(const permission of ['records:read','records:write']){
             await provider.authorize(session.token,permission);
@@ -149,7 +151,10 @@ export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchPr
               method,redirect:'error',signal:AbortSignal.timeout(10000),headers:{Cookie:SESSION+'='+sid,Origin:cfg.origin,
                 'X-CFT005-CSRF':session.csrf,'Content-Type':'application/json'},
               ...(method==='PUT'?{body:JSON.stringify({value:`synthetic-proof-${session.label}-${cfg.product}`})}:{})});
-            observe(id,expected,response.status);await response.body?.cancel();
+            const dbChecked=response.headers.get('x-cft005-row-check')==='evaluated';
+            observe(id,expected,response.status,...(store.kind==='postgres'&&product===cfg.product?[{databaseRowCheck:dbChecked}]:[]));
+            if(store.kind==='postgres'&&product===cfg.product&&!dbChecked)receipt.cases.at(-1).result='FAIL';
+            await response.body?.cancel();
           }
           for(const permission of ['records:read','records:write']){
             const response=await proofFetch(cfg.proofPeerOrigin+'/proof/token-policy',{
@@ -159,7 +164,12 @@ export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchPr
             observe('PEER-TOKEN-'+permission,401,response.status,{bindingVerified:result.error==='other_client_after_signature_verification'});
             if(result.error!=='other_client_after_signature_verification')receipt.cases.at(-1).result='FAIL';
           }
-          observe('OTHER-USER-UNCHANGED',true,records.get(otherUser)===untouched);
+          const own=await store.read(principal,session.label);
+          observe('OWN-RECORD-PERSISTED',true,own?.value===`synthetic-proof-${session.label}-${cfg.product}`);
+          if(store.kind==='postgres')for(const input of [{value:'forbidden',owner:'U2'},{value:'forbidden',product:other}]){
+            const response=await proofFetch(PROOF_ORIGINS[cfg.product]+`/api/products/${cfg.product}/records/${session.label}`,{method:'PUT',redirect:'error',signal:AbortSignal.timeout(10000),headers:{Cookie:SESSION+'='+sid,Origin:cfg.origin,'X-CFT005-CSRF':session.csrf,'Content-Type':'application/json'},body:JSON.stringify(input)});
+            observe('FORGED-'+('owner'in input?'OWNER':'PRODUCT')+'-BODY',400,response.status);await response.body?.cancel();
+          }
         }catch{receipt.cases.push({id:'TRANSPORT-OR-POLICY',result:'BLOCKED'});}
         finally{proofRunning=false;}
         receipt.finishedAt=new Date().toISOString();
@@ -170,21 +180,28 @@ export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchPr
       const route=/^\/api\/products\/([AB])\/records\/(U[12])$/.exec(url.pathname);
       if(!route)return fail(404,'not_found');
       if(route[1]!==cfg.product)return fail(403,'product_forbidden');
-      if(route[2]!==session.label||!records.has(route[2]))return fail(404,'not_found');
+      const storageHeaders={'X-CFT005-Store':store.kind,'X-CFT005-Row-Check':'evaluated'};
+      // Owner context is the cryptographically verified principal. The requested
+      // label only selects a row; PostgreSQL RLS evaluates cross-user requests.
       if(req.method==='PUT'){
-        if(req.headers['content-type']!=='application/json')return fail(415,'json_required');
-        let input;try{input=JSON.parse(await read(req,4096));}catch{return fail(400,'invalid_body');}
-        if(!input||Array.isArray(input)||Object.keys(input).length!==1||typeof input.value!=='string'||input.value.length>128)return fail(400,'invalid_body');
-        records.set(session.label,input.value);
+        const invalid=async(status,error)=>await store.read(principal,route[2])?fail(status,error):send(res,404,{error:'not_found'},storageHeaders);
+        if(req.headers['content-type']!=='application/json')return invalid(415,'json_required');
+        let input;try{input=JSON.parse(await read(req,4096));}catch{return invalid(400,'invalid_body');}
+        if(!input||Array.isArray(input)||Object.keys(input).length!==1||typeof input.value!=='string'||input.value.length>128)return invalid(400,'invalid_body');
+        const updated=await store.write(principal,route[2],input.value);
+        if(!updated)return send(res,404,{error:'not_found'},storageHeaders);
+        return send(res,200,{record:updated},storageHeaders);
       }else if(req.method!=='GET')return fail(405,'method_forbidden');
-      return send(res,200,{record:{id:session.label+'-'+cfg.product,value:records.get(session.label)}});
-    }catch{
+      const record=await store.read(principal,route[2]);
+      if(!record)return send(res,404,{error:'not_found'},storageHeaders);
+      return send(res,200,{record},storageHeaders);
+    }catch(error){
       // Never print or reflect request URLs, headers, bodies, tokens or provider errors.
-      return fail(401,'unauthorized');
+      return fail(error?.storeFailure?503:401,error?.storeFailure?'database_unavailable':'unauthorized');
     }
   });
   await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(port,host,resolve);});
   return Object.freeze({port:server.address().port,close:()=>new Promise((resolve,reject)=>{
-    server.close(error=>error?reject(error):resolve());server.closeAllConnections();
+    server.close(error=>error?reject(error):store.close().then(resolve,reject));server.closeAllConnections();
   })});
 }
