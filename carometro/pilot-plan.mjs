@@ -56,7 +56,7 @@ export function makePilotPlan(space,doc,provided={}){
    }
   }else historical+=list.length-active.length;
   const group=groupFor(space,row,options);if(group?.id)targetGroups.add(group.id);
-  if(group?.ambiguous||row.review){actions.push({kind:'review',name:row.name,code:row.code,row,group,selected:false,blocked:true,reason:row.review||'Mais de um grupo pode corresponder à turma.'});continue}
+  if(group?.ambiguous||row.review||row.name.length>140||row.code.length>80||(group&&group.label.length>100)){actions.push({kind:'review',name:row.name,code:row.code,row,group,selected:false,blocked:true,reason:row.review||(group?.ambiguous?'Mais de um grupo pode corresponder à turma.':'Campo acima do limite. Confira os dados antes de importar.')});continue}
   const codes=row.code?space.students.filter(p=>clean(p.code)===row.code):[];
   const names=space.students.filter(p=>key(p.name)===key(row.name));
   let person=null,weak=false,reason=[];
@@ -75,11 +75,11 @@ export function makePilotPlan(space,doc,provided={}){
   const changes={};
   if(row.name&&person.name!==row.name){changes.name=row.name;reason.push('Atualizar nome')}
   if(row.code&&!person.code){changes.code=row.code;reason.push('Acrescentar identificação')}
-  if(row.code&&(!person.codeType||!person.codeScope)){changes.idMetadata=true;reason.push('Registrar tipo/origem da identificação')}
+  if(row.code&&(!person.codeType||(unitCode&&!person.codeScope))){changes.idMetadata=true;reason.push('Registrar tipo/origem da identificação')}
   if(person.archived){changes.reactivate=true;weak=true;reason.push('Reativar pessoa arquivada')}
   const current=group?space.enrollments.find(e=>e.studentId===person.id&&e.status==='active'&&e.classId===group.id):null;
   if(group&&!current){changes.group=true;reason.push('Mover/vincular à turma '+group.label)}
-  if(options.useCallNumbers&&row.callNumber&&current?.callNumber!==row.callNumber){changes.callNumber=true;reason.push('Atualizar número de chamada')}
+  if(group&&options.useCallNumbers&&row.callNumber&&current?.callNumber!==row.callNumber){changes.callNumber=true;reason.push('Atualizar número de chamada')}
   const kind=Object.keys(changes).length?'update':'same';
   actions.push({...base,kind,changes,selected:kind==='update'&&!weak&&!row.forceReview,reason:reason.join('; ')||'Já corresponde ao cadastro.',requiresReview:weak&&kind!=='same'});
  }
@@ -133,5 +133,6 @@ export function applyPilotPlan(space,plan){
   applied++;
  }
  if(groupIds.size){s.settings.groupsEnabled=true;if(plan.options.useYears)s.settings.annualEnabled=true}
+ if(s.students.length>20000||s.classes.length>500||s.enrollments.length>200000)throw Error('O resultado excede a capacidade deste carômetro; reduza as turmas selecionadas.');
  s.updatedAt=now;return {space:s,applied};
 }
