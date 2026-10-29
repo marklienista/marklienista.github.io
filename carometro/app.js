@@ -1,684 +1,272 @@
-import {Session} from './session.js?v=0.11.2';
-import {prepareGoogleIdentity} from './drive.js?v=0.11';
-import {addClass,renameClass,addStudent,editStudent,moveStudent,markStudentInactive,setPhoto,classStudents,studentClass,planPromotion,applyPromotion,mapPilotRows,comparePilot,applyPilot,parseDelimited,exportCsv,normalize} from './model.js?v=0.11';
+import {Session} from './session.js?v=0.12';
+import {prepareGoogleIdentity} from './drive.js?v=0.12';
+import {addClass,renameClass,addStudent,editStudent,moveStudent,markStudentInactive,classStudents,studentClass,planPromotion,applyPromotion,mapPilotRows,comparePilot,applyPilot,parseDelimited,exportCsv} from './model.js?v=0.11';
 import {readPilotFile} from './xlsx.js?v=0.11';
-import {pickManifest} from './picker.js?v=0.11.2';
-import {renderClassBar,renderStudentCards,renderPrintSheet,renderBadgeSheet,notify,presentModal,closeModal,fillSelect} from './view.js?v=0.11';
-const $=id=>document.getElementById(id), S=new Session();
-let pilot=[],promotionPlan=[];
-const run=async fn=>{try{return await fn()}catch(e){console.error('FotoCrachá',e);notify(e?.message||'Não foi possível concluir.','error');render();return null}};
-function classesForYear(){return S.space.classes.filter(c=>c.year===Number(S.year)&&!c.archived)}
-function years(){
-  const found=new Set(S.space.classes.map(c=>c.year));found.add(Number(S.year));
-  return [...found].sort((a,b)=>b-a);
+import {renderClassBar,renderStudentCards,renderPrintSheet,renderBadgeSheet,notify,presentModal,closeModal,fillSelect} from './view.js?v=0.12';
+const $=id=>document.getElementById(id),S=new Session();
+let timer=null,saving=null,saveError=null,savedAt=null,pilot=[],promotion=[],captureId=null;
+const report=(text,kind='info')=>notify(text,kind);
+const run=async task=>{try{return await task()}catch(error){report(error.message||'Não foi possível concluir.','error');render();return null}};
+const currentClass=()=>S.space.classes.find(c=>c.id===S.classId)||null;
+const classes=()=>S.space.classes.filter(c=>c.year===Number(S.year)&&!c.archived);
+const on=(id,fn)=>{$(id).onclick=()=>run(fn)};
+function selectedPeople(){
+  const active=new Set(classes().flatMap(c=>classStudents(S.space,c.id).map(p=>p.id)));
+  return S.space.students.filter(p=>active.has(p.id)&&S.selected.has(p.id));
 }
-function currentClass(){return S.space.classes.find(c=>c.id===S.classId)||null}
-function selectedCurrentStudents(){
-  const current=new Set(S.space.enrollments.filter(e=>e.status==='active'&&S.space.classes.some(c=>c.id===e.classId&&c.year===Number(S.year))).map(e=>e.studentId));
-  return S.space.students.filter(p=>S.selected.has(p.id)&&current.has(p.id));
+function resetPrint(){ $('badgeExtra').value='';$('printSheet')?.remove() }
+function address(id=null){
+  const url=new URL(location.href);url.searchParams.delete('folder');
+  if(id)url.searchParams.set('space',id);else url.searchParams.delete('space');
+  history.replaceState(null,'',url.href);
 }
-function report(text,kind){notify(text,kind)}
-// Informações temporárias de crachá não acompanham uma mudança de escola/conta.
-function resetTemporaryPrint(){
-  $('badgeExtra').value='';
-  const sheet=document.getElementById('printSheet');
-  sheet?.remove();
-}
-async function loadSpace(manifestId){
-  const result=await S.load(manifestId);
-  resetTemporaryPrint();
-  return result;
-}
-let saveTimer=null,savePending=null,saveError=null,savePhase='idle',savedAt=null;
-function saveStatus(){
-  const node=$('saveStatus');
-  if(!node)return;
-  node.classList.toggle('save-error',savePhase==='error');
-  node.classList.toggle('save-pending',savePhase==='pending'||savePhase==='saving');
-  if(saveError){
-    node.textContent='Não foi salvo no Google Drive: '+(saveError.message||'Erro desconhecido.');
-  }else if(!S.editable()){
-    node.textContent='Acesso somente leitura. Apenas quem tem permissão de edição pode salvar alterações.';
-  }else if(savePhase==='saving'){
-    node.textContent='Salvando alterações no Google Drive…';
-  }else if(S.dirty||savePhase==='pending'){
-    node.textContent='Alterações aguardando salvamento automático…';
-  }else if(S.isLinked()){
-    node.textContent='Tudo salvo no Google Drive'+(savedAt?' · '+savedAt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'')+'.';
-  }else{
-    node.textContent='Preparando pasta no Google Drive…';
-  }
+function renderSave(){
+  const node=$('saveStatus');node.classList.toggle('save-error',!!saveError);
+  if(saveError)node.textContent='Não foi salvo: '+saveError.message;
+  else if(saving)node.textContent='Salvando alterações no Google Drive…';
+  else if(S.dirty)node.textContent='Alterações aguardando salvamento automático…';
+  else if(S.link&&!S.link.canEdit)node.textContent='Acesso somente leitura · alterações não permitidas pelo Google Drive.';
+  else node.textContent='Tudo salvo no Google Drive'+(savedAt?' · '+savedAt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'')+'.';
   $('retrySaveBtn').hidden=!saveError||saveError.code==='CONFLICT';
   $('reauthorizeBtn').hidden=!saveError||saveError.code==='CONFLICT';
-  $('reloadRemoteBtn').hidden=!saveError||saveError.code!=='CONFLICT'||!S.isLinked();
+  $('reloadRemoteBtn').hidden=!saveError||saveError.code!=='CONFLICT'||!S.link;
 }
 function render(){
-  const connected=S.isCloud(),hasSpace=S.hasSpace();
-  const workspaceVisible=connected&&hasSpace;
-  $('workspaceApp').hidden=!workspaceVisible;
-  $('entryGate').hidden=workspaceVisible;
-  $('entryDisconnected').hidden=connected;
-  $('entryChoose').hidden=!connected;
-  $('settingsBtn').hidden=!workspaceVisible||!S.editable();
-  if(!connected){
-    $('entryConnectBtn').textContent=hasSpace?'Reconectar ao Google Drive':'Conectar ao Google Drive';
-    $('entryTitle').textContent=hasSpace?'Reconecte seu Google Drive para proteger as alterações':'Conecte seu Google Drive para começar';
-  }
-  if(connected&&!hasSpace){
-    $('entryAccount').textContent=S.drive.email?'Conta conectada: '+S.drive.email:'Conta Google conectada';
-    // Nunca deixar o usuário preso por uma configuração antiga retida no cache.
-    // A chave pública também será conferida quando a pessoa clicar.
-    $('entryPickerBtn').disabled=false;
-    const hasInvite=!!new URL(location.href).searchParams.get('space');
-    $('entryPickerBtn').textContent=hasInvite?'Autorizar cadastro recebido no Google Drive':'Escolher no Google Drive';
-    $('pickerNotice').textContent=hasInvite
-      ?'O compartilhamento da pasta foi feito no Google. Para autorizar o acesso deste aplicativo, escolha carometro.json na janela do Google Drive.'
-      :'Para abrir um arquivo recebido de outra pessoa, selecione carometro.json no Google Drive. Apenas copiar a pasta não autoriza o aplicativo a ler os arquivos.';
-  }
-  if(!workspaceVisible)return;
-  $('spaceTitle').textContent=S.space.school.name||'Escola sem nome';
-  $('modeText').textContent=(S.isLinked()?'Google Drive · '+(S.drive.email||'conta autorizada'):'Criando pasta no Google Drive…')+
-    (S.link&&!S.link.canEdit?' · acesso para leitura':'');
-  $('connectBtn').textContent=S.isCloud()?'Trocar conta Google':'Reconectar ao Google Drive';
-  $('newSpaceBtn').disabled=!!savePending;
-  $('openDriveFolderBtn').disabled=!S.link?.folderId;
-  $('inviteBtn').disabled=!S.link?.canShare;
-  $('pickerBtn').disabled=false;
-  saveStatus();
-  fillSelect($('yearSelect'),years().map(y=>({value:y,label:String(y)})),S.year);
-  if(!S.classId||!currentClass()||currentClass().year!==Number(S.year))S.classId=classesForYear()[0]?.id||null;
-  renderClassBar(S.space,S.year,S.classId,id=>S.selectClass(id));
-  const c=currentClass();
-  $('currentClassTitle').textContent=c?.label||'Nenhuma turma neste ano';
-  $('currentClassMeta').textContent=String(S.year)+' · TURMA';
-  $('currentClassTeacher').textContent=c?.teacher?'Professor(a): '+c.teacher:'Professor(a) não informado(a) · use Editar turma';
-  $('studentCount').textContent=c?classStudents(S.space,c.id).length+' estudantes · '+selectedCurrentStudents().length+' selecionados no ano':'Crie uma turma para começar.';
-  $('renameClassBtn').disabled=!c||!S.editable();
-  $('addStudentBtn').disabled=!c||!S.editable();
-  $('promoteBtn').disabled=!classesForYear().length||!S.editable();
-  $('newClassBtn').disabled=!S.editable();
-  $('captureModeBtn').disabled=!c||!S.editable();
+  const cloud=S.isCloud(),active=cloud&&S.hasSpace();
+  $('entryGate').hidden=active;$('workspaceApp').hidden=!active;
+  $('entryDisconnected').hidden=cloud;$('entryChoose').hidden=!cloud;
+  $('settingsBtn').hidden=!active||!S.editable();
+  $('entryConnectBtn').textContent=S.hasSpace()?'Reconectar a mesma conta Google':'Conectar ao Google Drive';
+  $('entryAccount').textContent=cloud?'Conta conectada: '+S.drive.email:'';
+  if(!active)return;
+  $('spaceTitle').textContent=S.space.school.name;
+  $('modeText').textContent='Conta: '+S.drive.email+' · '+(S.link?.canEdit===false?'Leitor':'Editor')+' · arquivos na pasta deste espaço';
+  $('newSpaceBtn').disabled=!!saving;$('openDriveFolderBtn').disabled=!S.link?.folderId;
+  $('inviteBtn').disabled=!S.link?.canShare;renderSave();
+  const years=[...new Set([...S.space.classes.map(c=>c.year),S.year])].sort((a,b)=>b-a);
+  fillSelect($('yearSelect'),years.map(y=>({value:y,label:String(y)})),S.year);
+  if(!currentClass()||currentClass().year!==Number(S.year))S.classId=classes()[0]?.id||null;
+  const c=currentClass();renderClassBar(S.space,S.year,S.classId,id=>S.selectClass(id));
+  $('currentClassTitle').textContent=c?.label||'Nenhuma turma neste ano';$('currentClassMeta').textContent=S.year+' · TURMA';
+  $('currentClassTeacher').textContent=c?.teacher?'Professor(a): '+c.teacher:'Professor(a) não informado(a)';
+  $('studentCount').textContent=c?classStudents(S.space,c.id).length+' estudantes · '+selectedPeople().length+' selecionados':'Crie uma turma para começar.';
+  for(const id of ['renameClassBtn','addStudentBtn','captureModeBtn'])$(id).disabled=!c||!S.editable();
+  $('newClassBtn').disabled=!S.editable();$('promoteBtn').disabled=!classes().length||!S.editable();
+  const photoCount=S.photoErrors.size;
+  $('photoWarning').hidden=!photoCount||S.loadingPhotos;
+  $('photoWarningText').textContent=photoCount+' imagem(ns) não carregada(s). Confira a conexão e o acesso à pasta. Não é necessário autorizar cada fotografia.';
+  $('retryPhotosBtn').disabled=S.loadingPhotos;
   if(c)renderStudentCards(S.space,c.id,S.photos,S.selected,$('searchStudents').value,$('onlyMissing').checked,{
-    canEdit:S.editable(),
-    onSelect:(id,checked)=>{if(checked)S.selected.add(id);else S.selected.delete(id);render()},
-    onPhoto:(id,file)=>run(async()=>{await S.photo(id,file);report('Fotografia preparada. O FotoCrachá vai salvá-la automaticamente no Google Drive.','info')}),
+    canEdit:S.editable(),photoErrors:S.photoErrors,loadingPhotos:S.loadingPhotos,
+    onSelect:(id,checked)=>{checked?S.selected.add(id):S.selected.delete(id);render()},
+    onPhoto:(id,file)=>run(async()=>{await S.photo(id,file);report('Fotografia preparada; salvamento automático em andamento.')}),
     onEdit:openStudent,
-    onRemovePhoto:id=>run(async()=>{if(!confirm('Remover a foto do carômetro? O arquivo anterior continuará no Drive até exclusão manual.'))return;S.removePhoto(id);report('Referência da foto retirada; nenhuma exclusão permanente foi realizada.','warning')}),
-    onInactive:id=>run(async()=>{if(!confirm('Marcar o estudante como transferido nesta turma? O histórico será preservado.'))return;S.update(markStudentInactive(S.space,id,c.id));S.selected.delete(id)})
+    onRemovePhoto:id=>run(async()=>{if(confirm('Retirar a fotografia do cadastro? O arquivo anterior não será apagado do Drive.'))S.removePhoto(id)}),
+    onInactive:id=>run(async()=>{if(confirm('Registrar a transferência deste estudante, preservando o histórico?')){S.update(markStudentInactive(S.space,id,c.id));S.selected.delete(id)}})
   });
   else{$('studentsGrid').replaceChildren();$('emptyStudents').hidden=false}
-  $('studentCount').textContent=c?classStudents(S.space,c.id).length+' estudantes · '+selectedCurrentStudents().length+' selecionados no ano':'Crie uma turma para começar.';
 }
-/* Persistência automática: um escritor por vez nesta aba; nenhuma edição silenciosa após erro. */
-function rememberSpaceLink(id){
-  const url=new URL(location.href);
-  url.searchParams.delete('folder');
-  url.searchParams.set('space',id);
-  history.replaceState(null,'',url.href);
-}
-function clearSpaceLink(){
-  const url=new URL(location.href);
-  url.searchParams.delete('space');url.searchParams.delete('folder');
-  history.replaceState(null,'',url.href);
-}
-function queueAutosave(){
-  if(!S.hasSpace()||!S.dirty||!S.isCloud()||!S.editable()||saveError)return;
-  if(saveTimer)clearTimeout(saveTimer);
-  savePhase='pending';
-  saveStatus();
-  saveTimer=setTimeout(()=>{saveTimer=null;void saveNow()},1200);
+function scheduleSave(){
+  if(!S.dirty||!S.editable()||saveError||saving)return;
+  if(timer)clearTimeout(timer);timer=setTimeout(()=>{timer=null;void saveNow()},1200);renderSave();
 }
 async function saveNow(){
-  if(savePending)return savePending;
-  if(!S.dirty)return true;
-  if(saveError)return false;
-  if(!S.isCloud()){
-    saveError=Error('A sessão Google expirou. Reconecte para salvar as alterações.');
-    savePhase='error';render();return false;
-  }
-  savePhase='saving';saveStatus();
+  if(saving)return saving;
+  if(!S.dirty)return true;if(saveError)return false;
+  if(!S.isCloud()){saveError=Error('Reconecte a mesma conta Google para salvar.');render();return false}
   const work=(async()=>{
-    try{
-      const link=await S.save();
-      if(!link?.manifestId)throw Error('O Google Drive não confirmou o arquivo do FotoCrachá.');
-      savedAt=new Date();saveError=null;
-      savePhase=S.dirty?'pending':'saved';
-      rememberSpaceLink(link.manifestId);
-      return true;
-    }catch(error){
-      if(error?.status===401){
-        S.drive?.disconnect();
-        const expired=Error('O Google encerrou a autorização de acesso. Reconecte a conta para concluir o salvamento.');
-        expired.code='AUTH';saveError=expired;
-      }else saveError=error;
-      savePhase='error';
-      report('Salvamento automático interrompido: '+(saveError.message||'Erro desconhecido.'),'error');
-      render();
-      return false;
-    }finally{
-      savePending=null;
-      if(S.isCloud()&&S.hasSpace())saveStatus();
-      if(S.dirty&&!saveError&&S.isCloud())queueAutosave();
-    }
-  })();
-  savePending=work;
-  return work;
+    try{const link=await S.save();if(!link?.manifestId)throw Error('O Google não confirmou o cadastro.');savedAt=new Date();address(link.manifestId);return true}
+    catch(error){saveError=error;if(error.status===401)S.drive?.disconnect();report('Salvamento interrompido: '+error.message,'error');return false}
+    finally{saving=null;render();if(S.dirty&&!saveError)scheduleSave()}
+  })();saving=work;renderSave();return work;
 }
-async function flushEdits(){
-  if(saveTimer){clearTimeout(saveTimer);saveTimer=null}
-  if(savePending)await savePending;
+async function flush(){
+  if(timer){clearTimeout(timer);timer=null}if(saving)await saving;
   if(S.dirty&&!saveError)await saveNow();
-  if(S.dirty){
-    report('Há alterações sem confirmação no Google Drive. Resolva o erro de salvamento antes de trocar de espaço ou conta.','warning');
-    return false;
-  }
-  return true;
+  if(S.dirty){report('Há alterações sem confirmação. Resolva o salvamento antes de mudar de espaço ou conta.','warning');return false}return true;
 }
 async function openSpace(id){
-  if(!await flushEdits())return false;
-  saveError=null;savePhase='idle';savedAt=null;
-  const result=await loadSpace(id);
-  savedAt=new Date();savePhase='saved';rememberSpaceLink(id);render();
-  report(result.failed
-    ?'Espaço aberto; '+result.failed+' imagens não puderam ser carregadas pelo Google Drive.'
-    :'Espaço recuperado do Google Drive. Suas próximas alterações serão salvas automaticamente.',
-    result.failed?'warning':'info');
-  return true;
+  if(!await flush())return false;
+  saveError=null;savedAt=null;
+  const result=await S.load(id);resetPrint();address(id);savedAt=new Date();render();
+  report(result.failed?'Cadastro aberto. '+result.failed+' imagem(ns) não carregada(s); consulte o aviso acima das turmas.':'Espaço aberto com seus cadastros e fotografias. As alterações são salvas automaticamente.',result.failed?'warning':'info');return true;
 }
-async function refreshSpaces(){
+async function listSpaces(){
   if(!S.isCloud()||S.hasSpace())return;
-  const root=$('spacesList');
-  root.textContent='Procurando seus espaços no Google Drive…';
+  const root=$('spacesList');root.textContent='Localizando cadastros FotoCrachá…';
   try{
-    const files=await S.drive.spaces();
-    root.replaceChildren();
-    if(!files.length){
-      root.textContent='Nenhum espaço acessível foi encontrado. Crie um novo ou indique a pasta que já possui no Google Drive.';
-      return;
+    const files=await S.drive.spaces();root.replaceChildren();
+    if(!files.length){root.textContent='Nenhum espaço encontrado. Cole o link de uma pasta compartilhada ou crie um espaço vazio.';return}
+    for(const file of files.slice(0,30)){
+      let label='Cadastro FotoCrachá';
+      if(file.parents?.[0])try{label=(await S.drive.info(file.parents[0])).name||label}catch{}
+      const button=document.createElement('button');button.type='button';button.className='space-choice';
+      const title=document.createElement('strong'),subtitle=document.createElement('small');title.textContent=label;
+      subtitle.textContent='Abrir espaço'+(file.modifiedTime?' · '+new Date(file.modifiedTime).toLocaleDateString('pt-BR'):'');
+      button.append(title,subtitle);button.onclick=()=>run(()=>openSpace(file.id));root.append(button);
     }
-    const visible=files.slice(0,30);
-    const decorated=await Promise.all(visible.map(async f=>{
-      if(!f.parents?.[0])return {file:f,label:'Cadastro no Google Drive'};
-      try{
-        const folder=await S.drive.info(f.parents[0]);
-        return {file:f,label:String(folder.name||'Cadastro no Google Drive')};
-      }catch{return {file:f,label:'Cadastro no Google Drive'}}
-    }));
-    for(const item of decorated){
-      const button=document.createElement('button');
-      button.type='button';button.className='space-choice';
-      const title=document.createElement('strong'),sub=document.createElement('small');
-      title.textContent=item.label;
-      const date=item.file.modifiedTime?new Date(item.file.modifiedTime).toLocaleDateString('pt-BR'):'sem data';
-      sub.textContent='Alterado em '+date+' · abrir cadastro';
-      button.append(title,sub);
-      button.onclick=()=>run(async()=>openSpace(item.file.id));
-      root.append(button);
-    }
-    if(files.length>visible.length){
-      const info=document.createElement('p');info.className='sub';
-      info.textContent='Outros espaços podem ser abertos pelo link da pasta ou do arquivo.';
-      root.append(info);
-    }
-  }catch(error){
-    root.textContent='Não foi possível listar os arquivos nesta conta: '+error.message+
-      '. Você ainda pode indicar uma pasta, tentar o seletor do Google ou criar um espaço novo.';
-  }
-}
-/* A chave é pública, mas a importação versionada evita que um módulo antigo
-   do navegador deixe a autorização de arquivo desabilitada após um deploy. */
-async function ensurePickerConfig(){
-  if(/^AIza[A-Za-z0-9_-]{30,}$/.test(String(S.config.pickerKey||'')))return S.config.pickerKey;
-  const {CLOUD_CONFIG}=await import('./config.js?v=0.11.2');
-  const key=String(CLOUD_CONFIG.googlePickerApiKey||'');
-  if(!/^AIza[A-Za-z0-9_-]{30,}$/.test(key)){
-    throw Error('O Google Picker não foi carregado nesta sessão. Atualize a página com Ctrl+Shift+R e tente novamente.');
-  }
-  S.config.pickerKey=key;
-  render();
-  return key;
-}
-async function openProvidedFolder(){
-  if(!S.isCloud())throw Error('Conecte sua conta Google.');
-  const text=$('entryFolderLink').value.trim();
-  if(!text)throw Error('Cole o link da pasta ou do arquivo no Google Drive.');
-  try{
-    const manifestId=await S.drive.openFromFolder(text);
-    return openSpace(manifestId);
-  }catch(error){
-    if(error.code!=='PICKER_REQUIRED')throw error;
-    report('A conta recebeu a pasta, mas o aplicativo precisa de autorização ao arquivo. Escolha carometro.json na janela do Google.','warning');
-    const key=await ensurePickerConfig();
-    const suggested=new URL(location.href).searchParams.get('space')||'';
-    const manifestId=await pickManifest(S.drive.token,key,S.config.projectNumber,suggested);
-    if(manifestId)return openSpace(manifestId);
-    return false;
-  }
+  }catch(error){root.textContent='Não foi possível listar os espaços: '+error.message}
 }
 async function connectGoogle(){
-  if(!S.config.clientId){presentModal('driveUnavailableDialog');return}
-  const email=await S.connect();
-  report('Google Drive conectado'+(email?' como '+email:'')+'.','info');
+  const email=await S.connect();report('Conectado como '+email+'.');render();
   if(S.hasSpace()){
     if(saveError?.code!=='CONFLICT')saveError=null;
-    if(S.dirty)queueAutosave();
-    render();return;
+    const photos=await S.loadPhotos();render();if(S.dirty)scheduleSave();
+    if(photos.failed)report('Ainda existem imagens não carregadas. Confira o acesso à pasta.','warning');return;
   }
-  render();
   const params=new URL(location.href).searchParams;
-  const fromLink=params.get('space');
-  if(fromLink){
-    try{if(await openSpace(fromLink))return}
-    catch(error){
-      report('A conta recebeu o link, mas o acesso a carometro.json ainda precisa ser autorizado. Clique em “Autorizar cadastro recebido no Google Drive” e selecione o arquivo. '+error.message,'warning');
-    }
-  }
-  const fromFolder=params.get('folder');
-  if(fromFolder){
-    try{const id=await S.drive.openFromFolder(fromFolder);if(await openSpace(id))return}
-    catch(error){report('A pasta indicada não pôde ser aberta: '+error.message,'warning')}
-  }
-  await refreshSpaces();
+  try{
+    if(params.get('space')){await openSpace(params.get('space'));return}
+    if(params.get('folder')){await openSpace(await S.drive.openFromFolder(params.get('folder')));return}
+  }catch(error){report('Não foi possível abrir o convite nesta conta. '+error.message,'warning')}
+  await listSpaces();
 }
 async function disconnectGoogle(){
-  if(!await flushEdits())return false;
-  S.disconnect();resetTemporaryPrint();saveError=null;savePhase='idle';savedAt=null;clearSpaceLink();render();
-  $('spacesList').replaceChildren();
-  report('Conta Google desconectada deste navegador. Nenhum arquivo do Drive foi apagado.');
-  return true;
+  if(!await flush())return;
+  S.disconnect();resetPrint();saveError=null;savedAt=null;address();$('spacesList').replaceChildren();render();
+  report('Desconectado. Nenhum arquivo foi apagado do Google Drive.');
 }
-async function switchSpace(){
-  if(!await flushEdits())return false;
-  S.resetToGate();resetTemporaryPrint();saveError=null;savePhase='idle';savedAt=null;clearSpaceLink();render();
-  await refreshSpaces();
-  return true;
-}
-function folderUrl(){
-  if(!S.link?.folderId)throw Error('Este espaço ainda não tem pasta confirmada no Google Drive.');
-  return 'https://drive.google.com/drive/folders/'+encodeURIComponent(S.link.folderId);
-}
-function showGoogleFolder(){
-  // noopener evita dar à página externa acesso à janela do FotoCrachá.
-  const url=folderUrl();
-  const link=document.createElement('a');
-  link.href=url;link.target='_blank';link.rel='noopener noreferrer';
-  link.click();
-}
-async function clipboardFolder(){
-  const url=folderUrl();
-  try{await navigator.clipboard.writeText(url);report('Link da pasta copiado. A pessoa também precisa receber permissão de acesso no Google Drive.')}
-  catch{prompt('Copie o endereço da pasta do Google Drive:',url)}
-}
-function openNewSpaceDialog(){
-  $('newSpaceName').value='';
-  presentModal('newSpaceDialog');
-}
-
-function bindNavigation(){
-  document.querySelectorAll('.navtabs button').forEach(btn=>btn.onclick=()=>{
-    document.querySelectorAll('.navtabs button').forEach(b=>b.removeAttribute('aria-current'));
-    btn.setAttribute('aria-current','page');
-    document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!=='view-'+btn.dataset.view);
-    if(btn.dataset.view==='impressao')previewPrint(false);
-    if(btn.dataset.view==='partilha')run(loadPermissions);
-  });
-  document.querySelectorAll('[data-close]').forEach(btn=>btn.onclick=()=>btn.closest('dialog').close());
-  $('helpBtn').onclick=()=>presentModal('helpDialog');
-  $('settingsBtn').onclick=()=>{
-    $('settingSchool').value=S.space.school.name;
-    presentModal('settingsDialog');
-  };
+async function switchSpace(){if(!await flush())return;S.resetToGate();resetPrint();saveError=null;savedAt=null;address();render();await listSpaces()}
+function newSpace(){ $('newSpaceName').value='';presentModal('newSpaceDialog') }
+function folderURL(){if(!S.link?.folderId)throw Error('Aguarde a confirmação da pasta no Google Drive.');return 'https://drive.google.com/drive/folders/'+encodeURIComponent(S.link.folderId)}
+function visitFolder(){const a=document.createElement('a');a.href=folderURL();a.target='_blank';a.rel='noopener noreferrer';a.click()}
+async function copy(text,message){try{await navigator.clipboard.writeText(text);report(message)}catch{prompt('Copie o link:',text)}}
+function selectView(name){
+  document.querySelectorAll('.navtabs button').forEach(b=>{if(b.dataset.view===name)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+  document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!=='view-'+name);
+  if(name==='impressao')previewPrint(false);else $('printSheet')?.classList.remove('preview');
+  if(name==='partilha')void loadPermissions();
 }
 function openClass(edit=false){
-  if(edit&&!currentClass())return;
-  $('classModalTitle').textContent=edit?'Editar turma':'Nova turma';
-  $('className').value=edit?currentClass().label:'';
-  $('classTeacher').value=edit?(currentClass().teacher||''):'';
-  $('classYear').value=String(edit?currentClass().year:S.year);
-  $('classYear').disabled=edit;
-  $('classForm').dataset.mode=edit?'edit':'new';
-  presentModal('classDialog');
+  const c=currentClass();if(edit&&!c)return;
+  $('classModalTitle').textContent=edit?'Editar turma':'Nova turma';$('className').value=edit?c.label:'';
+  $('classTeacher').value=edit?(c.teacher||''):'';$('classYear').value=String(edit?c.year:S.year);$('classYear').disabled=edit;
+  $('classForm').dataset.mode=edit?'edit':'new';presentModal('classDialog');
 }
-function openStudent(id){
-  const person=S.space.students.find(p=>p.id===id);
-  $('studentId').value=id||'';
-  $('studentModalTitle').textContent=person?'Editar estudante':'Novo estudante';
-  $('studentName').value=person?.name||'';
-  $('studentCode').value=person?.code||'';
-  const cs=classesForYear();
-  fillSelect($('studentClass'),cs.map(c=>({value:c.id,label:c.label})),person?studentClass(S.space,id,S.year)?.id||S.classId:S.classId);
+function openStudent(id=null){
+  const p=S.space.students.find(p=>p.id===id);$('studentId').value=id||'';
+  $('studentModalTitle').textContent=p?'Editar estudante':'Novo estudante';$('studentName').value=p?.name||'';$('studentCode').value=p?.code||'';
+  fillSelect($('studentClass'),classes().map(c=>({value:c.id,label:c.label})),p?studentClass(S.space,p.id,S.year)?.id||S.classId:S.classId);
   presentModal('studentDialog');
 }
 function initForms(){
-  $('yearSelect').onchange=e=>S.chooseYear(Number(e.target.value));
-  $('searchStudents').oninput=render;
-  $('onlyMissing').onchange=render;
-  $('newClassBtn').onclick=()=>openClass(false);
-  $('captureModeBtn').onclick=()=>openCapture();
-  $('renameClassBtn').onclick=()=>openClass(true);
-  $('addStudentBtn').onclick=()=>openStudent(null);
+  $('yearSelect').onchange=e=>S.chooseYear(e.target.value);$('searchStudents').oninput=render;$('onlyMissing').onchange=render;
+  on('newClassBtn',()=>openClass());on('renameClassBtn',()=>openClass(true));on('addStudentBtn',()=>openStudent());
   $('classForm').onsubmit=e=>run(async()=>{
-    e.preventDefault();const mode=$('classForm').dataset.mode;
-    const changed=mode==='edit'?renameClass(S.space,S.classId,$('className').value,$('classTeacher').value):addClass(S.space,$('className').value,Number($('classYear').value),$('classTeacher').value);
-    S.update(changed);
-    if(mode!=='edit'){S.year=Number($('classYear').value);S.classId=changed.classes.at(-1)?.id}
-    closeModal('classDialog');render();report('Turma atualizada.');
+    e.preventDefault();const edit=$('classForm').dataset.mode==='edit',year=Number($('classYear').value);
+    const next=edit?renameClass(S.space,S.classId,$('className').value,$('classTeacher').value):addClass(S.space,$('className').value,year,$('classTeacher').value);
+    S.update(next);if(!edit){S.year=year;S.classId=next.classes.at(-1).id}closeModal('classDialog');render();
   });
   $('studentForm').onsubmit=e=>run(async()=>{
-    e.preventDefault();const id=$('studentId').value;
-    const name=$('studentName').value,code=$('studentCode').value,cl=$('studentClass').value;
-    if(!cl)throw Error('Selecione uma turma.');
-    let next=id?editStudent(S.space,id,{name,code}):addStudent(S.space,{name,code,classId:cl});
-    if(id)next=moveStudent(next,id,cl);
-    S.update(next);closeModal('studentDialog');report(id?'Cadastro atualizado.':'Estudante incluído.');
+    e.preventDefault();const id=$('studentId').value,name=$('studentName').value,code=$('studentCode').value,classId=$('studentClass').value;
+    if(!classId)throw Error('Escolha uma turma.');
+    let next=id?editStudent(S.space,id,{name,code}):addStudent(S.space,{name,code,classId});if(id)next=moveStudent(next,id,classId);
+    S.update(next);closeModal('studentDialog');
   });
-  $('selectAll').onclick=()=>{
-    if(!S.classId)return;
-    const all=classStudents(S.space,S.classId);const every=all.every(p=>S.selected.has(p.id));
-    all.forEach(p=>every?S.selected.delete(p.id):S.selected.add(p.id));render();
-  };
-  $('newSpaceBtn').onclick=openNewSpaceDialog;
-  $('entryNewBtn').onclick=openNewSpaceDialog;
-  $('newSpaceForm').onsubmit=e=>run(async()=>{
-    e.preventDefault();
-    if(!await flushEdits())return;
-    S.startSpace($('newSpaceName').value);
-    resetTemporaryPrint();
-    closeModal('newSpaceDialog');
-    report('Espaço criado. As alterações serão salvas automaticamente no Google Drive.');
-  });
+  on('selectAll',()=>{if(!S.classId)return;const people=classStudents(S.space,S.classId),all=people.every(p=>S.selected.has(p.id));people.forEach(p=>all?S.selected.delete(p.id):S.selected.add(p.id));render()});
+  on('newSpaceBtn',newSpace);on('entryNewBtn',newSpace);
+  $('newSpaceForm').onsubmit=e=>run(async()=>{e.preventDefault();if(!await flush())return;S.startSpace($('newSpaceName').value);resetPrint();closeModal('newSpaceDialog');report('Espaço vazio criado; o salvamento é automático.')});
+  on('settingsBtn',()=>{$('settingSchool').value=S.space.school.name;presentModal('settingsDialog')});
   $('settingsForm').onsubmit=e=>run(async()=>{
-    e.preventDefault();
-    const name=$('settingSchool').value.trim();
-    if(!name)throw Error('Informe o nome da escola.');
-    const changed=structuredClone(S.space);changed.school.name=name;S.update(changed);
-    if($('logoFile').files?.[0])await S.logo($('logoFile').files[0]);
-    $('logoFile').value='';closeModal('settingsDialog');report('Configurações aplicadas. O salvamento acontece automaticamente.');
+    e.preventDefault();const name=$('settingSchool').value.trim();if(!name)throw Error('Informe a escola.');
+    const next=structuredClone(S.space);next.school.name=name;S.update(next);
+    if($('logoFile').files?.[0])await S.logo($('logoFile').files[0]);$('logoFile').value='';closeModal('settingsDialog');
   });
 }
-
-let currentCaptureId=null;
 function nextCapture(){
-  const p=S.classId?classStudents(S.space,S.classId).find(p=>!p.photoId&&!S.photos.has(p.id)):null;
-  currentCaptureId=p?.id||null;
-  $('capturePrompt').textContent=p?'Próximo: '+p.name:'Não há estudantes sem fotografia nesta turma.';
-  $('captureFile').disabled=!p;$('captureSkipBtn').disabled=!p;
+  const next=S.classId?classStudents(S.space,S.classId).find(p=>!p.photoId&&!S.photos.has(p.id)):null;
+  captureId=next?.id||null;$('capturePrompt').textContent=next?'Próximo: '+next.name:'Não há estudantes sem fotografia nesta turma.';
+  $('captureFile').disabled=!next;$('captureSkipBtn').disabled=!next;
 }
-function openCapture(){if(!S.classId)return;nextCapture();presentModal('captureDialog')}
 function initCapture(){
-  $('captureSkipBtn').onclick=()=>{
-    const p=classStudents(S.space,S.classId).filter(p=>!p.photoId&&!S.photos.has(p.id));
-    const index=p.findIndex(x=>x.id===currentCaptureId),nxt=p[(index+1)%p.length];
-    if(nxt){currentCaptureId=nxt.id;$('capturePrompt').textContent='Próximo: '+nxt.name}
-  };
-  $('captureFile').onchange=()=>run(async()=>{
-    const file=$('captureFile').files?.[0],id=currentCaptureId;if(!file||!id)return;
-    await S.photo(id,file);$('captureFile').value='';nextCapture();
-  });
+  on('captureModeBtn',()=>{nextCapture();presentModal('captureDialog')});
+  on('captureSkipBtn',()=>{const pending=classStudents(S.space,S.classId).filter(p=>!p.photoId&&!S.photos.has(p.id));const next=pending[(pending.findIndex(p=>p.id===captureId)+1)%pending.length];if(next){captureId=next.id;$('capturePrompt').textContent='Próximo: '+next.name}});
+  $('captureFile').onchange=()=>run(async()=>{const file=$('captureFile').files?.[0],id=captureId;if(!file||!id)return;await S.photo(id,file);$('captureFile').value='';nextCapture()});
 }
 function initPromotion(){
-  $('promoteBtn').onclick=()=>run(async()=>{
-    promotionPlan=planPromotion(S.space,Number(S.year),Number(S.year)+1);
-    const root=$('promotionRows');root.replaceChildren();
-    if(!promotionPlan.length)return report('Crie uma turma antes de fazer a passagem.','warning');
-    promotionPlan.forEach((p,i)=>{
-      const entry=document.createElement('div');entry.className='promotion-entry';
-      const check=document.createElement('input');check.type='checkbox';check.checked=p.selected;check.setAttribute('aria-label','Promover '+p.sourceLabel);check.onchange=()=>p.selected=check.checked;
-      const from=document.createElement('span');from.textContent=p.sourceLabel+' · '+p.count+' estudantes';
-      const to=document.createElement('input');to.type='text';to.value=p.targetLabel||'';to.setAttribute('aria-label','Turma de destino para '+p.sourceLabel);to.oninput=()=>p.targetLabel=to.value;
-      entry.append(check,from,to);root.append(entry);
-    });
-    $('promotionModalTitle').textContent='Passagem de '+S.year+' para '+(Number(S.year)+1);
-    presentModal('promotionDialog');
-  });
-  $('confirmPromotionBtn').onclick=()=>run(async()=>{
-    const chosen=promotionPlan.filter(p=>p.selected);if(!chosen.length)throw Error('Selecione pelo menos uma turma.');
-    if(chosen.some(p=>!p.targetLabel?.trim()))throw Error('Preencha os destinos selecionados.');
-    if(!confirm('Criar as turmas do novo ano preservando os registros anteriores?'))return;
-    const target=Number(S.year)+1;
-    const result=applyPromotion(S.space,Number(S.year),target,promotionPlan);
-    S.update(result.space);S.chooseYear(target);S.selected.clear();closeModal('promotionDialog');
-    report('Passagem preparada: '+result.done.length+' turmas promovidas. Salvamento automático ativado.');
-  });
-}
-async function loadPermissions(){
-  const root=$('permissionsList');root.replaceChildren();
-  if(!S.isCloud()||!S.link?.folderId)return;
-  try{
-    const all=await S.drive.permissions(S.link.folderId);
-    const broad=all.filter(p=>p.type==='anyone'||p.type==='domain');
-    if(broad.length){
-      const warning=document.createElement('p');warning.className='alert warning';
-      warning.textContent='Atenção: o Google Drive informa uma permissão ampla ('+
-        broad.map(p=>p.type==='anyone'?'qualquer pessoa com o link':'domínio inteiro').join(', ')+
-        '). Revise imediatamente o acesso à pasta no próprio Google Drive antes de usar imagens reais de estudantes.';
-      root.append(warning);
+  on('promoteBtn',()=>{
+    promotion=planPromotion(S.space,S.year,Number(S.year)+1);$('promotionRows').replaceChildren();
+    for(const p of promotion){const row=document.createElement('div');row.className='promotion-entry';const check=document.createElement('input'),label=document.createElement('span'),input=document.createElement('input');
+      check.type='checkbox';check.checked=p.selected;check.setAttribute('aria-label','Promover '+p.sourceLabel);check.onchange=()=>p.selected=check.checked;
+      label.textContent=p.sourceLabel+' · '+p.count+' estudantes';input.type='text';input.value=p.targetLabel||'';input.setAttribute('aria-label','Destino de '+p.sourceLabel);input.oninput=()=>p.targetLabel=input.value;
+      row.append(check,label,input);$('promotionRows').append(row);
     }
-    const users=all.filter(p=>p.type==='user');
-    if(!users.length){
-      const none=document.createElement('p');none.className='sub';
-      none.textContent='Nenhuma permissão individual apareceu nesta consulta. Gerencie o acesso diretamente pelo Google Drive.';
-      root.append(none);
-    }
-    for(const p of users){
-      const row=document.createElement('div');row.className='permission';
-      const label=document.createElement('span');
-      label.textContent=(p.emailAddress||'Conta Google')+' · '+
-        (p.role==='writer'?'Pode editar':p.role==='owner'?'Responsável':'Pode visualizar');
-      row.append(label);
-      if(S.link.canShare&&p.role!=='owner'){
-        const remove=document.createElement('button');
-        remove.className='light';remove.textContent='Remover';remove.type='button';
-        remove.onclick=()=>run(async()=>{
-          if(!confirm('Retirar de '+(p.emailAddress||'esta pessoa')+' a permissão da pasta no Google Drive?'))return;
-          await S.drive.revoke(S.link.folderId,p.id);
-          await loadPermissions();
-        });
-        row.append(remove);
-      }
-      root.append(row);
-    }
-    if(!S.link.canShare){
-      const note=document.createElement('p');note.className='sub';
-      note.textContent='As permissões de compartilhamento são gerenciadas pelo responsável da pasta no Google Drive.';
-      root.append(note);
-    }
-  }catch(error){root.textContent='Permissões indisponíveis: '+error.message+
-    '. Abra a pasta no Google Drive para conferir os acessos.'}
-}
-function initSharing(){
-  $('refreshPermissionsBtn').onclick=()=>run(loadPermissions);
-  $('manageFolderBtn').onclick=()=>run(async()=>showGoogleFolder());
-  $('openDriveFolderBtn').onclick=()=>run(async()=>showGoogleFolder());
-  $('copyFolderBtn').onclick=()=>run(clipboardFolder);
-  $('inviteBtn').onclick=()=>run(async()=>{
-    if(!S.isCloud()||!S.link?.folderId||!S.link.canShare)throw Error('É necessário ser responsável por uma pasta do FotoCrachá no Google Drive.');
-    const email=$('inviteEmail').value.trim();
-    const role=$('inviteRole').value;
-    if(!email)throw Error('Informe o e-mail do convidado.');
-    if(!confirm('Convidar '+email+' como '+(role==='writer'?'Editor':'Leitor')+' da pasta no Google Drive?'))return;
-    await S.drive.share(S.link.folderId,email,role);
-    report('Permissão da pasta enviada pelo Google. A pessoa deve abrir a pasta com sua conta e pode precisar autorizar o arquivo pelo Google Picker.','info');
-    await loadPermissions();
+    $('promotionModalTitle').textContent='Passagem de '+S.year+' para '+(Number(S.year)+1);presentModal('promotionDialog');
   });
-  $('copyLinkBtn').onclick=()=>run(async()=>{
-    if(!S.link?.manifestId)throw Error('O Google Drive ainda não confirmou o cadastro.');
-    const url=new URL(location.href);url.search='';
-    url.searchParams.set('space',S.link.manifestId);
-    try{await navigator.clipboard.writeText(url.href);report('Link do FotoCrachá copiado. A pessoa ainda precisa receber acesso à pasta no Google Drive.')}
-    catch{prompt('Copie o link do FotoCrachá:',url.href)}
+  on('confirmPromotionBtn',()=>{
+    const chosen=promotion.filter(p=>p.selected);if(!chosen.length||chosen.some(p=>!p.targetLabel?.trim()))throw Error('Selecione turmas e informe seus destinos.');
+    if(!confirm('Criar as turmas do novo ano, sem apagar o histórico?'))return;
+    const year=Number(S.year)+1,result=applyPromotion(S.space,Number(S.year),year,promotion);S.update(result.space);S.chooseYear(year);S.selected.clear();closeModal('promotionDialog');
   });
-  $('pickerBtn').onclick=()=>run(async()=>{
-    if(!S.isCloud())throw Error('Conecte ao Google Drive.');
-    if(!await flushEdits())return;
-    const key=await ensurePickerConfig();
-    const id=await pickManifest(S.drive.token,key,S.config.projectNumber);
-    if(id)await openSpace(id);
-  });
-  $('entryPickerBtn').onclick=()=>run(async()=>{
-    if(!S.isCloud())throw Error('Conecte ao Google Drive.');
-    const key=await ensurePickerConfig();
-    const suggested=new URL(location.href).searchParams.get('space')||'';
-    const id=await pickManifest(S.drive.token,key,S.config.projectNumber,suggested);
-    if(id)await openSpace(id);
-  });
-  $('refreshSpacesBtn').onclick=()=>run(refreshSpaces);
-  $('openFolderBtn').onclick=()=>run(openProvidedFolder);
-}
-function updatePrintOptions(){
-  const badges=$('printFormat').value==='badges';
-  $('badgeOptions').hidden=!badges;
-  $('carometroOptions').hidden=badges;
-}
-function initPrint(){
-  $('printSelectedBtn').onclick=()=>{
-    $('printSource').value='selected';
-    previewPrint(true);
-  };
-  $('printFormat').onchange=()=>{updatePrintOptions();previewPrint(false)};
-  $('printSource').onchange=()=>previewPrint(false);
-  $('printColumns').onchange=()=>previewPrint(false);
-  $('printCodes').onchange=()=>previewPrint(false);
-  $('badgePhotoMode').onchange=()=>previewPrint(false);
-  $('badgeExtra').onchange=()=>previewPrint(false);
-  $('previewPrintBtn').onclick=()=>previewPrint(true);
-  $('printBtn').onclick=()=>run(async()=>{
-    if(!previewPrint(true))return;
-    const images=[...document.querySelectorAll('#printSheet img')];
-    await Promise.all(images.map(img=>img.decode?.().catch(()=>{})||Promise.resolve()));
-    window.print();
-  });
-  $('exportCsvBtn').onclick=()=>run(async()=>{
-    if(!S.classId)throw Error('Escolha uma turma.');
-    const content=exportCsv(S.space,S.classId);
-    download(new Blob([content],{type:'text/csv;charset=utf-8'}),'fotocracha-lista-'+S.year+'.csv');
-  });
-  updatePrintOptions();
-}
-function download(blob,name){
-  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),5000);
-}
-function printPeople(){
-  const classes=classesForYear();
-  if($('printSource').value==='selected')return selectedCurrentStudents();
-  if($('printSource').value==='class')return S.classId?classStudents(S.space,S.classId):[];
-  const ids=new Set(classes.flatMap(c=>classStudents(S.space,c.id).map(p=>p.id)));
-  return S.space.students.filter(p=>ids.has(p.id)).sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
-}
-function previewPrint(visible=true){
-  const people=printPeople();
-  if(!people.length){
-    const sheet=document.getElementById('printSheet');
-    if(sheet){sheet.replaceChildren();sheet.classList.remove('preview')}
-    if(visible)report('Selecione estudantes da turma antes de preparar a impressão.','warning');
-    return false;
-  }
-  if(visible){
-    const tab=document.querySelector('[data-view=impressao]');
-    if(tab.getAttribute('aria-current')!=='page')tab.click();
-  }
-  const badge=$('printFormat').value==='badges';
-  const sheet=badge
-    ? renderBadgeSheet(S.space,people,S.photos,S.logoUrl,S.year,{
-        withPhoto:$('badgePhotoMode').value==='photo',
-        extra:$('badgeExtra').value
-      })
-    : renderPrintSheet(S.space,people,S.photos,S.logoUrl,Number($('printColumns').value),$('printCodes').checked,S.year);
-  if(visible){
-    sheet.classList.add('preview');
-    sheet.scrollIntoView({block:'start',behavior:'smooth'});
-  }
-  return true;
-}
-function makeTag(kind){
-  const t=document.createElement('span');t.className='tag'+(['review'].includes(kind)?' review':['same'].includes(kind)?'':' warn');
-  t.textContent={new:'Novo',move:'Mudar turma',rename:'Corrigir nome',same:'Sem alteração',review:'Conferir'}[kind]||kind;
-  return t;
 }
 function showPilot(){
-  $('pilotResults').hidden=false;
-  $('pilotSummary').textContent=pilot.filter(x=>x.kind!=='same').length+' registros para revisar · '+pilot.filter(x=>x.selected).length+' selecionados';
-  const body=$('pilotBody');body.replaceChildren();
-  pilot.forEach((p,i)=>{
-    if(p.kind==='same')return;
-    const tr=document.createElement('tr');
-    const cell=document.createElement('td'),check=document.createElement('input');check.type='checkbox';check.checked=p.selected;check.disabled=p.kind==='review';check.setAttribute('aria-label','Aplicar alteração de '+p.name);
-    check.onchange=()=>{p.selected=check.checked;$('pilotSummary').textContent=pilot.filter(x=>x.selected).length+' alterações selecionadas'};
-    cell.append(check);tr.append(cell);
-    for(const txt of [p.name+(p.code?' ('+p.code+')':''),p.classLabel||'Turma não encontrada']){
-      const td=document.createElement('td');td.textContent=txt;tr.append(td);
-    }
-    const td=document.createElement('td');td.append(makeTag(p.kind));if(p.reason){const small=document.createElement('small');small.textContent=' '+p.reason;td.append(small)}tr.append(td);body.append(tr);
-  });
+  $('pilotResults').hidden=false;$('pilotSummary').textContent=pilot.filter(p=>p.selected).length+' alterações selecionadas';$('pilotBody').replaceChildren();
+  for(const p of pilot){if(p.kind==='same')continue;const row=document.createElement('tr'),choice=document.createElement('td'),check=document.createElement('input');
+    check.type='checkbox';check.checked=p.selected;check.disabled=p.kind==='review';check.setAttribute('aria-label','Aplicar mudança de '+p.name);check.onchange=()=>{p.selected=check.checked;$('pilotSummary').textContent=pilot.filter(x=>x.selected).length+' alterações selecionadas'};choice.append(check);row.append(choice);
+    const status={new:'Novo',move:'Mudar turma',rename:'Corrigir nome',review:'Conferir'}[p.kind]||p.kind;
+    for(const text of [p.name+(p.code?' ('+p.code+')':''),p.classLabel,status+(p.reason?' — '+p.reason:'')]){const cell=document.createElement('td');cell.textContent=text;row.append(cell)}$('pilotBody').append(row);
+  }
 }
 function initPilot(){
-  $('analyzePilotBtn').onclick=()=>run(async()=>{
-    if(!S.classId)throw Error('Escolha uma turma e um ano.');
-    const file=$('pilotFile').files?.[0];if(!file)throw Error('Escolha a lista piloto.');
-    const data=await readPilotFile(file);
-    const rows=data.rows||parseDelimited(data.csv);
-    const mapped=mapPilotRows(rows,currentClass()?.label);
-    pilot=comparePilot(S.space,mapped,S.year,S.classId);
-    showPilot();
-    report('Lista analisada somente neste navegador; revise as alterações. Nenhuma mudança aplicada automaticamente.');
+  on('analyzePilotBtn',async()=>{if(!S.classId)throw Error('Escolha uma turma.');const file=$('pilotFile').files?.[0];if(!file)throw Error('Selecione uma planilha XLSX ou CSV.');const data=await readPilotFile(file);const rows=data.rows||parseDelimited(data.csv);pilot=comparePilot(S.space,mapPilotRows(rows,currentClass().label),S.year,S.classId);showPilot();report('Confira as alterações antes de aplicar. Nenhum estudante ausente será apagado.')});
+  on('applyPilotBtn',()=>{if(!S.editable())throw Error('Acesso somente leitura.');const n=pilot.filter(p=>p.selected).length;if(!n)throw Error('Selecione alterações.');if(!confirm('Aplicar '+n+' alterações?'))return;const result=applyPilot(S.space,pilot);S.update(result.space);pilot=[];$('pilotResults').hidden=true;$('pilotFile').value='';report('Alterações aplicadas; salvamento automático em andamento.')});
+}
+function printPeople(){
+  if($('printSource').value==='selected')return selectedPeople();
+  if($('printSource').value==='class')return S.classId?classStudents(S.space,S.classId):[];
+  const ids=new Set(classes().flatMap(c=>classStudents(S.space,c.id).map(p=>p.id)));return S.space.students.filter(p=>ids.has(p.id)).sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
+}
+function printOptions(){const badges=$('printFormat').value==='badges';$('badgeOptions').hidden=!badges;$('carometroOptions').hidden=badges}
+function previewPrint(scroll=true){
+  const people=printPeople();if(!people.length){$('printSheet')?.remove();if(scroll)report('Selecione estudantes antes de imprimir.','warning');return false}
+  const sheet=$('printFormat').value==='badges'?renderBadgeSheet(S.space,people,S.photos,S.logoUrl,S.year,{withPhoto:$('badgePhotoMode').value==='photo',extra:$('badgeExtra').value}):renderPrintSheet(S.space,people,S.photos,S.logoUrl,Number($('printColumns').value),$('printCodes').checked,S.year);
+  sheet.classList.add('preview');if(scroll)sheet.scrollIntoView({block:'start',behavior:'smooth'});return true;
+}
+function initPrint(){
+  on('printSelectedBtn',()=>{$('printSource').value='selected';selectView('impressao');previewPrint()});
+  for(const id of ['printFormat','printSource','printColumns','printCodes','badgePhotoMode','badgeExtra'])$(id).onchange=()=>{printOptions();previewPrint(false)};
+  on('previewPrintBtn',()=>previewPrint());
+  on('printBtn',async()=>{if(!previewPrint())return;const missing=printPeople().filter(p=>p.photoId&&!S.photos.has(p.id)).length;
+    if(missing&&!confirm(missing+' fotografia(s) não carregada(s). Imprimir mesmo assim?'))return;
+    await Promise.all([...document.querySelectorAll('#printSheet img')].map(img=>img.decode?.().catch(()=>{})||Promise.resolve()));window.print();
   });
-  $('applyPilotBtn').onclick=()=>run(async()=>{
-    if(!S.editable())throw Error('Seu acesso é somente leitura.');
-    const count=pilot.filter(i=>i.selected).length;
-    if(!count)throw Error('Nenhuma alteração marcada.');
-    if(!confirm('Aplicar '+count+' alterações selecionadas ao carômetro?'))return;
-    const result=applyPilot(S.space,pilot);S.update(result.space);pilot=[];$('pilotResults').hidden=true;$('pilotFile').value='';
-    report(result.applied+' alterações aplicadas. O FotoCrachá vai gravá-las no Google Drive.');
+  on('exportCsvBtn',()=>{if(!S.classId)throw Error('Escolha uma turma.');const url=URL.createObjectURL(new Blob([exportCsv(S.space,S.classId)],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='fotocracha-lista-'+S.year+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),5000)});printOptions();
+}
+async function loadPermissions(){
+  const root=$('permissionsList');root.replaceChildren();if(!S.link?.folderId||!S.isCloud())return;
+  try{const all=await S.drive.permissions(S.link.folderId);
+    if(all.some(p=>p.type==='anyone'||p.type==='domain')){const warning=document.createElement('p');warning.className='alert warning';warning.textContent='Há uma permissão pública ou de domínio inteiro. Revise os acessos no Google Drive antes de usar fotografias reais.';root.append(warning)}
+    for(const p of all.filter(p=>p.type==='user')){const row=document.createElement('div');row.className='permission';const text=document.createElement('span');text.textContent=(p.emailAddress||'Conta Google')+' · '+({owner:'Responsável',writer:'Editor',reader:'Leitor'}[p.role]||p.role);row.append(text);
+      if(S.link.canShare&&p.role!=='owner'){const button=document.createElement('button');button.type='button';button.className='light';button.textContent='Retirar acesso';button.onclick=()=>run(async()=>{if(confirm('Retirar acesso de '+(p.emailAddress||'essa conta')+'?')){await S.drive.revoke(S.link.folderId,p.id);await loadPermissions()}});row.append(button)}root.append(row);
+    }
+  }catch(error){root.textContent='Confira os acessos no próprio Google Drive. '+error.message}
+}
+function initSharing(){
+  on('manageFolderBtn',visitFolder);on('openDriveFolderBtn',visitFolder);on('copyFolderBtn',()=>copy(folderURL(),'Link da pasta copiado; compartilhe apenas com pessoas autorizadas.'));
+  on('refreshPermissionsBtn',loadPermissions);
+  on('inviteBtn',async()=>{if(!S.link?.canShare)throw Error('A conta não pode gerenciar esta pasta.');const email=$('inviteEmail').value.trim(),role=$('inviteRole').value;
+    if(!email)throw Error('Informe o e-mail.');if(!confirm('Compartilhar a pasta com '+email+' como '+(role==='writer'?'Editor':'Leitor')+'?'))return;
+    await S.drive.share(S.link.folderId,email,role);report('Pasta compartilhada pelo Google. Envie o link de acesso à pessoa convidada.');await loadPermissions();
   });
+  on('copyLinkBtn',()=>{if(!S.link?.manifestId)throw Error('Aguarde a confirmação do salvamento.');const url=new URL(location.href);url.search='';url.searchParams.set('space',S.link.manifestId);return copy(url.href,'Link de acesso copiado. A pessoa entra com a conta que recebeu a pasta.')});
 }
 function initGoogle(){
-  $('entryConnectBtn').onclick=()=>run(connectGoogle);
-  $('connectBtn').onclick=()=>run(async()=>S.isCloud()?disconnectGoogle():connectGoogle());
-  $('changeAccountBtn').onclick=()=>run(disconnectGoogle);
-  $('switchSpaceBtn').onclick=()=>run(switchSpace);
-  $('retrySaveBtn').onclick=()=>run(async()=>{
-    if(!saveError||saveError.code==='CONFLICT')return;
-    saveError=null;savePhase='pending';
-    if(await saveNow())report('Alterações confirmadas no Google Drive.','info');
-  });
-  $('reauthorizeBtn').onclick=()=>run(async()=>{
-    if(savePending)await savePending;
-    // Mantém o espaço e as alterações em memória; só descarta o token OAuth antigo.
-    S.drive?.disconnect();
-    await connectGoogle();
-  });
-  $('reloadRemoteBtn').onclick=()=>run(async()=>{
-    if(!S.link?.manifestId)throw Error('O cadastro no Google Drive não está associado a esta página.');
-    if(!confirm('Descartar alterações não salvas nesta página e reabrir a versão atual do Google Drive? Essa ação não apaga o arquivo remoto.'))return;
-    const id=S.link.manifestId;
-    if(saveTimer){clearTimeout(saveTimer);saveTimer=null}
-    if(savePending)await savePending;
-    S.resetToGate();saveError=null;savePhase='idle';savedAt=null;
-    await openSpace(id);
-  });
+  on('entryConnectBtn',connectGoogle);on('connectBtn',disconnectGoogle);on('changeAccountBtn',disconnectGoogle);on('switchSpaceBtn',switchSpace);on('refreshSpacesBtn',listSpaces);
+  on('openFolderBtn',async()=>{if(!S.isCloud())throw Error('Conecte ao Google Drive.');await openSpace(await S.drive.openFromFolder($('entryFolderLink').value.trim()))});
+  on('retrySaveBtn',async()=>{if(saveError?.code==='CONFLICT')return;saveError=null;if(await saveNow())report('Alterações confirmadas no Google Drive.')});
+  on('reauthorizeBtn',async()=>{if(saving)await saving;S.drive?.disconnect();await connectGoogle()});
+  on('reloadRemoteBtn',async()=>{if(!S.link)return;if(!confirm('Descartar mudanças não salvas desta aba e reabrir o cadastro do Google Drive?'))return;const id=S.link.manifestId;if(timer)clearTimeout(timer);timer=null;if(saving)await saving;S.resetToGate();saveError=null;await openSpace(id)});
+  on('retryPhotosBtn',async()=>{const result=await S.loadPhotos();report(result.failed?'Ainda há imagens não carregadas. Confira a conta, a pasta e a conexão.':'Fotografias carregadas.',result.failed?'warning':'info')});
 }
-window.addEventListener('beforeunload',e=>{
-  if((S.hasSpace()&&S.dirty)||savePending){e.preventDefault();e.returnValue=''}
-});
 function start(){
-  // O Client ID é definido para todo o aplicativo, não por parâmetros de convite.
-  const address=new URL(location.href);
-  if(address.searchParams.has('client')){
-    address.searchParams.delete('client');
-    history.replaceState(null,'',address.href);
-  }
-  S.onUpdate=()=>{render();queueAutosave()};
+  const url=new URL(location.href);if(url.searchParams.has('client')){url.searchParams.delete('client');history.replaceState(null,'',url.href)}
+  S.onUpdate=()=>{render();scheduleSave()};
+  document.querySelectorAll('.navtabs button').forEach(b=>b.onclick=()=>selectView(b.dataset.view));
+  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());
+  on('helpBtn',()=>presentModal('helpDialog'));
+  initForms();initCapture();initPromotion();initPilot();initPrint();initSharing();initGoogle();render();
+  if(S.config.clientId)prepareGoogleIdentity().catch(()=>{});
+  window.addEventListener('beforeunload',e=>{if(S.dirty||saving){e.preventDefault();e.returnValue=''}});
   window.addEventListener('focus',()=>{if(S.hasSpace()&&!S.isCloud())render()});
-  bindNavigation();initForms();initCapture();initPromotion();initPilot();initPrint();initSharing();initGoogle();
-  render();
-  if(S.config.clientId){
-    // Só carregamos o SDK se a integração estiver ativada nesta instalação.
-    // A autorização propriamente dita acontece apenas após o clique do usuário.
-    prepareGoogleIdentity().catch(()=>{});
-  }
-  if(new URL(location.href).searchParams.has('space')){
-    report('Você recebeu o link de um espaço. Conecte-se à conta Google autorizada para abri-lo.','warning');
-  }
 }
 start();
