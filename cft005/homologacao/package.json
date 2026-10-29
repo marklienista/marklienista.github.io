@@ -1,0 +1,8 @@
+{
+  "name": "cft005-homologacao-database-validation",
+  "private": true,
+  "type": "module",
+  "engines": {"node": ">=22"},
+  "packageManager": "pnpm@11.25.0",
+  "dependencies": {"pg": "8.23.1"}
+}

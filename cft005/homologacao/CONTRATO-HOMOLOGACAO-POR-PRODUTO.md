@@ -1,5 +1,7 @@
 # CFT-005 — Contrato de homologação por produto, versão 1
 
+Adendo mais recente: [banco criado, papéis exclusivos e RLS comprovados em 84 controles SQL](./BANCO-RLS-RESULTADO.md). Sem conexão dos BFFs ao banco ou homologação publicada. Declarações originais de recurso não provisionado abaixo permanecem como histórico v1.
+
 Adendo posterior: [banco HML identificado](./ESCOLHA-BANCO-HML.md) — candidato novo Render Postgres Free, My Workspace/Virginia, ainda não provisionado. As referências abaixo a destino não escolhido descrevem a preparação original v1, preservada no commit 66828da0e0bca0bb37e232404222987e0090717d. A fronteira de segurança não mudou; a capacidade real dos papéis/grants/RLS continua BLOCKED.
 
 28/10/2026. Branch `cft005-oidc-dominios`. Estado: **PREPARADO, execução integrada BLOCKED**. O contrato define o candidato a homologar; não registra implantação, contratação nem aprovação de produção. Sua aprovação exige os recibos reais descritos abaixo.

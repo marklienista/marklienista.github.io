@@ -1,5 +1,7 @@
 # CFT-005 — Banco exclusivo de homologação identificado
 
+Resultado posterior: [banco criado e 84 controles SQL PASS](./BANCO-RLS-RESULTADO.md), ID dpg-dbh8tghsrm7s73f4tc9g-a, Free/Virginia, acesso externo fechado. A análise de escolha abaixo é histórica; os limites de integração e gratuidade permanecem.
+
 28/10/2026, 21:01 BRT. Estado: **candidato escolhido; banco não provisionado; permissões reais BLOCKED**. Esta etapa fez somente leituras de metadados e documentação, sem SQL nas aplicações existentes. Complementa o contrato CFT005-HML-1; não muda sua fronteira de autorização nem a matriz original 9 PASS, 3 BLOCKED e 2 FAIL.
 
 ## Escolha

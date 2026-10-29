@@ -1,0 +1,499 @@
+{
+  "schemaVersion": 1,
+  "kind": "REAL_DATABASE_LOGINS_AND_RLS",
+  "startedAt": "2026-10-29T00:18:16.440Z",
+  "databaseId": "dpg-dbh8tghsrm7s73f4tc9g-a",
+  "cases": [
+    {
+      "id": "TARGET_AND_ADMIN",
+      "result": "PASS"
+    },
+    {
+      "id": "PASSWORD_PARAMETER_LOGGING_GUARD",
+      "result": "PASS"
+    },
+    {
+      "id": "NEW_EMPTY_TARGET",
+      "result": "PASS"
+    },
+    {
+      "id": "A_ACTUAL_LOGIN_TLS",
+      "result": "PASS"
+    },
+    {
+      "id": "B_ACTUAL_LOGIN_TLS",
+      "result": "PASS"
+    },
+    {
+      "id": "A_U1_OWN_INSERT",
+      "result": "PASS"
+    },
+    {
+      "id": "A_U2_OWN_INSERT",
+      "result": "PASS"
+    },
+    {
+      "id": "B_U1_OWN_INSERT",
+      "result": "PASS"
+    },
+    {
+      "id": "B_U2_OWN_INSERT",
+      "result": "PASS"
+    },
+    {
+      "id": "A_MINIMAL_ATTRIBUTES",
+      "result": "PASS"
+    },
+    {
+      "id": "A_NO_ROLE_MEMBERSHIP",
+      "result": "PASS"
+    },
+    {
+      "id": "A_NO_CONTEXT_DENIES_READ",
+      "result": "PASS"
+    },
+    {
+      "id": "A_NO_CONTEXT_DENIES_INSERT",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "A_CROSS_SCHEMA_READ",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "A_CROSS_SCHEMA_WRITE",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "A_CANNOT_ASSUME_OWNER",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "A_CANNOT_ASSUME_OTHER_PRODUCT",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "A_CANNOT_ASSUME_ADMIN",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "A_NO_SCHEMA_CREATE",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "A_NO_TEMP_CREATE",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "A_NO_DELETE",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "A_NO_TRUNCATE",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "A_CANNOT_DISABLE_RLS",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "A_U1_OWN_READ",
+      "result": "PASS"
+    },
+    {
+      "id": "A_U1_OTHER_USER_READ_EMPTY",
+      "result": "PASS"
+    },
+    {
+      "id": "A_U1_OTHER_USER_UPDATE_ZERO",
+      "result": "PASS"
+    },
+    {
+      "id": "A_U1_WITH_CHECK_OWNER",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "A_U1_WITH_CHECK_PRODUCT",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "A_U1_OTHER_USER_INSERT_DENIED",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "A_U1_OWN_UPDATE",
+      "result": "PASS"
+    },
+    {
+      "id": "A_U1_CONTEXT_RESET_AFTER_COMMIT",
+      "result": "PASS"
+    },
+    {
+      "id": "A_U2_OWN_READ",
+      "result": "PASS"
+    },
+    {
+      "id": "A_U2_OTHER_USER_READ_EMPTY",
+      "result": "PASS"
+    },
+    {
+      "id": "A_U2_OTHER_USER_UPDATE_ZERO",
+      "result": "PASS"
+    },
+    {
+      "id": "A_U2_WITH_CHECK_OWNER",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "A_U2_WITH_CHECK_PRODUCT",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "A_U2_OTHER_USER_INSERT_DENIED",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "A_U2_OWN_UPDATE",
+      "result": "PASS"
+    },
+    {
+      "id": "A_U2_CONTEXT_RESET_AFTER_COMMIT",
+      "result": "PASS"
+    },
+    {
+      "id": "A_INVALID_CONTEXT_DENIES",
+      "result": "PASS"
+    },
+    {
+      "id": "A_RLS_ENABLED_FORCED_SEPARATE_OWNER",
+      "result": "PASS"
+    },
+    {
+      "id": "A_FORCED_OWNER_WITHOUT_POLICY_DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "B_MINIMAL_ATTRIBUTES",
+      "result": "PASS"
+    },
+    {
+      "id": "B_NO_ROLE_MEMBERSHIP",
+      "result": "PASS"
+    },
+    {
+      "id": "B_NO_CONTEXT_DENIES_READ",
+      "result": "PASS"
+    },
+    {
+      "id": "B_NO_CONTEXT_DENIES_INSERT",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "B_CROSS_SCHEMA_READ",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "B_CROSS_SCHEMA_WRITE",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "B_CANNOT_ASSUME_OWNER",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "B_CANNOT_ASSUME_OTHER_PRODUCT",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "B_CANNOT_ASSUME_ADMIN",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "B_NO_SCHEMA_CREATE",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "B_NO_TEMP_CREATE",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "B_NO_DELETE",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "B_NO_TRUNCATE",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "B_CANNOT_DISABLE_RLS",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "B_U1_OWN_READ",
+      "result": "PASS"
+    },
+    {
+      "id": "B_U1_OTHER_USER_READ_EMPTY",
+      "result": "PASS"
+    },
+    {
+      "id": "B_U1_OTHER_USER_UPDATE_ZERO",
+      "result": "PASS"
+    },
+    {
+      "id": "B_U1_WITH_CHECK_OWNER",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "B_U1_WITH_CHECK_PRODUCT",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "B_U1_OTHER_USER_INSERT_DENIED",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "B_U1_OWN_UPDATE",
+      "result": "PASS"
+    },
+    {
+      "id": "B_U1_CONTEXT_RESET_AFTER_COMMIT",
+      "result": "PASS"
+    },
+    {
+      "id": "B_U2_OWN_READ",
+      "result": "PASS"
+    },
+    {
+      "id": "B_U2_OTHER_USER_READ_EMPTY",
+      "result": "PASS"
+    },
+    {
+      "id": "B_U2_OTHER_USER_UPDATE_ZERO",
+      "result": "PASS"
+    },
+    {
+      "id": "B_U2_WITH_CHECK_OWNER",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "B_U2_WITH_CHECK_PRODUCT",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "B_U2_OTHER_USER_INSERT_DENIED",
+      "result": "PASS",
+      "expectedSqlState": "42501",
+      "actualSqlState": "42501"
+    },
+    {
+      "id": "B_U2_OWN_UPDATE",
+      "result": "PASS"
+    },
+    {
+      "id": "B_U2_CONTEXT_RESET_AFTER_COMMIT",
+      "result": "PASS"
+    },
+    {
+      "id": "B_INVALID_CONTEXT_DENIES",
+      "result": "PASS"
+    },
+    {
+      "id": "B_RLS_ENABLED_FORCED_SEPARATE_OWNER",
+      "result": "PASS"
+    },
+    {
+      "id": "B_FORCED_OWNER_WITHOUT_POLICY_DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "A_U1_FINAL_OWN_RECORD_INTACT",
+      "result": "PASS"
+    },
+    {
+      "id": "A_U2_FINAL_OWN_RECORD_INTACT",
+      "result": "PASS"
+    },
+    {
+      "id": "B_U1_FINAL_OWN_RECORD_INTACT",
+      "result": "PASS"
+    },
+    {
+      "id": "B_U2_FINAL_OWN_RECORD_INTACT",
+      "result": "PASS"
+    },
+    {
+      "id": "NO_HML_VIEW_OR_RPC_BYPASS",
+      "result": "PASS"
+    },
+    {
+      "id": "OWNER_GLOBAL_DEFAULT_FUNCTION_EXECUTE_REVOKED",
+      "result": "PASS"
+    },
+    {
+      "id": "DATABASE_PUBLIC_PRIVILEGES_DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "SCHEMA_PUBLIC_PRIVILEGES_DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "EXACT_TWO_PRIVATE_TABLES",
+      "result": "PASS"
+    }
+  ],
+  "limitations": [
+    "Direct PostgreSQL test; no BFF adapter, HTTP identity integration or central logout attested",
+    "Owner context is asserted by the trusted backend; one product login can select U1 or U2 context within its own product",
+    "Runtime passwords were generated only in memory and discarded after validation; no BFF environment was configured",
+    "No restart, backup, provider log retention or browser profile proof in this run"
+  ],
+  "syntheticRecords": 4,
+  "fixtureRevision": 2,
+  "stage": "COMPLETED",
+  "finishedAt": "2026-10-29T00:18:58.549Z",
+  "counts": {
+    "PASS": 84,
+    "FAIL": 0
+  },
+  "result": "PASS",
+  "credentialTransport": "RSA-3072 OAEP-SHA256 one-use ciphertext file deleted before SQL; private key only in memory",
+  "defaultPrivilegeSupplementAt": "2026-10-29T00:22:06.654Z",
+  "provisioning": {
+    "name": "cft005-hml-db-teste",
+    "databaseName": "cft005_hml_db_teste",
+    "workspaceId": "tea-dattm47lk1mc73cu74bg",
+    "plan": "free",
+    "region": "virginia",
+    "postgresMajor": 17,
+    "storageGb": 1,
+    "createdAt": "2026-10-29T00:09:38.528462Z",
+    "expiresAt": "2026-11-28T00:09:38.528462Z",
+    "initialDiskSizeArgumentRejected": true,
+    "createdWithoutCustomDiskSize": true,
+    "highAvailability": false,
+    "autoscaling": false,
+    "managedPool": false
+  },
+  "network": {
+    "initialExternalRules": 0,
+    "temporarySingleAdminIp": true,
+    "finalExternalRules": 0,
+    "finalMetadataVerified": true,
+    "hostedConnectorRefusedByAllowlist": true,
+    "liveTcpDenialNotSeparatelyProbed": true
+  },
+  "dependencies": {
+    "pg": "8.23.1",
+    "lockfile": true,
+    "ignoredInstallScripts": true,
+    "knownAdvisories": 0,
+    "dependencyCount": 14
+  },
+  "scope": {
+    "newRuntimeRoles": 2,
+    "newOwnerRoles": 1,
+    "newSchemas": 2,
+    "newTables": 2,
+    "syntheticRows": 4,
+    "bffEnvironmentChanges": 0,
+    "bffDeploys": 0,
+    "publishedAppChanges": 0,
+    "apertaquemChanges": 0,
+    "supabaseChanges": 0,
+    "auth0Changes": 0,
+    "globalTtlChanges": 0
+  },
+  "attemptLimits": [
+    "First free creation with custom disk size rejected before resource creation",
+    "Read-only Render SQL connector refused access with empty allowlist",
+    "Direct browser runtime network EACCES; local pipe EPERM; neither executed SQL",
+    "One-use encrypted transfer was deleted before SQL; no plaintext secret file",
+    "Closing external rules required an explicit confirmation in Render; final empty list independently verified"
+  ],
+  "sourceFiles": [
+    {
+      "path": "database-validation.mjs",
+      "sha256": "b9506f1908d9de15f391da1ac9e367ec8c711abffd3338d7e0accdef198455ba"
+    },
+    {
+      "path": "database-admin-runner.mjs",
+      "sha256": "d861c47e033a88c29a1d4a5b8a6255522c30213ed74addfca965b7b6a61c176a"
+    },
+    {
+      "path": "package.json",
+      "sha256": "1d0e9516768d8a772022f3ac960b553b9fb44e409e8a4bf24401deb47a70c39a"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "b69c50c7699bffde4d0ab5989801a8ca284e2c54bec74fbec63ec8b78706897d"
+    }
+  ]
+}
