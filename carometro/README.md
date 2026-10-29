@@ -1,97 +1,70 @@
-# FotoCrachá — ambiente de testes 0.11.2 (Google Drive, gravação automática e Picker)
+# FotoCrachá — laboratório 0.12: acesso amplo com limites operacionais
 
-**Aplicativo:** https://carometro-teste.onrender.com
-**Código único:** GitHub `marklienista/marklienista.github.io`, branch `carometro-lab-002`, diretório `carometro/`.
-**Condutor vigente:** https://docs.google.com/document/d/1JSY62EjOjDT73UchbGdGqq3VdD5zs4eQ2UU6PRnb92k/edit
-**Nome público:** FotoCrachá; “Carômetro” continua sendo um tipo de impressão. Projeto ainda não lançado.
+Aplicativo de testes: https://carometro-teste.onrender.com
+Código: `marklienista/marklienista.github.io`, branch `carometro-lab-002`, pasta `carometro/`.
+Condutor único: https://docs.google.com/document/d/1JSY62EjOjDT73UchbGdGqq3VdD5zs4eQ2UU6PRnb92k/edit
 
-## Primeira visita
+## Decisão aprovada
 
-- A primeira tela **não carrega nenhuma turma, aluno ou fotografia de exemplo**. Somente permite **Conectar ao Google Drive**, consultar Ajuda e ler os avisos de privacidade.
-- Após autorizar a conta Google, a pessoa escolhe um espaço existente listado no Drive, **cola o link da pasta ou do arquivo `carometro.json` já autorizado para o app**, ou cria um espaço novo, inicialmente vazio.
-- Nenhum espaço novo é criado automaticamente só por conectar. A escolha da escola é explícita e o app não apaga ou substitui pastas já existentes.
-- O identificador do espaço aberto é colocado no endereço da própria página, `?space=<file-id>`. O link **não concede acesso**: o Google exige que a conta seja autorizada na pasta/arquivo. Não há senha nem token gravado no endereço.
-- O vínculo de uma **futura conta básica comum** entre ferramentas não está implementado. OAuth do Google Drive continua separado e o token é transitório, guardado apenas na memória do navegador.
+Marcelo aprovou em 28/10/2026 o uso do escopo `https://www.googleapis.com/auth/drive` para eliminar autorizações separadas do cadastro e das fotografias nas contas convidadas. Essa decisão substitui a hipótese de autorizar cada imagem pelo Picker, de armazenar imagens em planilhas ou de migrar para um pacote único. Os dados permanecem no Google Drive do responsável, com cadastro `carometro.json` e fotografias na subpasta `Fotos`. Nenhum arquivo existente precisa ser renomeado, convertido ou apagado.
 
-## Salvamento automático
+**A permissão concedida pelo Google é ampla.** Ela pode permitir ver, criar, editar e excluir arquivos acessíveis à conta, inclusive fora da pasta do FotoCrachá. A aplicação implementa limites operacionais por espaço, mas eles NÃO restringem o alcance do token OAuth. Esse aviso aparece antes da conexão, durante o uso e em Ajuda e privacidade. A escolha exige novo consentimento das contas, não uma alteração silenciosa de autorização.
 
-- Alterações pelo aplicativo em turmas, professores, estudantes, fotografias, logo, importação e promoção são programadas para envio ao Drive após cerca de **1,2 segundo sem novas alterações**, em uma fila serializada por aba.
-- A interface mostra **“Salvando…”**, **“Tudo salvo no Google Drive”** ou **“Não foi salvo…”**. Não existe botão normal “Salvar”; erro exige intervenção e não dispara tentativas infinitas.
-- O primeiro salvamento agora **cria o registro final uma única vez** após carregar as fotografias. A versão anterior enviava um JSON e tentava imediatamente um segundo PATCH, podendo resultar no falso aviso de outra pessoa editando.
-- Para espaços já existentes, uma nova versão de metadados do Google não é tratada como edição humana: compara-se o **conteúdo do manifesto remoto com o conteúdo aberto originalmente**. Se o conteúdo de fato mudou, a gravação é interrompida, o original remoto é mantido e a pessoa pode escolher reabrir a versão atual, com confirmação expressa de descarte das edições não salvas nesta aba.
-- Mudanças feitas enquanto o upload estava em andamento ficam pendentes e são salvas em uma próxima operação; não se apagam essas mudanças ao receber resposta da gravação anterior.
-- Trocar espaço/conta tenta concluir alterações pendentes antes de liberar a mudança. Fechar a página com alterações não confirmadas aciona o aviso do navegador (dependente do navegador).
-- **Não há edição colaborativa em tempo real nem trava distribuída garantida.** A comparação entre consulta e atualização do Drive é de melhor esforço, não uma transação atômica. Orientar que uma pessoa edite de cada vez e reabra o espaço antes de iniciar outra rodada.
-- O FotoCrachá **não cria arquivos de backup ou versões próprias**. O Google Drive pode manter revisões do próprio arquivo como parte de seu funcionamento.
+## Funcionamento
 
-## Pastas e compartilhamento
+Antes do login a interface fica vazia, sem estudantes demonstrativos. Depois da autorização, a pessoa escolhe o espaço, cola um link de pasta/arquivo ou abre o convite `?space=ID`. A aplicação lê cadastro e fotos diretamente, sem Google Picker e sem selecionar cada fotografia. A lista inicial busca apenas metadados de arquivos chamados `carometro.json`; não baixa o conteúdo dos demais documentos do Drive.
 
-- Novo espaço: pasta `FotoCrachá — [escola]`, subpasta `Fotos`, arquivo interno `carometro.json` (nome mantido por compatibilidade).
-- Espaços antigos com pasta `Carômetro — [escola]` permanecem onde estavam e são descobertos por `carometro.json`. Nenhum arquivo existente é renomeado automaticamente.
-- A pasta do Drive é a **fonte única de permissões** (Leitor ou Editor). A interface abre a pasta para gerenciar acessos no Google; pode convidar usuários por e-mail, mostrar permissões e revogá-las quando a conta tem direito. Se uma permissão `anyone` ou `domain` aparecer, o aplicativo alerta para revisar exposição indevida.
-- Colar o link de pasta/cadastro funciona somente se o OAuth limitado `drive.file` já permitir o acesso. Para a conta convidada, **compartilhar uma pasta não autoriza automaticamente a API a ler cada arquivo**. É necessário selecionar `carometro.json` pelo Google Picker; além disso, o acesso a fotografias filhas precisa ser validado por conta.
-- A **Google Picker API key pública informada por Marcelo** foi registrada manualmente em `config.js`, na branch de testes. O botão Picker passa a ficar habilitado após a publicação da versão 0.11.1. A seleção pelo Google e a colaboração real NÃO estão homologadas antes do teste entre duas contas adultas. Não substituir o scope `drive.file` por acesso irrestrito ao Drive como atalho.
-- A API do Drive pode indicar que um arquivo perdeu a permissão de edição; a aplicação deve bloquear gravação em vez de tentar sobrescrever ou conceder autorização por conta própria.
+A pasta continua sendo compartilhada pelo Google com papéis Leitor/Editor. Uma conta sem acesso à pasta não recebe acesso por causa do escopo amplo. Quem recebeu apenas leitura não vê controles de edição e o adaptador também recusa gravações. O uso de nova conta durante uma reconexão é bloqueado enquanto existe um espaço ativo, para não gravar alterações em nome de outra pessoa por engano.
 
-## Privacidade e integridade
+O salvamento automático é agrupado após aproximadamente 1,2 segundo sem alterações e serializado na mesma aba. A interface mostra salvamento, confirmação ou erro. Erros interrompem novas tentativas automáticas; reconexão e reabertura são ações explícitas. Atualizações feitas durante um envio permanecem pendentes para a próxima gravação. Não se promete coedição em tempo real: a proteção de versão/conteúdo é de melhor esforço, não uma transação atômica entre contas. Evitar alterações simultâneas.
 
-O FotoCrachá é uma aplicação web estática, sem banco próprio de estudantes: código servido pelo Render e processamento de nomes/fotografias no navegador, com armazenamento dos arquivos diretamente **na conta Google Drive escolhida**. Isso não significa que a infraestrutura do Google fique fora do tratamento de dados; o responsável pela conta e a instituição devem avaliar políticas internas, LGPD, autorizações e a necessidade da finalidade. Recomendar conta institucional ou privada com acesso restrito, senha forte e autenticação em duas etapas. Não usar fotografias e nomes de crianças reais antes de homologar as permissões e o tratamento.
+## Limites operacionais implementados
 
-**Não alterar manualmente `carometro.json` nem mover, renomear ou apagar pastas e fotografias relacionadas.** Fazer as modificações dentro da aplicação, para manter a estrutura referencial íntegra. Crachás não imprimem RA/matrícula; nota adicional é transitória e não entra no manifesto. Não há reconhecimento facial.
+O adaptador `drive-files.js` mantém internamente o manifesto e as pastas vinculadas ao espaço aberto, e verifica a hierarquia real retornada pelo Google:
 
-## Funcionalidades de impressão
+- O manifesto deve ter nome `carometro.json`, MIME JSON, schema 1 e tamanho permitido. Seu `drive.folderId` deve coincidir com a pasta-pai real.
+- A pasta de fotografias deve pertencer à pasta principal. O código não segue um identificador que redirecione para outra pasta.
+- Uma fotografia só é baixada se estiver referenciada no espaço ou tiver sido enviada por esta sessão. Antes de obter o conteúdo, o código confirma pasta-pai, tipo JPG/PNG/WEBP, tamanho e permissão de download.
+- Uploads só podem criar fotografias e logotipo na subpasta de fotos vinculada. O manifesto só é criado/atualizado na pasta correspondente ao espaço ativo.
+- Compartilhamento e revogação pelo aplicativo só atuam na pasta do espaço ativo, respeitam `canShare` e não removem a propriedade do arquivo.
+- Não há operação de exclusão de arquivos no aplicativo. Retirar uma foto do cadastro não apaga automaticamente o arquivo anterior no Drive.
+- Token OAuth só fica na memória da página. Não é salvo em URL, localStorage, GitHub, Supabase ou servidor de dados do FotoCrachá. O Client ID e a chave pública do Picker permanecem na configuração, mas o Picker não faz mais parte do fluxo atual.
 
-- Carômetro em grade por turma, ano ou selecionados, com professor opcional.
-- Crachás individuais (86 × 54 mm) com foto ou apenas nome: até oito por folha A4 retrato, com nome, turma, professor, escola, logo opcional e uma observação comum ao lote (até 120 caracteres) que **não é gravada em nenhum arquivo**.
-- **Imprimir / Salvar PDF** utiliza a impressão local do navegador (A4, escala de 100%, sem cabeçalhos/rodapés). As medidas finais dependem de prova visual e, quando possível, impressão física.
+Essas verificações reduzem erros de implementação, mas não equivalem à segurança de um token limitado por pasta. Comprometimento do código ou do token continua sendo um risco compatível com a autorização ampla. Não afirmar ao usuário que o Google impõe acesso somente à pasta.
 
-## Condição atual, testes e próximo passo
+## Google Cloud: configuração administrativa a conferir
 
-Publicação de código **não é lançamento nem validação do fluxo real**. A autenticação Google foi comprovada por Marcelo em uma conta de teste, mas a criação, salvamento, reabertura, alteração e compartilhamento do novo fluxo ainda precisam de prova no navegador autorizado.
+Projeto Google Cloud existente: número `784125401141`; manter o Client ID OAuth Web já configurado e a origem `https://carometro-teste.onrender.com`. Não criar novas credenciais nem publicar Client Secret.
 
-Testar somente com dados fictícios:
-1. conectar a conta, confirmar que **não aparecem alunos de exemplo** e que a escolha de espaço funciona;
-2. criar uma escola e uma turma fictícias; alterar professor e estudante; verificar mensagem **“Tudo salvo no Google Drive”**;
-3. atualizar a página, conectar novamente, reabrir o mesmo espaço e confirmar os registros; verificar pasta `FotoCrachá — [escola]` no Drive;
-4. testar carômetro/crachás com fotos fictícias e confirmar impressão;
-5. somente com Picker habilitado, testar convite real entre duas contas adultas, leitura/edição/revogação e fotos.
+Em Google Auth Platform → Data Access, declarar `https://www.googleapis.com/auth/drive`. Em Audience, manter o aplicativo em Testing e as contas adultas utilizadas na validação como testadoras. A configuração administrativa não foi editada automaticamente pelo código; a autorização efetiva depende da conta Google e de suas políticas organizacionais. O aplicativo solicita o novo escopo e rejeita respostas que concedam apenas `drive.file`.
 
-Se surgir erro de salvamento, **não apagar ou editar manualmente o JSON**. Registrar mensagem completa; o novo fluxo interrompe tentativas após erro para evitar operações repetidas de resultado incerto.
+Antes de disponibilidade pública, preparar política de privacidade e submeter o acesso restrito à verificação aplicável do Google. Aprovação desta arquitetura por Marcelo, deploy live e testes simulados não equivalem à aprovação pelo Google nem à autorização institucional para tratar dados reais de estudantes.
 
-## Integração Google Cloud
+Referências oficiais:
+- https://developers.google.com/workspace/drive/api/guides/api-specific-auth
+- https://developers.google.com/identity/oauth2/web/reference/js-reference
+- https://developers.google.com/workspace/guides/configure-oauth-consent
+- https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification
 
-Projeto Google Cloud: `784125401141`. Client ID OAuth Web público centralizado em `config.js`, origem autorizada `https://carometro-teste.onrender.com`, scope mínimo `https://www.googleapis.com/auth/drive.file`. Manter configuração de testes e adultos autorizados. A Google Picker API key foi preenchida manualmente por Marcelo em `config.js` na branch de testes, sem alterar o OAuth Client ID nem o número do projeto. A verificação direta das restrições no Google Cloud e o teste ponta a ponta continuam pendentes. Nunca incluir `client_secret`, tokens de acesso ou fotos reais no repositório.
+## Privacidade e continuidade
 
-A identidade B do ecossistema foi preservada. Nenhuma mudança neste fluxo altera Apertaquem, Som da Turma, MeEmpresta, ApertaLetra, Supabase ou a conta comum futura.
+A aplicação continua estática, com processamento de dados no navegador e armazenamento direto no Google Drive escolhido. Não foi criado servidor intermediário ou banco de estudantes. Recomendam-se conta institucional autorizada ou privada segura, autenticação em duas etapas e convites apenas para pessoas específicas. Quem recebe o convite também concede acesso amplo à própria conta; uma conta dedicada apenas do proprietário não elimina a exposição dos convidados.
 
+Mantenha os dados íntegros: não edite manualmente `carometro.json`, não mova a pasta de fotos e não apague imagens usadas pelo cadastro. Não torne a pasta pública. O Google pode manter seu próprio histórico de revisões; o FotoCrachá não cria um controle paralelo de versões.
 
-## Preparação do Google Picker — 28/10/2026
+O modelo de dados, cadastro de professor, promoção anual, lista piloto CSV/XLSX, captura de imagens, carômetros, crachás e nota temporária de impressão foram preservados. A nota do crachá não entra no cadastro. Nenhuma outra ferramenta do ecossistema ou Supabase foi alterada. `styles.css` permanece como identidade visual base; `access.css` destaca os avisos adicionais.
 
-Marcelo criou a chave pública do Google Picker e a registrou manualmente na branch de testes em `config.js` em 28/10/2026. A inserção automática inicial foi bloqueada por segurança; a edição manual foi conferida por leitura do GitHub, sem reproduzir o valor da chave nos documentos. Não inserir Client Secret nem desativar proteções do GitHub/Google Cloud.
+## Testes desta revisão
 
-Foi preparada a seleção de cadastros compartilhados:
-- `picker.js` usa `DocsViewMode.LIST`, adequado ao escopo restrito `drive.file`;
-- quando o convite contém `?space=<id>`, o Picker usa `DocsView.setFileIds(id)` para apresentar o arquivo de cadastro pertinente, se a pessoa tiver autorização no Drive;
-- o arquivo selecionado deve ser `carometro.json`; a decisão de acesso continua com o Google;
-- fluxo validado com 9 checagens simuladas de seleção de arquivo, modo lista, número do projeto, origem e comportamento com chave ausente; **nenhum teste real com segunda conta realizado**.
+Foram executados testes locais com dados e imagens sintéticos e Google simulado:
+- 8 verificações de OAuth: escopo amplo, recusa do escopo anterior, identificação da conta, cancelamento e token em memória.
+- 20 verificações do adaptador: leitura de cadastro/foto, papéis Leitor/Editor, criação única, conflitos reais versus alterações de metadados, rejeição de pastas/fotos externas e recusa após retirada de permissão.
+- 15 verificações funcionais em Chromium com DOM isolado: entrada vazia, aviso antes do login, abertura de cadastro e foto, salvamento de professor/novo estudante/nova foto, segunda conta lendo fotos antigas e novas, bloqueio de edição para Leitor e prévia de crachás com nota não persistida.
 
-Próximo passo: confirmar publicação no Render (autoDeploy desligado), abrir a versão 0.11.1 em duas contas adultas de teste e verificar se a conta convidada consegue selecionar `carometro.json` no Picker, carregar cadastro e fotografias e respeitar a permissão Leitor/Editor. A chave deve estar restrita aos referrers `https://carometro-teste.onrender.com/*` e `https://docs.google.com/*`, e às APIs Picker e Drive; a presença da chave no GitHub não permite verificar as restrições do Google Cloud. Nenhum dado real de estudantes antes da validação.
+As APIs Google nesses testes são simuladas. Não houve teste de novo consentimento real ou tráfego com tokens das contas do usuário. A navegação automática na URL real depende do ambiente e não deve ser confundida com o teste DOM isolado. Nenhuma fotografia real de criança foi acessada ou publicada.
 
-## Ativação técnica em 28/10/2026
+## Próxima validação real
 
-A configuração pública do Picker está presente no GitHub; o Client ID OAuth Web e número do projeto `784125401141` permaneceram inalterados. O aplicativo carrega agora `app.js?v=0.11.1`, `session.js?v=0.11.1`, `picker.js?v=0.11.1` e `config.js?v=0.11.1` para evitar que o navegador reutilize módulos antigos sem a chave. A seleção de um arquivo específico indicado no convite utiliza `DocsView.setFileIds` com a opção de lista compatível com `drive.file`, conforme documentação do Google. O código foi conferido, mas o funcionamento real do Picker deve ser testado com a conta convidada e arquivos fictícios.
+Depois de confirmar o deploy, atualizar a página para 0.12 e usar uma conta adulta testadora. Aceitar o novo acesso amplo, abrir o mesmo espaço existente e conferir a fotografia antiga. Acrescentar uma foto fictícia com a conta Editora, aguardar Tudo salvo e reabrir com a conta convidada. Confirmar que as duas imagens aparecem sem Picker. Testar leitura/edição e retirada de acesso em sequência, sem edições simultâneas. Qualquer bloqueio Google deve ser registrado com a mensagem exata; não desativar proteções nem ignorar alertas para forçar o acesso.
 
-
-## Diagnóstico de acesso compartilhado e cache — 28/10/2026
-
-Foi relatado que o convite de pasta/arquivo gerava 404 via API Google Drive com a conta convidada, apesar de a pasta estar compartilhada, e que o botão “Escolher no Google Drive” permaneceu desabilitado. A leitura das configurações no GitHub e do deploy publicado indicava que a chave pública do Picker já havia sido registrada corretamente. A ausência de autorização via `drive.file` explica o 404 para uma conta convidada; o botão desabilitado era incompatível com o código publicado e sugere módulo antigo em cache ou divergência do navegador. A causa exata do estado na aba do usuário não pôde ser observada diretamente.
-
-A versão **0.11.2** faz mudanças delimitadas, sem tocar em cadastros:
-- Não bloqueia o controle de escolher arquivo apenas porque uma sessão em cache ainda não reconheceu a chave; ao clicar, consulta `config.js?v=0.11.2` se necessário e informa como atualizar em caso de falha.
-- Quando o convite contém `?space=ID`, o botão é apresentado como **Autorizar cadastro recebido no Google Drive** e o Picker é orientado a exibir aquele arquivo.
-- Colar o link de uma pasta inacessível via API pode abrir o Picker como alternativa, sem criar outra pasta ou outro arquivo.
-- Os erros 403/404 de permissão passam a indicar a necessidade de selecionar `carometro.json`, sem afirmar incorretamente que ainda falta configurar uma API key.
-- O HTML importa `app.js?v=0.11.2`, que por sua vez importa `session.js?v=0.11.2` e `picker.js?v=0.11.2`; a sessão importa `config.js?v=0.11.2` e `drive-files.js?v=0.11.2`. Para evitar um HTML antigo no cache, acessar `https://carometro-teste.onrender.com/?release=0.11.2` ou usar Ctrl+Shift+R.
-- Testes locais simulados confirmaram seleção sugerida pelo Picker, botão habilitado mesmo com configuração inicial obsoleta e fallback ao colar uma pasta inacessível via API. **Não são testes reais de autorização com uma segunda conta.**
-
-**Situação da permissão no Drive:** quando um convidado tem acesso à pasta como Editor, isso não autoriza automaticamente o aplicativo a acessar os arquivos pelo escopo `drive.file`. O Google Picker é a forma adequada de permitir que esse aplicativo acesse o manifesto selecionado. Fotografia e edição por segunda conta continuam pendentes de prova real. Não criar contas/bancos/arquivos de controle próprios e não aumentar escopos.
+Esta versão continua sendo laboratório, não lançamento.
