@@ -4,8 +4,9 @@ import {addClass,renameClass,addStudent,editStudent,moveStudent,markStudentInact
 import {readPilotFile} from './xlsx.js?v=0.11';
 import {renderClassBar,renderStudentCards,renderPrintSheet,renderBadgeSheet,notify,presentModal,closeModal,fillSelect} from './view.js?v=0.13';
 import {mountPdfImport} from './pilot-ui.mjs?v=0.14';
+import {mountNavigation} from './navigation.mjs?v=0.15';
 const $=id=>document.getElementById(id),S=new Session();
-let timer=null,saving=null,saveError=null,savedAt=null,pilot=[],promotion=[],captureId=null;
+let timer=null,saving=null,saveError=null,savedAt=null,pilot=[],promotion=[],captureId=null,navigation=null;
 const report=(text,kind='info')=>notify(text,kind);
 const run=async task=>{try{return await task()}catch(error){report(error.message||'Não foi possível concluir.','error');render();return null}};
 const currentClass=()=>S.space.classes.find(c=>c.id===S.classId)||null;
@@ -25,12 +26,12 @@ function renderSave(){
 }
 function render(){
   const cloud=S.isCloud(),active=cloud&&S.hasSpace();$('entryGate').hidden=active;$('workspaceApp').hidden=!active;$('entryDisconnected').hidden=cloud;$('entryChoose').hidden=!cloud;
-  $('settingsBtn').hidden=!active||!S.editable();$('entryConnectBtn').textContent=S.hasSpace()?'Reconectar a mesma conta Google':'Conectar ao Google Drive';$('entryAccount').textContent=cloud?'Conta conectada: '+S.drive.email:'';
-  if(!active)return;
+  $('settingsBtn').hidden=!active;$('entryConnectBtn').textContent=S.hasSpace()?'Reconectar a mesma conta Google':'Conectar ao Google Drive';$('entryAccount').textContent=cloud?'Conta conectada: '+S.drive.email:'';
+  if(!active){navigation?.render();return;}
   const grouped=hasGroups(S.space),annual=hasYears(S.space);
   if(!grouped)S.classId=ALL;else if(![ALL,UNGROUPED].includes(S.classId)&&!classes().some(c=>c.id===S.classId))S.classId=ALL;
   $('spaceTitle').textContent=carometroTitle(S.space);$('institutionLine').textContent=S.space.school.name||'';$('institutionLine').hidden=!S.space.school.name;
-  $('modeText').textContent='Conta: '+S.drive.email+' · '+(S.link?.canEdit===false?'Leitor':'Editor');$('newSpaceBtn').disabled=!!saving;$('openDriveFolderBtn').disabled=!S.link?.folderId;$('inviteBtn').disabled=!S.link?.canShare;renderSave();
+  $('modeText').textContent=S.link?.canEdit===false?'Somente leitura':'';$('modeText').hidden=S.link?.canEdit!==false;renderSave();
   $('organizationPanel').hidden=!grouped;$('yearControls').hidden=!annual;$('promoteBtn').hidden=!annual;
   if(annual){const years=[...new Set(S.space.classes.map(c=>c.year).filter(Number.isInteger))];if(Number.isInteger(S.year)&&!years.includes(S.year))years.push(S.year);years.sort((a,b)=>b-a);fillSelect($('yearSelect'),[{value:'',label:'Sem ano definido'},...years.map(y=>({value:y,label:String(y)}))],S.year??'')}
   renderClassBar(S.space,S.year,S.classId,id=>S.selectClass(id));
@@ -49,6 +50,7 @@ function render(){
     onInactive:id=>run(async()=>{if(c&&confirm('Encerrar o vínculo com este grupo, preservando o histórico?')){S.update(markStudentInactive(S.space,id,c.id));S.selected.delete(id)}})
   });
   $('printAllOption').textContent=annual?'Todas as pessoas do período':'Todas as pessoas do carômetro';
+  navigation?.render();
 }
 function scheduleSave(){if(!S.dirty||!S.editable()||saveError||saving)return;if(timer)clearTimeout(timer);timer=setTimeout(()=>{timer=null;void saveNow()},1200);renderSave()}
 async function saveNow(){
@@ -58,34 +60,19 @@ async function saveNow(){
     finally{saving=null;render();if(S.dirty&&!saveError)scheduleSave()}})();saving=work;renderSave();return work;
 }
 async function flush(){if(timer){clearTimeout(timer);timer=null}if(saving)await saving;if(S.dirty&&!saveError)await saveNow();if(S.dirty){report('Há alterações sem confirmação. Resolva o salvamento antes de mudar de carômetro ou conta.','warning');return false}return true}
-async function openSpace(id){if(!await flush())return false;saveError=null;savedAt=null;const result=await S.load(id);resetPrint();address(id);savedAt=new Date();render();report(result.failed?'Carômetro aberto. '+result.failed+' imagem(ns) não carregada(s); consulte o aviso.':'Carômetro aberto. As alterações são salvas automaticamente.',result.failed?'warning':'info');return true}
-async function listSpaces(autoOpen=false){
-  if(!S.isCloud()||S.hasSpace())return;const root=$('spacesList');root.textContent='Localizando seus carômetros…';
-  try{const files=await S.drive.spaces();root.replaceChildren();if(!files.length){root.textContent='Nenhum carômetro encontrado. Crie um novo ou abra o link de um carômetro compartilhado.';return}
-    if(autoOpen&&files.length===1){try{await openSpace(files[0].id);return}catch(error){report('O carômetro não pôde ser aberto: '+error.message,'warning')}}
-    for(const file of files.slice(0,30)){
-      const props=file.appProperties||{};let title=Object.hasOwn(props,'fcTitle')?(props.fcTitle||'Carômetro sem nome'):'';
-      if(!title&&file.parents?.[0])try{title=(await S.drive.info(file.parents[0])).name?.replace(/^FotoCrachá\s*[—-]\s*/,'')||''}catch{}
-      title=title||'Carômetro sem nome';const button=document.createElement('button');button.type='button';button.className='space-choice';const heading=document.createElement('strong'),sub=document.createElement('small');heading.textContent=title;
-      const details=[props.fcInstitution||'',file.modifiedTime?'Atualizado em '+new Date(file.modifiedTime).toLocaleDateString('pt-BR'):'','ID '+file.id.slice(-6)];sub.textContent=details.filter(Boolean).join(' · ');button.append(heading,sub);button.onclick=()=>run(()=>openSpace(file.id));root.append(button);
-    }
-    if(files.length>30){const more=document.createElement('p');more.className='sub';more.textContent='Mostrando os 30 carômetros mais recentes. Outros podem ser abertos pelo link da pasta.';root.append(more)}
-  }catch(error){root.textContent='Não foi possível listar os carômetros: '+error.message}
-}
+async function openSpace(id){if(navigation&&!navigation.allowOpen())return false;if(!await flush())return false;saveError=null;savedAt=null;const result=await S.load(id);resetPrint();address(id);savedAt=new Date();navigation?.enterEditor(true);render();if(result.failed)report('Carômetro aberto. '+result.failed+' imagem(ns) não carregada(s); consulte o aviso.','warning');else $('alerts').replaceChildren();return true}
+async function listSpaces(){return navigation?.home()}
 async function connectGoogle(){
   const email=await S.connect();report('Conectado como '+email+'.');render();if(S.hasSpace()){if(saveError?.code!=='CONFLICT')saveError=null;const photos=await S.loadPhotos();render();if(S.dirty)scheduleSave();if(photos.failed)report('Ainda existem imagens não carregadas. Confira o acesso à pasta.','warning');return}
   const params=new URL(location.href).searchParams;try{if(params.get('space')){await openSpace(params.get('space'));return}if(params.get('folder')){await openSpace(await S.drive.openFromFolder(params.get('folder')));return}}catch(error){report('Não foi possível abrir o convite nesta conta. '+error.message,'warning')}
   await listSpaces(true);
 }
-async function disconnectGoogle(){if(!await flush())return;S.disconnect();resetPrint();saveError=null;savedAt=null;address();$('spacesList').replaceChildren();render();report('Desconectado. Nenhum arquivo foi apagado do Google Drive.')}
-async function switchSpace(){if(!await flush())return;S.resetToGate();resetPrint();saveError=null;savedAt=null;address();render();await listSpaces(false)}
+async function disconnectGoogle(){if(navigation&&!navigation.allowOpen())return;if(!await flush())return;S.disconnect();resetPrint();saveError=null;savedAt=null;address();$('spacesList').replaceChildren();navigation?.disconnected();render();report('Desconectado. Nenhum arquivo foi apagado do Google Drive.')}
+async function switchSpace(){return navigation?.home()}
 function toggleYearChoice(prefix){const grouped=$(prefix+'Groups').checked;$(prefix+'AnnualWrap').hidden=!grouped;$(prefix+'Annual').disabled=!grouped}
 function newSpace(){$('newSpaceName').value='';$('newInstitution').value='';$('newGroups').checked=false;$('newAnnual').checked=false;toggleYearChoice('new');presentModal('newSpaceDialog')}
-function openSettings(){$('settingTitle').value=S.space.title||'';$('settingSchool').value=S.space.school.name||'';$('settingGroups').checked=hasGroups(S.space);$('settingAnnual').checked=hasYears(S.space);toggleYearChoice('setting');presentModal('settingsDialog')}
-function folderURL(){if(!S.link?.folderId)throw Error('Aguarde a confirmação da pasta no Google Drive.');return 'https://drive.google.com/drive/folders/'+encodeURIComponent(S.link.folderId)}
-function visitFolder(){const a=document.createElement('a');a.href=folderURL();a.target='_blank';a.rel='noopener noreferrer';a.click()}
-async function copy(text,message){try{await navigator.clipboard.writeText(text);report(message)}catch{prompt('Copie o link:',text)}}
-function selectView(name){document.querySelectorAll('.navtabs button').forEach(b=>{if(b.dataset.view===name)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!=='view-'+name);if(name==='impressao')previewPrint(false);else $('printSheet')?.classList.remove('preview');if(name==='partilha')void loadPermissions()}
+function openSettings(){if(navigation?.hasSettingsDraft()){selectView('configuracao');return;}$('settingTitle').value=S.space.title||'';$('settingSchool').value=S.space.school.name||'';$('settingGroups').checked=hasGroups(S.space);$('settingAnnual').checked=hasYears(S.space);toggleYearChoice('setting');selectView('configuracao');navigation?.settingsOpened()}
+function selectView(name){if($('alerts').querySelector('.alert:not(.error):not(.warning)'))$('alerts').replaceChildren();document.querySelectorAll('.navtabs button').forEach(b=>{if(b.dataset.view===name)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!=='view-'+name);if(name==='impressao')previewPrint(false);else $('printSheet')?.classList.remove('preview');navigation?.viewChanged(name)}
 function openClass(edit=false){
   const c=currentClass();if(edit&&!c)return;$('classModalTitle').textContent=edit?'Editar turma ou grupo':'Nova turma ou grupo';$('className').value=edit?c.label:'';$('classTeacher').value=edit?(c.teacher||''):'';
   $('classYear').value=edit?(c.year??''):(S.year??'');$('classYearWrap').hidden=!hasYears(S.space);$('classForm').dataset.mode=edit?'edit':'new';presentModal('classDialog');
@@ -108,14 +95,14 @@ function initForms(){
     e.preventDefault();const id=$('studentId').value,name=$('studentName').value,code=$('studentCode').value,grouped=hasGroups(S.space),classId=grouped?$('studentClass').value||null:null;
     let next=id?editStudent(S.space,id,{name,code}):addStudent(S.space,{name,code,classId});if(id&&grouped)next=moveStudent(next,id,classId,hasYears(S.space)?S.year:undefined);S.update(next);closeModal('studentDialog');
   });
-  on('selectAll',()=>{const people=currentPeople(),all=people.every(p=>S.selected.has(p.id));people.forEach(p=>all?S.selected.delete(p.id):S.selected.add(p.id));render()});on('newSpaceBtn',newSpace);on('entryNewBtn',newSpace);
+  on('selectAll',()=>{const people=currentPeople(),all=people.every(p=>S.selected.has(p.id));people.forEach(p=>all?S.selected.delete(p.id):S.selected.add(p.id));render()});on('entryNewBtn',newSpace);
   $('newGroups').onchange=()=>toggleYearChoice('new');$('settingGroups').onchange=()=>toggleYearChoice('setting');
-  $('newSpaceForm').onsubmit=e=>run(async()=>{e.preventDefault();if(!await flush())return;S.startSpace({title:$('newSpaceName').value,institution:$('newInstitution').value,groupsEnabled:$('newGroups').checked,annualEnabled:$('newGroups').checked&&$('newAnnual').checked});resetPrint();closeModal('newSpaceDialog');report('Carômetro criado. Você pode começar adicionando pessoas; os demais campos são opcionais.')});
+  $('newSpaceForm').onsubmit=e=>run(async()=>{e.preventDefault();if(navigation&&!navigation.allowOpen())return;if(!await flush())return;S.startSpace({title:$('newSpaceName').value,institution:$('newInstitution').value,groupsEnabled:$('newGroups').checked,annualEnabled:$('newGroups').checked&&$('newAnnual').checked});resetPrint();closeModal('newSpaceDialog');navigation?.enterEditor(true);render();report('Carômetro criado. Você pode começar adicionando pessoas; os demais campos são opcionais.')});
   on('settingsBtn',openSettings);on('organizeBtn',openSettings);
   $('settingsForm').onsubmit=e=>run(async()=>{
-    e.preventDefault();const next=configureSpace(S.space,{title:$('settingTitle').value,institution:$('settingSchool').value,groupsEnabled:$('settingGroups').checked,annualEnabled:$('settingGroups').checked&&$('settingAnnual').checked});
+    e.preventDefault();if(!S.editable())throw Error('Acesso somente leitura.');const next=configureSpace(S.space,{title:$('settingTitle').value,institution:$('settingSchool').value,groupsEnabled:$('settingGroups').checked,annualEnabled:$('settingGroups').checked&&$('settingAnnual').checked});
     if(!hasGroups(next))S.classId=ALL;if(!hasYears(next))S.year=null;else if(S.year===null){const years=next.classes.map(c=>c.year).filter(Number.isInteger);S.year=years.length?Math.max(...years):null}
-    S.update(next);if($('logoFile').files?.[0])await S.logo($('logoFile').files[0]);$('logoFile').value='';resetPrint();closeModal('settingsDialog');
+    S.update(next);if($('logoFile').files?.[0])await S.logo($('logoFile').files[0]);$('logoFile').value='';resetPrint();navigation?.settingsOpened();report('Configurações aplicadas. Acompanhe o salvamento no topo.');
   });
 }
 function nextCapture(){const next=currentPeople().find(p=>!p.photoId&&!S.photos.has(p.id));captureId=next?.id||null;$('capturePrompt').textContent=next?'Próxima pessoa: '+personName(next):'Todas as pessoas desta lista já têm fotografia.';$('captureFile').disabled=!next;$('captureSkipBtn').disabled=!next}
@@ -149,19 +136,8 @@ function initPrint(){
   on('previewPrintBtn',()=>previewPrint());on('printBtn',async()=>{if(!previewPrint())return;const missing=printPeople().filter(p=>p.photoId&&!S.photos.has(p.id)).length;if(missing&&!confirm(missing+' fotografia(s) não carregada(s). Imprimir mesmo assim?'))return;await Promise.all([...document.querySelectorAll('#printSheet img')].map(img=>img.decode?.().catch(()=>{})||Promise.resolve()));window.print()});
   on('exportCsvBtn',()=>{const url=URL.createObjectURL(new Blob([exportCsv(S.space,S.classId,S.year)],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='fotocracha-lista.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),5000)});printOptions();
 }
-async function loadPermissions(){
-  const root=$('permissionsList');root.replaceChildren();if(!S.link?.folderId||!S.isCloud())return;
-  try{const all=await S.drive.permissions(S.link.folderId);if(all.some(p=>p.type==='anyone'||p.type==='domain')){const warning=document.createElement('p');warning.className='alert warning';warning.textContent='Há uma permissão pública ou de domínio inteiro. Revise os acessos no Google Drive antes de usar fotografias reais.';root.append(warning)}
-    for(const p of all.filter(p=>p.type==='user')){const row=document.createElement('div');row.className='permission';const text=document.createElement('span');text.textContent=(p.emailAddress||'Conta Google')+' · '+({owner:'Responsável',writer:'Editor',reader:'Leitor'}[p.role]||p.role);row.append(text);if(S.link.canShare&&p.role!=='owner'){const button=document.createElement('button');button.type='button';button.className='light';button.textContent='Retirar acesso';button.onclick=()=>run(async()=>{if(confirm('Retirar acesso de '+(p.emailAddress||'essa conta')+'?')){await S.drive.revoke(S.link.folderId,p.id);await loadPermissions()}});row.append(button)}root.append(row)}
-  }catch(error){root.textContent='Confira os acessos no próprio Google Drive. '+error.message}
-}
-function initSharing(){
-  on('manageFolderBtn',visitFolder);on('openDriveFolderBtn',visitFolder);on('copyFolderBtn',()=>copy(folderURL(),'Link da pasta copiado; compartilhe apenas com pessoas autorizadas.'));on('refreshPermissionsBtn',loadPermissions);
-  on('inviteBtn',async()=>{if(!S.link?.canShare)throw Error('A conta não pode gerenciar esta pasta.');const email=$('inviteEmail').value.trim(),role=$('inviteRole').value;if(!email)throw Error('Informe o e-mail.');if(!confirm('Compartilhar este carômetro com '+email+' como '+(role==='writer'?'Editor':'Leitor')+'?'))return;await S.drive.share(S.link.folderId,email,role);report('Carômetro compartilhado pelo Google. Envie o link de acesso à pessoa convidada.');await loadPermissions()});
-  on('copyLinkBtn',()=>{if(!S.link?.manifestId)throw Error('Aguarde a confirmação do salvamento.');const url=new URL(location.href);url.search='';url.searchParams.set('space',S.link.manifestId);return copy(url.href,'Link copiado. A pessoa entra com a conta que recebeu a pasta.')});
-}
 function initGoogle(){
-  on('entryConnectBtn',connectGoogle);on('connectBtn',disconnectGoogle);on('changeAccountBtn',disconnectGoogle);on('switchSpaceBtn',switchSpace);on('refreshSpacesBtn',()=>listSpaces(false));
+  on('entryConnectBtn',connectGoogle);on('connectBtn',()=>navigation?.account());on('changeAccountBtn',disconnectGoogle);on('switchSpaceBtn',switchSpace);on('refreshSpacesBtn',()=>listSpaces(false));
   on('openFolderBtn',async()=>{if(!S.isCloud())throw Error('Conecte ao Google Drive.');await openSpace(await S.drive.openFromFolder($('entryFolderLink').value.trim()))});
   on('retrySaveBtn',async()=>{if(saveError?.code==='CONFLICT')return;saveError=null;if(await saveNow())report('Alterações confirmadas no Google Drive.')});on('reauthorizeBtn',async()=>{if(saving)await saving;S.drive?.disconnect();await connectGoogle()});
   on('reloadRemoteBtn',async()=>{if(!S.link)return;if(!confirm('Descartar mudanças não salvas desta aba e reabrir o cadastro do Google Drive?'))return;const id=S.link.manifestId;if(timer)clearTimeout(timer);timer=null;if(saving)await saving;S.resetToGate();saveError=null;await openSpace(id)});
@@ -170,9 +146,10 @@ function initGoogle(){
 function start(){
   const url=new URL(location.href);if(url.searchParams.has('client')){url.searchParams.delete('client');history.replaceState(null,'',url.href)}S.onUpdate=()=>{render();scheduleSave()};
   document.querySelectorAll('.navtabs button').forEach(b=>b.onclick=()=>selectView(b.dataset.view));document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('dialog').close());on('helpBtn',()=>presentModal('helpDialog'));
-  initForms();initCapture();initPromotion();initPilot();initPrint();initSharing();initGoogle();render();if(S.config.clientId)prepareGoogleIdentity().catch(()=>{});
+  initForms();initCapture();initPromotion();initPilot();initPrint();initGoogle();render();if(S.config.clientId)prepareGoogleIdentity().catch(()=>{});
   window.addEventListener('beforeunload',e=>{if(S.dirty||saving){e.preventDefault();e.returnValue=''}});window.addEventListener('focus',()=>{if(S.hasSpace()&&!S.isCloud())render()});
 }
 start();
 mountPdfImport({session:S,flush,report,afterApply:()=>{resetPrint();render()}});
-const versionLabel=document.querySelector('.version');if(versionLabel)versionLabel.textContent='LABORATÓRIO 0.14 · NÃO LANÇADO';
+navigation=mountNavigation({session:S,flush,openSpace,render,selectView,report,address});
+render();
