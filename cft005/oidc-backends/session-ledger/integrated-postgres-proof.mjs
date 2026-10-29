@@ -24,7 +24,7 @@ export async function integratedPostgresProof({root,ca,passwords,config,coordina
   const store=cfg=>{
     const role='cft005_hml_'+cfg.product.toLowerCase();
     class LocalPool extends pg.Pool{
-      constructor(){super({...config,user:role,password:passwords[cfg.product],database:'cft005_hml_db_teste',max:2,application_name:'cft005-local-http-'+cfg.product});
+      constructor(){super({...config,user:role,password:passwords[cfg.product],database:'cft005_hml_db_teste',max:1,application_name:'cft005-local-http-'+cfg.product});
         this.on('connect',c=>{const query=c.query.bind(c);c.query=(...args)=>{const result=query(...args);if(writePause?.product!==cfg.product||!String(args[0]).startsWith('UPDATE '+role+'.records SET value='))return result;
           const hold=writePause;writePause=undefined;return result.then(async r=>{hold.pid=c.processID;hold.entered.resolve();await hold.release.promise;return r;});};});
       }
@@ -45,7 +45,17 @@ export async function integratedPostgresProof({root,ca,passwords,config,coordina
       await check('INT-'+p+'-'+u+'-CROSS-USER-PRODUCT-DENIED',async()=>{const peer=p==='A'?'B':'A',other=u==='U1'?'U2':'U1';for(const method of ['GET','PUT']){assert.equal((await req(p,u,`/api/products/${p}/records/${other}`,method,method==='PUT'?{value:'synthetic-denied'}:undefined)).status,404);assert.equal((await req(p,u,`/api/products/${peer}/records/${u}`,method,method==='PUT'?{value:'synthetic-denied'}:undefined)).status,403);}});
     }
     await check('INT-REVOKE-CSRF-AND-BROWSER-OWNER-BODY-REFUSED',async()=>{assert.equal((await req('A','U1','/sessions/revoke','POST',undefined,{'X-CFT005-CSRF':'wrong'})).status,403);assert.equal((await req('A','U1','/sessions/revoke','POST',{owner:'U2'})).status,400);assert.equal((await req('A','U1','/session')).status,200);});
-    await check('INT-LEGACY-AUDIT-DOES-NOT-BYPASS-LEDGER-LOCK',async()=>{const r=await req('A','U1','/proof/technical/run','POST');assert.equal(r.status,503);assert.equal(r.json.error,'technical_requires_ledger_review');});
+    for(const p of ['A','B'])for(const u of ['U1','U2'])await check('INT-'+p+'-'+u+'-GUARDED-TECHNICAL-AUDIT',async()=>{
+      const before=await req(p,u,`/api/products/${p}/records/${u}`);
+      const r=await req(p,u,'/proof/technical/run','POST');
+      assert.equal(r.status,200);assert.equal(r.json.version,3);assert.equal(r.json.result,'PASS');
+      assert.ok(r.json.cases.length>=49);assert.ok(r.json.cases.every(c=>c.result==='PASS'));
+      if(u==='U2')assert.deepEqual(r.json.connectionReuse,{previousVerifiedOwnerDifferent:true,samePhysicalConnection:true});
+      assert.deepEqual((await req(p,u,`/api/products/${p}/records/${u}`)).json,before.json);
+      const summary=(await fixture.request(p,{path:'/proof/technical/results'})).json;
+      assert.equal(JSON.stringify(summary).includes(sessions.get(key(p,u)).csrf),false);
+      assert.equal(r.json.sharedSupabaseJwtRealTest,false);
+    });
     await check('INT-LOCAL-LOGOUT-PRESERVES-PEER-AND-U2',async()=>{const r=await req('A','U1','/logout','POST');assert.equal(r.status,200);assert.equal(r.json.durableLocalLogout,true);assert.equal((await req('A','U1','/session')).status,401);for(const [p,u]of [['B','U1'],['A','U2'],['B','U2']])assert.equal((await req(p,u,'/session')).status,200);await login('A','U1');});
     const pending=await fixture.begin('A',new Map(),{user:'U1'});
     const oldB=new Map(sessions.get('BU1').jar);

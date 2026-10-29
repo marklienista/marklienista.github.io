@@ -6,10 +6,14 @@ const unavailable=()=>new Error('E_LEDGER_UNAVAILABLE');
 const validHash=s=>typeof s==='string'&&/^[a-f0-9]{64}$/.test(s);
 const validBinding=b=>b&&Object.keys(b).length===3&&['owner','sessionHash','epoch'].every(k=>Object.hasOwn(b,k))&&['U1','U2'].includes(b.owner)&&validHash(b.sessionHash)&&validEpoch(b.epoch);
 
-async function transaction(pool,role,fn){
+const auditContext=async c=>(await c.query("/* CFT005_LEDGER_AUDIT_CONTEXT */ SELECT pg_backend_pid() AS pid,current_user AS role,session_user AS login,current_setting('cft005.owner',true) AS owner")).rows[0];
+const cleanAuditContext=(row,role)=>Number.isSafeInteger(row?.pid)&&row.pid>0&&row.role===role&&row.login===role&&(row.owner===null||row.owner==='');
+async function transaction(pool,role,fn,{audit=false,rollbackOnly=false}={}){
   let c,destroy=false,commitStarted=false;
   try{
     c=await pool.connect();
+    const before=audit?await auditContext(c):undefined;
+    if(audit&&!cleanAuditContext(before,role))throw unavailable();
     await c.query('BEGIN ISOLATION LEVEL READ COMMITTED');
     await c.query("SET LOCAL synchronous_commit = 'on'");
     await c.query("SET LOCAL lock_timeout = '1500ms'");
@@ -18,10 +22,13 @@ async function transaction(pool,role,fn){
     const check=await c.query(`SELECT current_database()=$1 AND current_user=$2 AND session_user=$2 AND NOT rolsuper AND NOT rolcreatedb AND NOT rolcreaterole AND NOT rolreplication AND NOT rolbypassrls AND NOT rolinherit AND NOT EXISTS(SELECT 1 FROM pg_auth_members WHERE member=r.oid) AND (SELECT ssl FROM pg_stat_ssl WHERE pid=pg_backend_pid()) AS ok FROM pg_roles r WHERE rolname=current_user`,[DB,role]);
     if(check.rows[0]?.ok!==true)throw unavailable();
     const result=await fn(c);
-    commitStarted=true;await c.query('COMMIT'); // No success returned before this promise resolves.
-    return result;
+    commitStarted=true;await c.query(rollbackOnly?'ROLLBACK':'COMMIT'); // No success before completion.
+    if(!audit)return result;
+    const after=await auditContext(c);
+    if(!cleanAuditContext(after,role)||after.pid!==before.pid)throw unavailable();
+    return {result,before,after,completion:rollbackOnly?'ROLLBACK':'COMMIT'};
   }catch(e){
-    if(commitStarted)destroy=true; // Unknown commit outcome never returns to pool.
+    if(commitStarted||audit)destroy=true; // Unknown outcome or audit context never returns to pool.
     if(c)try{await c.query('ROLLBACK');}catch{destroy=true;}
     throw e?.ledgerDenied?denial():unavailable();
   }finally{c?.release(destroy);}
@@ -77,7 +84,7 @@ export async function executeCommand(pool,command,verification){
   });
 }
 
-export async function protectedTransaction({pool,coordinator,cfg,principal,binding,operation}){
+async function protectedOperation({pool,coordinator,cfg,principal,binding,operation},options){
   // Caller is trusted server code. No browser-selected principal or callback.
   if(!['A','B'].includes(cfg?.product)||!principal||cfg.subjects?.[principal.subject]!==principal.label||
     !validBinding(binding)||principal.label!==binding.owner||typeof operation!=='function'||typeof coordinator?.authorize!=='function')throw denial();
@@ -92,5 +99,14 @@ export async function protectedTransaction({pool,coordinator,cfg,principal,bindi
     // Locks stay held on THIS connection through the data operation and COMMIT.
     // The callback must use only this client and fixed parameterized data SQL.
     return operation(c);
-  });
+  },options);
+}
+
+export const protectedTransaction=input=>protectedOperation(input);
+// Two fixed server-only phases. Both obtain fresh online authorization and the
+// epoch/session locks before invoking fixed SQL. Only data-free context is read
+// after completion. No callback can run outside the protected transaction here.
+export function protectedAuditTransaction(input,phase){
+  if(!['probe','verify'].includes(phase))throw denial();
+  return protectedOperation(input,{audit:true,rollbackOnly:phase==='probe'});
 }

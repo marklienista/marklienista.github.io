@@ -12,7 +12,7 @@ function databaseFixture({allowedProbe,failTag,unsafePolicy=false,restrictedColu
   const client={async query(sql,args=[]){
     const tag=/CFT005_AUDIT:([A-Z_]+)/.exec(sql)?.[1];calls.push({tag,sql,args});
     if(tag===failTag)throw Object.assign(Error('synthetic-private-error-must-not-escape'),{code:'XX000'});
-    if(['BEFORE','PROBE_CONTEXT','AFTER_ROLLBACK','AFTER_COMMIT'].includes(tag))return {rows:[{pid:12345,role:'cft005_hml_a',owner}]};
+    if(['CONTEXT','BEFORE','PROBE_CONTEXT','AFTER_ROLLBACK','AFTER_COMMIT'].includes(tag))return {rows:[{pid:12345,role:'cft005_hml_a',owner}]};
     if(['OWNER','READ_OWNER'].includes(tag))owner=args[0];
     if(['BEGIN','READ_BEGIN'].includes(tag))readOnly=tag==='READ_BEGIN';
     if(['ROLLBACK','ABORT','COMMIT'].includes(tag)){if(tag==='COMMIT')assert.equal(readOnly,true);owner=null;}
@@ -79,6 +79,15 @@ test('technical endpoint requires authentication, correct CSRF and Origin; unava
   assert.equal(JSON.stringify(publicReceipt).includes(state.csrf),false);
   assert.equal(JSON.stringify(publicReceipt).includes('access_token'),false);
   assert.equal((await f.request('A',{path:'/proof/technical/run',method:'POST',jar:login.jar,headers:{Origin:f.configs.A.origin,'X-CFT005-CSRF':state.csrf}})).status,429);
+});
+
+test('ledger audit preserves fixed denial/outage categories and never opens SQL after failed authorization',async()=>{
+  class Pool{on(){}async connect(){throw Error('SQL_MUST_NOT_BE_REACHED');}async end(){}}
+  const principal={subject:'fixture-u1',label:'U1',ledgerBinding:{owner:'U1',epoch:1,sessionHash:'a'.repeat(64)}};
+  for(const denied of [true,false]){
+    const store=createPostgresStore(cfg,'postgresql://cft005_hml_a:synthetic-only-password@dpg-dbh8tghsrm7s73f4tc9g-a/cft005_hml_db_teste',{Pool,ledger:{authorize:async()=>{throw Object.assign(Error('private-upstream-error'),denied?{ledgerDenied:true}:{});}}});
+    await assert.rejects(store.audit(principal),{message:denied?'E_LEDGER_DENIED':'E_LEDGER_UNAVAILABLE'});
+  }
 });
 
 test('technical HTTP probes use fixed destinations and prove product policy with absent/forged Origin, without exporting credentials',async()=>{

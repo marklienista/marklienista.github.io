@@ -153,7 +153,7 @@ export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchPr
         return send(res,200,{revoked:true,scope:'hml-user',durable:true},{'Set-Cookie':cookie(SESSION,'',0)});
       }
       if(req.method==='POST'&&url.pathname==='/proof/technical/run'){
-        if(sessionLedger)return fail(503,'technical_requires_ledger_review');
+        if(sessionLedger&&store.ledgerAuditVersion!==1)return fail(503,'technical_requires_ledger_review');
         if(proofRunning||now-(session.lastTechnical??0)<15)return fail(429,'proof_busy');
         proofRunning=true;session.lastTechnical=now;
         let receipt;

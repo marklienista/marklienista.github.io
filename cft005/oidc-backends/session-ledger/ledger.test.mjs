@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {generateKeyPairSync,createHash} from 'node:crypto';
 import {readFile} from 'node:fs/promises';
 import {audience,destination,signCommand,verifyCommand,sessionHash} from './protocol.mjs';
-import {executeCommand,protectedTransaction} from './transactions.mjs';
+import {executeCommand,protectedTransaction,protectedAuditTransaction} from './transactions.mjs';
 
 // Cryptographic keys exist only in test-process memory. Never exported to files.
 const keys={A:generateKeyPairSync('ed25519'),B:generateKeyPairSync('ed25519')};
@@ -33,7 +33,7 @@ function fixture(){
   for(const p of ['A','B'])for(const u of ['U1','U2'])sessions.set(hash(p+u),{product:p,owner:u,epoch:1,expires_at:1900,revoked:false});
   const f={epochs,sessions,nonces,revision:4,now:1000,events:[],calls:[],connections:0,destroyed:0,failCommit:false,failRollback:false,roleOk:true};
   const pool=role=>({async connect(){
-    f.connections++;const held=new Map(),effects=[],reserved=[];
+    f.connections++;const pid=f.connections,held=new Map(),effects=[],reserved=[];let owner=null;
     const unlock=()=>{for(const release of held.values())release();held.clear();for(const n of reserved)pending.delete(n);};
     async function lock(id,write){if(held.has(id))return;let l=locks.get(id);if(!l)locks.set(id,l=new Lock());held.set(id,await l.acquire(write));}
     return {async query(sql,args=[]){
@@ -41,9 +41,11 @@ function fixture(){
       if(sql==='COMMIT'){
         if(f.commitGate)await f.commitGate.promise;
         if(f.failCommit)throw Error('private-commit-error');
-        for(const effect of effects)effect();effects.length=0;f.events.push('commit:'+role);unlock();return {rows:[]};
+        for(const effect of effects)effect();effects.length=0;owner=null;f.events.push('commit:'+role);unlock();return {rows:[]};
       }
-      if(sql==='ROLLBACK'){effects.length=0;unlock();if(f.failRollback)throw Error('private-rollback-error');return {rows:[]};}
+      if(sql==='ROLLBACK'){effects.length=0;owner=null;unlock();if(f.failRollback)throw Error('private-rollback-error');return {rows:[]};}
+      if(sql.includes('CFT005_LEDGER_AUDIT_CONTEXT'))return {rows:[{pid,role,login:role,owner:f.dirtyAuditContext?'U2':owner}]};
+      if(sql.startsWith('SELECT set_config'))owner=args[0];
       if(sql.startsWith('BEGIN')||sql.startsWith('SET LOCAL')||sql.startsWith('SELECT set_config'))return {rows:[]};
       if(sql.includes('FROM pg_roles r'))return {rows:[{ok:f.roleOk&&args[1]===role&&args[0]==='cft005_hml_db_teste'}]};
       if(sql.includes('clock_timestamp()'))return {rows:[{now:String(f.now)}]};
@@ -177,6 +179,26 @@ test('local fixture: ambiguous commit has no success acknowledgment and destroys
 });
 test('local fixture: failed rollback destroys the connection and hides internal errors',async()=>{
   const f=fixture();f.failRollback=true;await assert.rejects(f.run({action:'revoke',...binding(),epoch:2}),{message:'E_LEDGER_DENIED'});assert.equal(f.destroyed,1);
+});
+const auditInput=f=>({pool:f.aPool,coordinator:f.coordinator,cfg:{product:'A',subjects:{'fixture-U1':'U1'}},principal:{subject:'fixture-U1',label:'U1'},binding:binding(),operation:async c=>{await c.query('UPDATE FIXTURE RECORD');return 'probe';}});
+test('audit phase rolls back every probe effect and returns only clean context on the same client',async()=>{
+  const f=fixture(),r=await protectedAuditTransaction(auditInput(f),'probe');
+  assert.equal(f.revision,4);assert.equal(r.result,'probe');assert.equal(r.completion,'ROLLBACK');
+  assert.equal(r.before.owner,null);assert.equal(r.after.owner,null);assert.equal(r.before.pid,r.after.pid);
+});
+test('audit verification reacquires authorization and SQL locks after the probe rollback',async()=>{
+  const f=fixture();await protectedAuditTransaction(auditInput(f),'probe');
+  await f.run({action:'revoke',...binding()});let reached=false;
+  await assert.rejects(protectedAuditTransaction({...auditInput(f),operation:async()=>{reached=true;}},'verify'),{message:'E_LEDGER_DENIED'});
+  assert.equal(reached,false);assert.equal(f.revision,4);
+});
+test('dirty pooled audit context is destroyed before any probe and never reported as successful cleanup',async()=>{
+  const f=fixture();f.dirtyAuditContext=true;let reached=false;
+  await assert.rejects(protectedAuditTransaction({...auditInput(f),operation:async()=>{reached=true;}},'probe'),{message:'E_LEDGER_UNAVAILABLE'});
+  assert.equal(reached,false);assert.equal(f.destroyed,1);assert.equal(f.revision,4);
+});
+test('unknown audit phase is rejected before network or SQL',()=>{
+  const f=fixture();assert.throws(()=>protectedAuditTransaction(auditInput(f),'commit-unrestricted'),{message:'E_LEDGER_DENIED'});assert.equal(f.connections,0);
 });
 test('migration drafts are guarded, never executed by startup, and do not grant record access',async()=>{
   const migration=await readFile(new URL('./001-ledger.DRAFT.sql',import.meta.url),'utf8');

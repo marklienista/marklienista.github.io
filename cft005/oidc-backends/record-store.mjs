@@ -1,5 +1,5 @@
 import pg from 'pg';
-import {auditDatabase} from './technical-audit.mjs';
+import {auditDatabase,auditLedgerDatabase} from './technical-audit.mjs';
 import {protectedTransaction} from './session-ledger/transactions.mjs';
 
 const HOST='dpg-dbh8tghsrm7s73f4tc9g-a';
@@ -47,7 +47,7 @@ export function createPostgresStore(cfg,connectionString,{Pool=pg.Pool,ledger}={
     }finally{client?.release(destroy);}
   }
   function view(row){return row?{id:row.record_id,value:row.value,revision:row.revision}:null;}
-  return Object.freeze({kind:'postgres',ledgerRequired:Boolean(ledger),
+  return Object.freeze({kind:'postgres',ledgerRequired:Boolean(ledger),ledgerAuditVersion:ledger?1:undefined,
     async ready(){
       try{
         const r=await pool.query(`SELECT current_user=$1 AND session_user=$1 AND NOT rolsuper AND NOT rolcreatedb AND NOT rolcreaterole AND NOT rolbypassrls AS login_ok,
@@ -74,17 +74,24 @@ export function createPostgresStore(cfg,connectionString,{Pool=pg.Pool,ledger}={
       const r=await execute(principal,`UPDATE ${table} SET value=$1,revision=revision+1 WHERE record_id=$2 RETURNING record_id,value,revision`,[value,`HML-${cfg.product}-${requested}`]);return view(r.rows[0]);
     },
     async audit(principal){
-      // Legacy audit opens/rolls back its own transactions. It cannot run through
-      // this lock boundary; require an explicit ledger-aware audit before reuse.
-      if(ledger)throw unavailable('unknown');
       const label=principalLabel(principal);let client,reuse=false;
       try{
+        if(ledger){
+          const {checks,next}=await auditLedgerDatabase({pool,coordinator:ledger,cfg,principal,previous:previousAudit});
+          previousAudit=next??undefined;
+          return checks;
+        }
         client=await pool.connect();
         const {checks,next}=await auditDatabase(client,cfg.product,label,previousAudit);
         reuse=Boolean(next&&checks.afterRollbackContextEmpty&&checks.afterCommitContextEmpty);
         previousAudit=reuse?next:undefined;
         return checks;
-      }catch{previousAudit=undefined;throw unavailable('unknown');}
+      }catch(error){
+        previousAudit=undefined;
+        if(ledger&&error?.ledgerDenied)throw Object.assign(new Error('E_LEDGER_DENIED'),{ledgerDenied:true});
+        if(ledger&&error?.message==='E_LEDGER_UNAVAILABLE')throw new Error('E_LEDGER_UNAVAILABLE');
+        throw unavailable('unknown');
+      }
       finally{client?.release(!reuse);}
     },
     async close(){await pool.end();}

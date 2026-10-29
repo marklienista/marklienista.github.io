@@ -10,12 +10,13 @@ const DB_CHECKS=Object.freeze(['initialContextEmpty','exactRuntimeRole','restric
 
 // Session and token stay server-side, with fixed destinations and no caller-selected SQL.
 export async function runTechnicalProof({cfg,principal,session,sid,store,proofFetch}){
-  const receipt={version:2,startedAt:new Date().toISOString(),product:cfg.product,user:session.label,storage:store.kind,cases:[]};
+  const receipt={version:store.ledgerRequired?3:2,startedAt:new Date().toISOString(),product:cfg.product,user:session.label,storage:store.kind,cases:[]};
   const observe=(id,expected,actual)=>receipt.cases.push({id,expected,actual,result:expected===actual?'PASS':'FAIL'});
   try{
     if(store.kind!=='postgres'||typeof store.audit!=='function')throw Error('E_AUDIT_NOT_AVAILABLE');
     const db=await store.audit(principal);
-    for(const id of DB_CHECKS){
+    const required=store.ledgerRequired?[...DB_CHECKS,'ledgerGuardedProbeRollback','ledgerGuardedVerificationCommit','ledgerFreshAuthorizationEachPhase']:DB_CHECKS;
+    for(const id of required){
       if(typeof db[id]!=='boolean'){receipt.cases.push({id:'DB-'+id,result:'BLOCKED'});continue;}
       observe('DB-'+id,true,db[id]);
     }

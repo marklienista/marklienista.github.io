@@ -1,0 +1,220 @@
+{
+  "schema": "CFT005-LOCAL-HTTPS-LEDGER-INTEGRATION-1",
+  "recordedAt": "2026-10-29T20:52:49.523Z",
+  "scope": "local-synthetic-only",
+  "mode": "native-postgresql",
+  "serverVersionNum": 170011,
+  "realOidc": false,
+  "realBrowserSessions": false,
+  "hostedDatabaseAccessed": false,
+  "hostedNetworkChanged": false,
+  "runtimeIntegrated": true,
+  "coordinatorHttps": true,
+  "counts": {
+    "PASS": 37,
+    "FAIL": 1
+  },
+  "cases": [
+    {
+      "id": "PG17-TLS-LOCAL-BOUNDARY",
+      "result": "PASS"
+    },
+    {
+      "id": "MIGRATION-UNREVIEWED-REFUSED",
+      "result": "PASS"
+    },
+    {
+      "id": "MIGRATION-EXACT-SQL-APPLIED-LOCAL",
+      "result": "PASS"
+    },
+    {
+      "id": "MIGRATION-SECOND-APPLICATION-REFUSED",
+      "result": "PASS"
+    },
+    {
+      "id": "SCHEMA-OWNER-FORCE-RLS-NO-PUBLIC",
+      "result": "PASS"
+    },
+    {
+      "id": "A-REAL-LOGIN-RESTRICTED-TLS",
+      "result": "PASS"
+    },
+    {
+      "id": "A-CROSS-PRODUCT-RECORDS-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "A-NO-EPOCH-SESSION-MUTATION-OR-NONCES",
+      "result": "PASS"
+    },
+    {
+      "id": "A-NO-ROLE-ESCALATION-OR-DDL",
+      "result": "PASS"
+    },
+    {
+      "id": "A-NO-CONTEXT-NO-METADATA",
+      "result": "PASS"
+    },
+    {
+      "id": "A-U1-REGISTER-LOCK-AND-POSITIVE-READ",
+      "result": "PASS"
+    },
+    {
+      "id": "A-U2-REGISTER-LOCK-AND-POSITIVE-READ",
+      "result": "PASS"
+    },
+    {
+      "id": "A-METADATA-RLS-OWNER-PRODUCT-AND-LOCK-PAD",
+      "result": "PASS"
+    },
+    {
+      "id": "A-OTHER-USER-RECORD-FILTERED",
+      "result": "PASS"
+    },
+    {
+      "id": "B-REAL-LOGIN-RESTRICTED-TLS",
+      "result": "PASS"
+    },
+    {
+      "id": "B-CROSS-PRODUCT-RECORDS-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "B-NO-EPOCH-SESSION-MUTATION-OR-NONCES",
+      "result": "PASS"
+    },
+    {
+      "id": "B-NO-ROLE-ESCALATION-OR-DDL",
+      "result": "PASS"
+    },
+    {
+      "id": "B-NO-CONTEXT-NO-METADATA",
+      "result": "PASS"
+    },
+    {
+      "id": "B-U1-REGISTER-LOCK-AND-POSITIVE-READ",
+      "result": "PASS"
+    },
+    {
+      "id": "B-U2-REGISTER-LOCK-AND-POSITIVE-READ",
+      "result": "PASS"
+    },
+    {
+      "id": "B-METADATA-RLS-OWNER-PRODUCT-AND-LOCK-PAD",
+      "result": "PASS"
+    },
+    {
+      "id": "B-OTHER-USER-RECORD-FILTERED",
+      "result": "PASS"
+    },
+    {
+      "id": "COORDINATOR-NO-PRODUCT-DATA-OR-DDL",
+      "result": "PASS"
+    },
+    {
+      "id": "REPLAY-UNIQUE-NONCE-DURABLE",
+      "result": "PASS"
+    },
+    {
+      "id": "WRONG-PRODUCT-SIGNED-COMMAND-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "LOCAL-LOGOUT-LEAVES-PEER-AND-U2",
+      "result": "PASS"
+    },
+    {
+      "id": "A-REAL-CONCURRENT-WRITE-THEN-REVOCATION",
+      "result": "PASS"
+    },
+    {
+      "id": "B-REAL-CONCURRENT-WRITE-THEN-REVOCATION",
+      "result": "PASS"
+    },
+    {
+      "id": "CHECK-THEN-WRITE-RACE-FENCED",
+      "result": "PASS"
+    },
+    {
+      "id": "OLD-LOGIN-SNAPSHOT-AND-REACTIVATION-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "COORDINATOR-OUTAGE-FAILS-CLOSED",
+      "result": "PASS"
+    },
+    {
+      "id": "REAL-RESTART-PRESERVES-EPOCH-NONCE-AND-ROWS",
+      "result": "PASS"
+    },
+    {
+      "id": "A-U1-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "A-U2-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "B-U1-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "B-U2-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "AUDIT-A-U1-RLS-ROLLBACK-CLEANUP-AND-REUSE",
+      "result": "FAIL",
+      "category": "ASSERTION_OR_SQL",
+      "checkpoint": "AUDIT-A-U1-RLS-ROLLBACK-CLEANUP-AND-REUSE",
+      "errorType": "AssertionError",
+      "sqlState": "ERR_ASSERTION"
+    }
+  ],
+  "diagnostics": [
+    {
+      "phase": "A-METADATA-RLS-OWNER-PRODUCT-AND-LOCK-PAD",
+      "sqlState": "23514",
+      "kind": "UPDATE"
+    },
+    {
+      "phase": "B-METADATA-RLS-OWNER-PRODUCT-AND-LOCK-PAD",
+      "sqlState": "23514",
+      "kind": "UPDATE"
+    },
+    {
+      "phase": "REPLAY-UNIQUE-NONCE-DURABLE",
+      "sqlState": "23505",
+      "kind": "INSERT"
+    },
+    {
+      "phase": "restart-reconnect",
+      "sqlState": "23505",
+      "kind": "INSERT"
+    }
+  ],
+  "sourceSha256": {
+    "001-ledger.DRAFT.sql": "81584f9b5c280ea29680c4aabd62362daeee7c488e864342564e91026f6b00aa",
+    "002-rollback.DRAFT.sql": "92849aaea292ab787c9dc8f588fcc399322a6e5bef128807d636d3671b2da8b1",
+    "transactions.mjs": "1e6e145bd357ed50b786840daf256f5d22c8cdfcb64bc2edc720631c16f4873c",
+    "protocol.mjs": "3d7a187e6d6c564a4fdbb1492fcf0f39c328aa1301a505227e161a1ae3d925bb",
+    "local-baseline.sql": "cfc19ae3f57a4ab1c686b552b8b85f6b6c8659b0a452916d08bc84fd2422f8c5",
+    "postgres-validation.mjs": "62419d48ea8e2cdcae0c4cbc9b125a8046fcb5f4801217277d251002755385e4",
+    "run-local-postgres.ps1": "1af906e5ef1c304039af6372efd130a033675423891d08f5cd6a10ab03040b85",
+    "control-local-postgres.ps1": "117cf8b5f4dded7721010c0b2ffebe71053d8288a58af789d91386538188f2d5",
+    "transport.mjs": "082ca25c8d699cd35033722fef292f34417ca866ae110625858d0907bdaf50dd",
+    "settings.mjs": "2d741fa51809f77b7a949abc3e90db487e28826ff22d1c93c51c43e72961f40a",
+    "integrated-postgres-proof.mjs": "1c550b9f55f11d7bff341249b1b7fdb8c77f04636da2827716c525f4ed81ab5f",
+    "../backend.mjs": "26cc96756edd159653b1717154640981ab1a1ce4c71a20c17008116a9dfe5136",
+    "../record-store.mjs": "c39c5287044e3215d89fc66ad99cc51af3b3f57b11b64d2c81ecd7e3f62d26d9",
+    "../protocol-fixture.mjs": "4009f04d06564ac8d251b31552863909c6f7da6b58df032758e0f0eb419cf17c",
+    "audit-postgres-proof.mjs": "9bddca6398e6bcd18a90a49b6318aa27e7a8ecf513cdffd322f950998e7e72a0",
+    "../technical-audit.mjs": "a08f84fb9b5fdfb5fc978636668fe2e9231a8f898060caa6128c600fac7d1263",
+    "../technical-proof.mjs": "8d46460d7f93a463714bd29c2692abbe1620b3a0e0cb58356f9794bdfa7ab87c"
+  },
+  "publishedHomologation": "NOT_GRANTED",
+  "newHmlGatePasses": 0,
+  "firstFailure": "AUDIT-A-U1-RLS-ROLLBACK-CLEANUP-AND-REUSE",
+  "auditIntegrated": true
+}

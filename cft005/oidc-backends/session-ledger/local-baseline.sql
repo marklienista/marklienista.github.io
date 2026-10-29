@@ -27,8 +27,14 @@ ALTER TABLE cft005_hml_a.records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE cft005_hml_a.records FORCE ROW LEVEL SECURITY;
 ALTER TABLE cft005_hml_b.records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE cft005_hml_b.records FORCE ROW LEVEL SECURITY;
-CREATE POLICY own_record ON cft005_hml_a.records TO cft005_hml_a USING(owner_label=current_setting('cft005.owner',true)) WITH CHECK(owner_label=current_setting('cft005.owner',true));
-CREATE POLICY own_record ON cft005_hml_b.records TO cft005_hml_b USING(owner_label=current_setting('cft005.owner',true)) WITH CHECK(owner_label=current_setting('cft005.owner',true));
+-- Match the product/owner predicate in the reviewed HML installer. A CHECK
+-- constraint alone must not be misreported as a product RLS WITH CHECK denial.
+CREATE POLICY own_select ON cft005_hml_a.records FOR SELECT TO cft005_hml_a USING(product='A' AND owner_label=current_setting('cft005.owner',true) AND current_setting('cft005.owner',true) IN ('U1','U2'));
+CREATE POLICY own_insert ON cft005_hml_a.records FOR INSERT TO cft005_hml_a WITH CHECK(product='A' AND owner_label=current_setting('cft005.owner',true) AND current_setting('cft005.owner',true) IN ('U1','U2'));
+CREATE POLICY own_update ON cft005_hml_a.records FOR UPDATE TO cft005_hml_a USING(product='A' AND owner_label=current_setting('cft005.owner',true) AND current_setting('cft005.owner',true) IN ('U1','U2')) WITH CHECK(product='A' AND owner_label=current_setting('cft005.owner',true) AND current_setting('cft005.owner',true) IN ('U1','U2'));
+CREATE POLICY own_select ON cft005_hml_b.records FOR SELECT TO cft005_hml_b USING(product='B' AND owner_label=current_setting('cft005.owner',true) AND current_setting('cft005.owner',true) IN ('U1','U2'));
+CREATE POLICY own_insert ON cft005_hml_b.records FOR INSERT TO cft005_hml_b WITH CHECK(product='B' AND owner_label=current_setting('cft005.owner',true) AND current_setting('cft005.owner',true) IN ('U1','U2'));
+CREATE POLICY own_update ON cft005_hml_b.records FOR UPDATE TO cft005_hml_b USING(product='B' AND owner_label=current_setting('cft005.owner',true) AND current_setting('cft005.owner',true) IN ('U1','U2')) WITH CHECK(product='B' AND owner_label=current_setting('cft005.owner',true) AND current_setting('cft005.owner',true) IN ('U1','U2'));
 GRANT USAGE ON SCHEMA cft005_hml_a TO cft005_hml_a;
 GRANT USAGE ON SCHEMA cft005_hml_b TO cft005_hml_b;
 GRANT SELECT,INSERT,UPDATE ON cft005_hml_a.records TO cft005_hml_a;

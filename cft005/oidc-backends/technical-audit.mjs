@@ -2,12 +2,14 @@
 // Never return SQL errors, backend PIDs, credentials or raw catalog definitions.
 const empty=value=>value===null||value==='';
 const normalize=value=>value.replace(/::text|[\s()]/g,'');
-export async function auditDatabase(client,product,label,previous){
+import {protectedAuditTransaction} from './session-ledger/transactions.mjs';
+const context=async client=>(await client.query("/* CFT005_AUDIT:CONTEXT */ SELECT pg_backend_pid() AS pid,current_user AS role,current_setting('cft005.owner',true) AS owner")).rows[0];
+async function auditInTransaction(client,product,label){
   if(!['A','B'].includes(product)||!['U1','U2'].includes(label))throw Error('E_AUDIT_INPUT');
   const role='cft005_hml_'+product.toLowerCase(),otherRole='cft005_hml_'+(product==='A'?'b':'a');
   const table=role+'.records',otherTable=otherRole+'.records';
   const id=`HML-${product}-${label}`,otherLabel=label==='U1'?'U2':'U1',otherId=`HML-${product}-${otherLabel}`;
-  const checks={};let pid,transaction=false,initial;
+  const checks={};let initial;
   const query=(tag,sql,args=[])=>client.query(`/* CFT005_AUDIT:${tag} */ ${sql}`,args);
   const context=async tag=>(await query(tag,"SELECT pg_backend_pid() AS pid,current_user AS role,current_setting('cft005.owner',true) AS owner")).rows[0];
   const denied=async(tag,sql,args=[])=>{
@@ -18,13 +20,9 @@ export async function auditDatabase(client,product,label,previous){
     return rejected&&restored.role===role&&restored.owner===label;
   };
   const record=async tag=>(await query(tag,`SELECT record_id,owner_label,product,value,revision FROM ${table} WHERE record_id=$1`,[id])).rows;
-  try{
-    const before=await context('BEFORE');pid=before.pid;
-    checks.initialContextEmpty=empty(before.owner);checks.exactRuntimeRole=before.role===role;
-    if(!checks.initialContextEmpty||!checks.exactRuntimeRole)return {checks,next:null};
-    await query('BEGIN','BEGIN');transaction=true;
-    await query('LOCK_TIMEOUT',"SET LOCAL lock_timeout='2s'");
-    await query('OWNER',"SELECT set_config('cft005.owner',$1,true)",[label]);
+  const entered=await context('PROBE_CONTEXT');
+  checks.exactRuntimeRole=entered.role===role;
+  if(!checks.exactRuntimeRole||entered.owner!==label)throw Error('E_AUDIT_CONTEXT');
     const policy=(await query('POLICY',`SELECT NOT r.rolsuper AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication AND NOT r.rolbypassrls AND NOT r.rolinherit
       AND NOT EXISTS(SELECT 1 FROM pg_auth_members WHERE member=r.oid) AS restricted_role,
       c.relrowsecurity AND c.relforcerowsecurity AND pg_get_userbyid(c.relowner)='cft005_hml_owner' AS forced_rls,
@@ -74,18 +72,56 @@ export async function auditDatabase(client,product,label,previous){
     checks.noPublicRelations=inventory?.public_relations===0;checks.fixedPrivateTables=inventory?.fixed_private_tables===true;
     checks.ownerDefaultExecuteRevoked=inventory?.default_public_execute_revoked===true;checks.noPublications=inventory?.no_publications===true;
     checks.ownRowPreservedInsideTransaction=JSON.stringify(await record('FINAL_ROW'))===JSON.stringify(initial);
+  return {checks,initial};
+}
+
+// Retained local/legacy adapter; hosted ledger mode uses the guarded adapter below.
+export async function auditDatabase(client,product,label,previous){
+  if(!['A','B'].includes(product)||!['U1','U2'].includes(label))throw Error('E_AUDIT_INPUT');
+  const query=(tag,sql,args=[])=>client.query('/* CFT005_AUDIT:'+tag+' */ '+sql,args);
+  const before=await context(client),checks={initialContextEmpty:empty(before.owner),exactRuntimeRole:before.role==='cft005_hml_'+product.toLowerCase()};
+  if(!checks.initialContextEmpty||!checks.exactRuntimeRole)return {checks,next:null};
+  let transaction=false;
+  try{
+    await query('BEGIN','BEGIN');transaction=true;
+    await query('LOCK_TIMEOUT',"SET LOCAL lock_timeout='2s'");
+    await query('OWNER',"SELECT set_config('cft005.owner',$1,true)",[label]);
+    const audited=await auditInTransaction(client,product,label);Object.assign(checks,audited.checks);
+    if(!audited.initial)return {checks,next:null};
     await query('ROLLBACK','ROLLBACK');transaction=false;
-    const rolledBack=await context('AFTER_ROLLBACK');checks.afterRollbackContextEmpty=empty(rolledBack.owner)&&rolledBack.role===role;
-    checks.sameConnectionThroughRollback=rolledBack.pid===pid;
-    // Read-only commit checks SET LOCAL cleanup independently from rollback.
+    const rolledBack=await context(client);checks.afterRollbackContextEmpty=empty(rolledBack.owner)&&rolledBack.role===before.role;
+    checks.sameConnectionThroughRollback=rolledBack.pid===before.pid;
     await query('READ_BEGIN','BEGIN READ ONLY');transaction=true;
     await query('READ_OWNER',"SELECT set_config('cft005.owner',$1,true)",[label]);
-    checks.ownRowPreservedAfterRollback=JSON.stringify(await record('ROW_AFTER_ROLLBACK'))===JSON.stringify(initial);
+    const row=await query('ROW_AFTER_ROLLBACK',`SELECT record_id,owner_label,product,value,revision FROM cft005_hml_${product.toLowerCase()}.records WHERE record_id=$1`,[`HML-${product}-${label}`]);
+    checks.ownRowPreservedAfterRollback=JSON.stringify(row.rows)===JSON.stringify(audited.initial);
     await query('COMMIT','COMMIT');transaction=false;
-    const committed=await context('AFTER_COMMIT');checks.afterCommitContextEmpty=empty(committed.owner)&&committed.role===role;
-    checks.sameConnectionThroughCommit=committed.pid===pid;
+    const committed=await context(client);checks.afterCommitContextEmpty=empty(committed.owner)&&committed.role===before.role;
+    checks.sameConnectionThroughCommit=committed.pid===before.pid;
     checks.previousVerifiedOwnerDifferent=Boolean(previous&&previous.label!==label);
-    checks.sameConnectionAsPreviousAudit=Boolean(previous&&previous.pid===pid);
-    return {checks,next:{pid,label}};
+    checks.sameConnectionAsPreviousAudit=Boolean(previous&&previous.pid===before.pid);
+    return {checks,next:{pid:before.pid,label}};
   }finally{if(transaction)await query('ABORT','ROLLBACK');}
+}
+
+export async function auditLedgerDatabase({pool,coordinator,cfg,principal,previous}){
+  const input={pool,coordinator,cfg,principal,binding:principal.ledgerBinding};
+  const probes=await protectedAuditTransaction({...input,operation:c=>auditInTransaction(c,cfg.product,principal.label)},'probe');
+  const {checks,initial}=probes.result;
+  checks.initialContextEmpty=empty(probes.before.owner);
+  checks.afterRollbackContextEmpty=empty(probes.after.owner);
+  checks.sameConnectionThroughRollback=probes.before.pid===probes.after.pid;
+  if(!initial)return {checks,next:null};
+  // The full rollback released the first fence. A fresh online authorization and
+  // fresh SQL fence MUST precede this second data read, even on a reused client.
+  const verified=await protectedAuditTransaction({...input,operation:c=>c.query(`/* CFT005_AUDIT:ROW_AFTER_ROLLBACK */ SELECT record_id,owner_label,product,value,revision FROM cft005_hml_${cfg.product.toLowerCase()}.records WHERE record_id=$1`,[`HML-${cfg.product}-${principal.label}`])},'verify');
+  checks.ownRowPreservedAfterRollback=JSON.stringify(verified.result.rows)===JSON.stringify(initial);
+  checks.afterCommitContextEmpty=empty(verified.after.owner);
+  checks.sameConnectionThroughCommit=verified.before.pid===verified.after.pid&&verified.before.pid===probes.before.pid;
+  checks.previousVerifiedOwnerDifferent=Boolean(previous&&previous.label!==principal.label);
+  checks.sameConnectionAsPreviousAudit=Boolean(previous&&previous.pid===probes.before.pid);
+  checks.ledgerGuardedProbeRollback=probes.completion==='ROLLBACK';
+  checks.ledgerGuardedVerificationCommit=verified.completion==='COMMIT';
+  checks.ledgerFreshAuthorizationEachPhase=true; // Both guarded phases returned successfully.
+  return {checks,next:{pid:verified.after.pid,label:principal.label}};
 }
