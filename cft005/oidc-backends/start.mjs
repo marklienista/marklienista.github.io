@@ -12,7 +12,9 @@ try {
   const server=await startBackend(cfg,provider,{host:'0.0.0.0',port,recordStore});
   console.log(`CFT005 backend ${cfg.product} ready`);
   for(const signal of ['SIGINT','SIGTERM'])process.once(signal,()=>{server.close().then(()=>process.exit(0),()=>process.exit(1));});
-}catch{
-  console.error('CFT005 backend unavailable: check configuration and OIDC discovery. No credentials logged.');
+}catch(error){
+  const safeCategories=new Set(['configuration','tls_validation','authentication','privilege','network_dns','network_connection','role_policy','tls_required','rls_policy','unknown']);
+  const category=error?.storeFailure&&safeCategories.has(error.storeCategory)?'database_'+error.storeCategory:'configuration_or_oidc';
+  console.error('CFT005 backend unavailable: '+category+'. No credentials logged.');
   process.exitCode=1;
 }

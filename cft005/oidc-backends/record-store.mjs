@@ -3,13 +3,21 @@ import pg from 'pg';
 const HOST='dpg-dbh8tghsrm7s73f4tc9g-a';
 const DATABASE='cft005_hml_db_teste';
 const TLS_NAME=HOST+'.virginia-postgres.render.com';
-const unavailable=()=>Object.assign(new Error('E_DATABASE_UNAVAILABLE'),{storeFailure:true});
+const unavailable=(storeCategory='unknown')=>Object.assign(new Error('E_DATABASE_UNAVAILABLE'),{storeFailure:true,storeCategory});
+export function databaseFailureCategory(error){
+  if(['ERR_TLS_CERT_ALTNAME_INVALID','DEPTH_ZERO_SELF_SIGNED_CERT','SELF_SIGNED_CERT_IN_CHAIN','UNABLE_TO_VERIFY_LEAF_SIGNATURE','UNABLE_TO_GET_ISSUER_CERT_LOCALLY','CERT_HAS_EXPIRED'].includes(error?.code))return 'tls_validation';
+  if(['28000','28P01'].includes(error?.code))return 'authentication';
+  if(error?.code==='42501')return 'privilege';
+  if(['ENOTFOUND','EAI_AGAIN'].includes(error?.code))return 'network_dns';
+  if(['ECONNREFUSED','ETIMEDOUT','ECONNRESET'].includes(error?.code))return 'network_connection';
+  return 'unknown';
+}
 
 export function databaseOptions(product,connectionString){
-  let url;try{url=new URL(connectionString);}catch{throw unavailable();}
+  let url;try{url=new URL(connectionString);}catch{throw unavailable('configuration');}
   const user='cft005_hml_'+product?.toLowerCase();
   if(!['A','B'].includes(product)||!['postgres:','postgresql:'].includes(url.protocol)||url.hostname!==HOST||
-    url.pathname!=='/'+DATABASE||decodeURIComponent(url.username)!==user||!url.password||url.search||url.hash||url.port&&url.port!=='5432')throw unavailable();
+    url.pathname!=='/'+DATABASE||decodeURIComponent(url.username)!==user||!url.password||url.search||url.hash||url.port&&url.port!=='5432')throw unavailable('configuration');
   return {host:HOST,port:5432,database:DATABASE,user,password:decodeURIComponent(url.password),
     ssl:{rejectUnauthorized:true,servername:TLS_NAME},max:1,connectionTimeoutMillis:8000,
     statement_timeout:5000,idle_in_transaction_session_timeout:5000,idleTimeoutMillis:30000,application_name:'cft005-bff-'+product};
@@ -42,8 +50,10 @@ export function createPostgresStore(cfg,connectionString,{Pool=pg.Pool}={}){
           (SELECT ssl FROM pg_stat_ssl WHERE pid=pg_backend_pid()) AS tls,
           EXISTS(SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname=$2 AND relname='records' AND relrowsecurity AND relforcerowsecurity AND pg_get_userbyid(c.relowner)='cft005_hml_owner') AS rls
           FROM pg_roles WHERE rolname=current_user`,[schema,schema]);
-        if(!r.rows[0]?.login_ok||!r.rows[0].tls||!r.rows[0].rls)throw unavailable();
-      }catch{throw unavailable();}
+        if(!r.rows[0]?.login_ok)throw unavailable('role_policy');
+        if(!r.rows[0].tls)throw unavailable('tls_required');
+        if(!r.rows[0].rls)throw unavailable('rls_policy');
+      }catch(error){throw error?.storeFailure?error:unavailable(databaseFailureCategory(error));}
     },
     async read(principal,requested){
       if(!['U1','U2'].includes(requested))return null;

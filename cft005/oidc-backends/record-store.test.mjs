@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {databaseOptions,createPostgresStore} from './record-store.mjs';
+import {databaseOptions,createPostgresStore,databaseFailureCategory} from './record-store.mjs';
 const url='postgresql://cft005_hml_a:synthetic-password-only@dpg-dbh8tghsrm7s73f4tc9g-a/cft005_hml_db_teste';
 const cfg={product:'A',subjects:{'fixture-u1':'U1','fixture-u2':'U2'}};
 const principal={subject:'fixture-u1',label:'U1'};
@@ -29,4 +29,7 @@ test('database failure rolls back and returns only fixed sanitized category',asy
 });
 test('readiness requires TLS, exact role and forced RLS, with no memory fallback',async()=>{
   await fixture().store.ready();await assert.rejects(fixture({ready:false}).store.ready(),{message:'E_DATABASE_UNAVAILABLE'});
+});
+test('startup diagnostics classify fixed codes without reflecting provider messages',()=>{
+  for(const [code,expected]of [['ERR_TLS_CERT_ALTNAME_INVALID','tls_validation'],['28P01','authentication'],['42501','privilege'],['ENOTFOUND','network_dns'],['ECONNREFUSED','network_connection'],['raw-secret','unknown']])assert.equal(databaseFailureCategory({code,message:'private-runtime-material'}),expected);
 });
