@@ -1,5 +1,14 @@
 # CFT-005 — Matriz consolidada, 28/10/2026
 
+## Atualização de 29/10/2026 — nova rodada nos dois perfis
+
+| Matriz | PASS | FAIL | BLOCKED | Limite |
+|---|---:|---:|---:|---|
+| Contrato H01–H24 | 6 | 0 | 18 | H01/H02 anteriores e H03/H04/H07/H09 agora completos; restantes sem promoção automática. |
+| Clientes SPA originais S01–S14 | 9 | 2 | 3 | Preservados; não foram reexecutados por este candidato BFF. |
+
+[52 controles novos e preservação dos quatro registros](../homologacao/H03-H13-RESULTADO.md). Leituras manuais: inicial 3/3/3/3, após U1 4/4/3/3, após U2 4/4/4/4, valores preservados. Rede temporária encerrada, sem novo deploy. Próximo passo único: complementar tecnicamente H05/H06/H08/H10–H13. CFT-005 ABERTO; os estados abaixo são históricos.
+
 ## Atualização de 29/10/2026 — perfis do candidato BFF
 
 | Escopo | PASS | FAIL | BLOCKED | Evidência e limite |

@@ -1,5 +1,7 @@
 # CFT-005 — Integração BFF e PostgreSQL de homologação
 
+**Atualização — 29/10/2026, 09:36 BRT:** nova rodada em dois perfis: 52 controles HTTP PostgreSQL PASS e preservação manual dos quatro registros (revisões 3 → 4 somente na escrita própria). H03/H04/H07/H09 completos PASS, somados a H01/H02: **6 PASS, 0 FAIL, 18 BLOCKED**. [Resultado e limites](./H03-H13-RESULTADO.md). H05/H06/H08/H10–H13 ainda exigem complementos técnicos; o runner não comprova esses gates inteiros. Rede novamente fechada, health 503 esperado. Sem mudança executável/deploy. Próximo passo único: instrumentar/completar os sete gates técnicos restantes do bloco, sem repetir estes cliques manuais. CFT-005 ABERTO; os adendos abaixo são históricos.
+
 **Atualização — 29/10/2026, 09:16 BRT:** [H01/H02 PASS por execução manual](./H01-H02-RESULTADO.md), quatro rótulos preservados em dois perfis após recarga/reabertura; intervalo informado de cerca de 11 minutos. Contrato completo: **2 PASS, 0 FAIL, 22 BLOCKED**. Quatro logins corroborados nos servidores, com um início extra sem callback em B; contadores não atestam perfis nem toda a persistência. Duas regras temporárias removidas, API vazia/painel bloqueado; health A/B 503 esperado. Sem novas escritas ou deploy. Próximo passo único: H03–H13 com nova baseline nos dois perfis. Os 52 controles PostgreSQL anteriores seguem no próprio escopo; não há homologação publicada. As seções abaixo são históricas.
 
 ## Resultado atual — 29/10/2026, 08:05 BRT: 52 controles HTTP reais PASS

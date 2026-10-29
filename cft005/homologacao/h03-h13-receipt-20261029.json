@@ -1,0 +1,88 @@
+{
+  "contractVersion": "CFT005-HML-1",
+  "runId": "HML-20261029-MANUAL-HTTP",
+  "mode": "real",
+  "scope": "synthetic-only",
+  "safeguards": {
+    "publishedAppsUnchanged": true,
+    "apertaquemUnchanged": true,
+    "realDataUntouched": true,
+    "globalTtlUnchanged": true
+  },
+  "prerequisites": {
+    "isolatedTarget": true,
+    "separateProfiles": true,
+    "database": true,
+    "surfaceInventory": false,
+    "sessionLedger": false,
+    "isolatedSso": false,
+    "securityInventory": false
+  },
+  "observations": [
+    {
+      "id": "H01",
+      "at": "2026-10-29T12:14:57.055Z",
+      "source": "browser",
+      "checks": {
+        "verifiedSessions": 4,
+        "profilesSeparated": true,
+        "identitiesDistinct": true,
+        "noPersonalAccountUsed": true
+      }
+    },
+    {
+      "id": "H02",
+      "at": "2026-10-29T12:14:57.055Z",
+      "source": "browser",
+      "checks": {
+        "reloadsVerified": 4,
+        "reopenedTabsVerified": 4,
+        "identityPreserved": true,
+        "noNewLogin": true
+      }
+    },
+    {
+      "id": "H03",
+      "at": "2026-10-29T12:39:24.113Z",
+      "source": "http",
+      "checks": {
+        "ownReads200": 4,
+        "ownWrites200": 4,
+        "readBackMatches": true,
+        "persistentAdapterUsed": true
+      }
+    },
+    {
+      "id": "H04",
+      "at": "2026-10-29T12:39:24.113Z",
+      "source": "http",
+      "checks": {
+        "otherReads404": 4,
+        "otherWrites404": 4,
+        "otherRowsUnchanged": true,
+        "noDataDisclosed": true
+      }
+    },
+    {
+      "id": "H07",
+      "at": "2026-10-29T12:39:24.113Z",
+      "source": "http",
+      "checks": {
+        "crossReads403": 4,
+        "crossWrites403": 4,
+        "allTargetsUnchanged": true
+      }
+    },
+    {
+      "id": "H09",
+      "at": "2026-10-29T12:39:24.113Z",
+      "source": "http",
+      "checks": {
+        "aToB401": true,
+        "bToA401": true,
+        "signatureVerifiedBeforeClientMismatch": true,
+        "noDataRouteReached": true
+      }
+    }
+  ]
+}

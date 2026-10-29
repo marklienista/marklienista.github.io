@@ -1,5 +1,7 @@
 # CFT-005 — Roteiro dos gates restantes
 
+**Atualização — 29/10/2026, 09:36 BRT:** nova rodada em dois perfis: 52 controles HTTP PostgreSQL PASS e preservação manual dos quatro registros (revisões 3 → 4 somente na escrita própria). H03/H04/H07/H09 completos PASS, somados a H01/H02: **6 PASS, 0 FAIL, 18 BLOCKED**. [Resultado e limites](./H03-H13-RESULTADO.md). H05/H06/H08/H10–H13 ainda exigem complementos técnicos; o runner não comprova esses gates inteiros. Rede novamente fechada, health 503 esperado. Sem mudança executável/deploy. Próximo passo único: instrumentar/completar os sete gates técnicos restantes do bloco, sem repetir estes cliques manuais. CFT-005 ABERTO; os adendos abaixo são históricos.
+
 **Atualização — 29/10/2026:** H01/H02 foram executados manualmente pelo operador e passaram no candidato BFF/PostgreSQL; [recibo e limites](H01-H02-RESULTADO.md). Restam 22 gates BLOCKED. Próximo bloco H03–H13 exige nova baseline positiva e os critérios completos de cada caso. Não reabrir a janela de rede encerrada até a rodada estar pronta. A preparação abaixo é histórica; não constitui resultado corrente.
 
 Preparação em 28/10/2026; versão CFT005-HML-1. Todos os casos abaixo começam **BLOCKED**, sem recibo da nova integração persistente. Os resultados anteriores da matriz S01–S14 não mudam. A fonte exata dos critérios é [plan.mjs](./plan.mjs); o [contrato](./CONTRATO-HOMOLOGACAO-POR-PRODUTO.md) define a fronteira.
