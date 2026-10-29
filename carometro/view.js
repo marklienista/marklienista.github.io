@@ -19,11 +19,15 @@ export function renderStudentCards(space,classId,photoUrls,selected,query,missin
     check.onchange=()=>actions.onSelect(student.id,check.checked);card.append(check);
     const photo=make('div','photo');
     const src=photoUrls.get(student.id);
-    if(src){const img=make('img');img.src=src;img.alt='Fotografia de teste de '+student.name;photo.append(img)}
+    if(src){const img=make('img');img.src=src;img.alt='Fotografia de '+student.name;photo.append(img)}
     else photo.textContent='◩';
     card.append(photo,make('h3','',student.name));
     if(student.code)card.append(make('p','',student.code));
-    if(!src)card.append(make('span','badge',student.photoId?'Carregando ou sem acesso':'Sem foto'));
+    if(!src){
+      const issue=actions.photoErrors?.get(student.id);
+      const status=!student.photoId?'Sem foto':issue?(issue.code==='SPACE_BOUNDARY'?'Imagem fora da pasta do espaço':'Falha ao carregar foto'):actions.loadingPhotos?'Carregando fotografia…':'Foto não carregada';
+      const badge=make('span','badge',status);if(issue?.message)badge.title=issue.message;card.append(badge);
+    }
     if(actions.canEdit){
       const actionsEl=make('div','mini-actions');
       const label=make('label','',src?'Trocar foto':'Fotografar');
@@ -40,104 +44,50 @@ export function renderStudentCards(space,classId,photoUrls,selected,query,missin
     root.append(card);
   });
 }
-
 function preparePrintSheet(layout){
   let sheet=document.getElementById('printSheet');
   if(!sheet){sheet=make('section');sheet.id='printSheet';document.querySelector('.container').append(sheet)}
-  sheet.replaceChildren();
-  sheet.dataset.layout=layout;
-  sheet.classList.remove('preview');
-  return sheet;
+  sheet.replaceChildren();sheet.dataset.layout=layout;sheet.classList.remove('preview');return sheet;
 }
 export function renderPrintSheet(space,students,photoUrls,logoUrl,columns,showCodes,year) {
-  const sheet=preparePrintSheet('carometro');
-  sheet.style.setProperty('--print-columns',String(columns));
-  const head=make('header','print-head'),h=make('div');
-  h.append(make('h1','',space.school.name||'Carômetro'));
-  const classes=new Map(students.map(p=>{
-    const klass=studentClass(space,p.id,year);
-    return [klass?.id,klass];
-  }).filter(entry=>entry[0]));
+  const sheet=preparePrintSheet('carometro');sheet.style.setProperty('--print-columns',String(columns));
+  const head=make('header','print-head'),h=make('div');h.append(make('h1','',space.school.name||'Carômetro'));
+  const classes=new Map(students.map(p=>{const klass=studentClass(space,p.id,year);return [klass?.id,klass]}).filter(entry=>entry[0]));
   h.append(make('p','',String(year)+' · '+([...classes.values()].map(c=>c.label).join(', ')||'Turmas selecionadas')+' · '+students.length+' estudantes'));
-  if(classes.size===1){
-    const professor=[...classes.values()][0]?.teacher;
-    if(professor)h.append(make('p','print-teacher','Professor(a): '+professor));
-  }
-  head.append(h);
-  if(logoUrl){const img=make('img');img.src=logoUrl;img.alt='Logotipo da escola';head.append(img)}
-  sheet.append(head);
-  const grid=make('div','print-grid');
-  students.forEach(p=>{
+  if(classes.size===1){const professor=[...classes.values()][0]?.teacher;if(professor)h.append(make('p','print-teacher','Professor(a): '+professor))}
+  head.append(h);if(logoUrl){const img=make('img');img.src=logoUrl;img.alt='Logotipo da escola';head.append(img)}sheet.append(head);
+  const grid=make('div','print-grid');students.forEach(p=>{
     const entry=make('article','print-student'),url=photoUrls.get(p.id);
-    if(url){const img=make('img');img.src=url;img.alt='';entry.append(img)}
-    else entry.append(make('div','no-photo','Sem foto'));
-    entry.append(make('strong','',p.name));
-    if(showCodes&&p.code)entry.append(make('small','',p.code));
-    if(classes.size>1){
-      const c=studentClass(space,p.id,year);
-      entry.append(make('small','',c?.label||''));
-      if(c?.teacher)entry.append(make('small','print-teacher','Professor(a): '+c.teacher));
-    }
+    if(url){const img=make('img');img.src=url;img.alt='';entry.append(img)}else entry.append(make('div','no-photo','Sem foto'));
+    entry.append(make('strong','',p.name));if(showCodes&&p.code)entry.append(make('small','',p.code));
+    if(classes.size>1){const c=studentClass(space,p.id,year);entry.append(make('small','',c?.label||''));if(c?.teacher)entry.append(make('small','print-teacher','Professor(a): '+c.teacher))}
     grid.append(entry);
-  });
-  sheet.append(grid);
-  return sheet;
+  });sheet.append(grid);return sheet;
 }
-/*
- * Modelo de crachá horizontal em tamanho real (86 x 54 mm).
- * O texto adicional é um parâmetro transitório da interface. Não faz parte de
- * space, settings, students ou do manifesto salvo no Drive.
- */
+/* Texto adicional é transitório: não faz parte de space ou do manifesto no Drive. */
 export function renderBadgeSheet(space,students,photoUrls,logoUrl,year,options={}) {
-  const sheet=preparePrintSheet('badges');
-  sheet.style.removeProperty('--print-columns');
-  const withPhoto=options.withPhoto!==false;
-  const extra=String(options.extra||'').trim().slice(0,120);
+  const sheet=preparePrintSheet('badges');sheet.style.removeProperty('--print-columns');
+  const withPhoto=options.withPhoto!==false,extra=String(options.extra||'').trim().slice(0,120);
   for(let index=0;index<students.length;index+=8){
-    const page=make('section','badge-page');
-    const header=make('header','badge-page-head');
-    header.append(make('strong','',space.school.name||'Escola'),make('span','','Crachás · '+year+' · folha '+(Math.floor(index/8)+1)));
-    page.append(header);
-    const grid=make('div','badge-grid');
-    students.slice(index,index+8).forEach(p=>{
-      const klass=studentClass(space,p.id,year);
-      const badge=make('article','badge-item');
-      badge.setAttribute('aria-label','Crachá de '+p.name);
-      const top=make('div','badge-item-top');
-      top.append(make('span','badge-school',space.school.name||'Escola'));
-      if(logoUrl){const logo=make('img','badge-logo');logo.src=logoUrl;logo.alt='';top.append(logo)}
-      badge.append(top);
+    const page=make('section','badge-page'),header=make('header','badge-page-head');
+    header.append(make('strong','',space.school.name||'Escola'),make('span','','Crachás · '+year+' · folha '+(Math.floor(index/8)+1)));page.append(header);
+    const grid=make('div','badge-grid');students.slice(index,index+8).forEach(p=>{
+      const klass=studentClass(space,p.id,year),badge=make('article','badge-item');badge.setAttribute('aria-label','Crachá de '+p.name);
+      const top=make('div','badge-item-top');top.append(make('span','badge-school',space.school.name||'Escola'));
+      if(logoUrl){const logo=make('img','badge-logo');logo.src=logoUrl;logo.alt='';top.append(logo)}badge.append(top);
       const main=make('div','badge-item-main'+(withPhoto?'':' badge-without-photo'));
-      if(withPhoto){
-        const photo=make('div','badge-portrait'),url=photoUrls.get(p.id);
-        if(url){const img=make('img');img.src=url;img.alt='';photo.append(img)}
-        else photo.append(make('span','', 'Sem foto'));
-        main.append(photo);
-      }
-      const text=make('div','badge-text');
-      text.append(make('strong','badge-person-name',p.name));
-      text.append(make('span','badge-class',klass?.label||'Turma não informada'));
-      if(klass?.teacher)text.append(make('span','badge-teacher','Professor(a): '+klass.teacher));
-      main.append(text);badge.append(main);
-      const note=make('div','badge-extra-note');
-      if(extra)note.textContent=extra;
-      badge.append(note);grid.append(badge);
-    });
-    page.append(grid);sheet.append(page);
-  }
-  return sheet;
+      if(withPhoto){const photo=make('div','badge-portrait'),url=photoUrls.get(p.id);if(url){const img=make('img');img.src=url;img.alt='';photo.append(img)}else photo.append(make('span','','Sem foto'));main.append(photo)}
+      const text=make('div','badge-text');text.append(make('strong','badge-person-name',p.name));text.append(make('span','badge-class',klass?.label||'Turma não informada'));
+      if(klass?.teacher)text.append(make('span','badge-teacher','Professor(a): '+klass.teacher));main.append(text);badge.append(main);
+      const note=make('div','badge-extra-note');if(extra)note.textContent=extra;badge.append(note);grid.append(badge);
+    });page.append(grid);sheet.append(page);
+  }return sheet;
 }
 export function notify(text,kind='info'){
   const wrap=document.getElementById('alerts');wrap.replaceChildren();
-  const p=make('div','alert '+(kind==='error'?'error':kind==='warning'?'warning':''),text);wrap.append(p);
-  if(kind==='error')p.setAttribute('role','alert');
-  return p;
+  const p=make('div','alert '+(kind==='error'?'error':kind==='warning'?'warning':''),text);wrap.append(p);if(kind==='error')p.setAttribute('role','alert');return p;
 }
 export function presentModal(id){const el=document.getElementById(id);if(!el.open)el.showModal();return el}
 export function closeModal(id){document.getElementById(id).close()}
-export function fillSelect(el,options,value){
-  el.replaceChildren();
-  for(const o of options){const option=make('option','',o.label);option.value=String(o.value);el.append(option)}
-  if(value!==undefined)el.value=String(value);
-}
+export function fillSelect(el,options,value){el.replaceChildren();for(const o of options){const option=make('option','',o.label);option.value=String(o.value);el.append(option)}if(value!==undefined)el.value=String(value)}
 export function printHtml(){document.getElementById('printSheet')?.classList.add('preview')}
