@@ -29,5 +29,23 @@
   },
   "preservation": {"publishedAppsUnchanged":true,"apertaquemUnchanged":true,"realDataUntouched":true,"globalTtlUnchanged":true,"auth0Unchanged":true},
   "limits": ["No integrated HTTP PASS","No PostgreSQL-backed login proof","Historical SQL and Map-backed HTTP controls remain separate","No separate browser-profile proof","No durable session ledger or central logout","Provider retention not attested"],
-  "publishedHomologation":"NOT_GRANTED"
+  "publishedHomologation":"NOT_GRANTED",
+  "externalAlternativePreparation": {
+    "observedAt":"2026-10-29T02:09:08Z",
+    "userExplicitConfirmationReceived":true,
+    "protectedEnvironmentEndpointA":"external-fixed-verified",
+    "protectedEnvironmentEndpointB":"external-fixed-verified",
+    "saveOnlyConfirmedA":true,
+    "saveOnlyConfirmedB":true,
+    "credentialsUnchanged":true,
+    "newDeployTriggered":false,
+    "networkDraftCidrs":["74.220.49.0/24","74.220.57.0/24"],
+    "activeNetworkRuleCount":0,
+    "saveBlockedByAutomaticReview":true,
+    "rejectedSaveAttempts":2,
+    "statedReason":"action_time_confirmation_not_recognized",
+    "workaroundUsed":false,
+    "awaitingHumanSave":true,
+    "postgresHttpControlsExecuted":0
+  }
 }

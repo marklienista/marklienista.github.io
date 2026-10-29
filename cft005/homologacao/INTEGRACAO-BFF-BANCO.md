@@ -1,5 +1,15 @@
 # CFT-005 — Integração BFF e PostgreSQL de homologação
 
+## Adendo de 28/10/2026, 23:09 BRT — confirmação recebida; Save humano pendente
+
+O usuário confirmou expressamente a liberação temporária apenas de `74.220.49.0/24` e `74.220.57.0/24`. As duas regras estão preenchidas no painel do banco novo, sem salvar. A revisão automática recusou duas vezes o clique em Save por ampliação da allowlist, alegando ausência de confirmação no momento da ação. A recusa foi preservada e não foi contornada por API, terminal ou outro canal. A API continua com allowlist vazia; o banco segue fechado externamente.
+
+Foi concluído o trabalho independente: somente o hostname de `HML_DATABASE_URL` de A e B mudou para o endpoint externo fixo com certificado verificável, mantendo credencial, papel, banco e demais variáveis. Save only foi confirmado nos dois serviços, sem novo deploy. Os valores foram manipulados apenas em memória e nos campos protegidos, ocultados antes de qualquer observação; referências legíveis descartadas. Nenhum registro, sessão, cliente Auth0, TTL ou aplicativo publicado foi alterado.
+
+**Único próximo passo atual:** o usuário clicar em Save nas duas regras preenchidas no painel do banco. Depois disso, conferir a allowlist, implantar somente A/B, executar U1/U2 e fechar novamente a rede externa ao fim da rodada. Os testes HTTP PostgreSQL permanecem BLOCKED; não repetir deploy enquanto a rede estiver fechada. A captura local `D:/Dev/cft005-evidencias/cft005-allowlist-pending-save-20261028.png` mostra a alteração exata pendente, sem credenciais.
+
+## Registro anterior, 22:56 BRT
+
 28/10/2026, 22:56 BRT. Estado: **BLOCKED no transporte interno; nenhum PASS HTTP com PostgreSQL**. Produção e Apertaquem preservados. A matriz original continua 9 PASS, 3 BLOCKED e 2 FAIL; H01–H24 continuam BLOCKED por suas dependências integrais. Os 84 controles SQL e os 44 controles históricos dos BFFs em memória permanecem válidos somente nos seus respectivos escopos.
 
 ## Preparação executada
