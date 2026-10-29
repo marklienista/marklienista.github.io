@@ -1,0 +1,70 @@
+/* FotoCrachá 0.16 — estado de salvamento e revisão paginada. */
+#connectBtn[hidden]{display:none!important}
+.visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.workspace-head{display:grid!important;grid-template-columns:minmax(0,1fr) auto;align-items:center!important;gap:24px}
+.workspace-head>div:first-child{min-width:0}
+.save-area{width:218px;justify-self:end;min-width:0}
+.save-tile{position:relative;isolation:isolate;display:grid;grid-template-columns:30px minmax(0,1fr) 24px;align-items:center;gap:10px;min-height:100px;padding:18px 16px;color:var(--deep);}
+.save-tile:before{content:"";position:absolute;inset:0;z-index:-1;background:#e1eee5;clip-path:polygon(3% 0,100% 5%,97% 100%,0 95%)}
+.save-tile:after{content:"";position:absolute;right:14px;top:0;width:21px;height:6px;background:var(--yellow);transform:rotate(4deg)}
+.save-symbol{font-size:28px;font-weight:800;line-height:1;text-align:center}
+.save-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+.save-label{font-size:21px;line-height:1.12;overflow-wrap:anywhere;letter-spacing:-.4px}
+.save-destination{font-size:12px;line-height:1.25;white-space:nowrap}
+.save-time{font-size:11px;line-height:1.2;color:var(--muted)}
+.drive-product-icon{display:block;object-fit:contain;flex:none}
+.drive-product-icon[hidden],.save-time[hidden],#updateRemoteBtn[hidden]{display:none!important}
+.save-detail{font-size:12px;line-height:1.45;margin:9px 3px 0;color:var(--muted);overflow-wrap:anywhere}
+.save-area[data-state="saved"] .save-detail,.save-area[data-state="reader"] .save-detail{display:none}
+.save-area[data-state="pending"] .save-tile:before,.save-area[data-state="saving"] .save-tile:before,.save-area[data-state="loading"] .save-tile:before{background:#fff0be}
+.save-area[data-state="remote"] .save-tile:before{background:#f9dbca}
+.save-area[data-state="error"] .save-tile:before,.save-area[data-state="offline"] .save-tile:before{background:#f9e0da}
+.save-area[data-state="reader"] .save-tile:before{background:#eceee8}
+.save-area[data-state="warning"] .save-tile:before{background:#fff0d0}
+.save-area[data-state="error"] .save-tile,.save-area[data-state="remote"] .save-tile{color:#7b3427}
+.save-area[data-state="saving"] .save-symbol,.save-area[data-state="loading"] .save-symbol{animation:save-turn 1.5s linear infinite}
+@keyframes save-turn{to{transform:rotate(360deg)}}
+.save-area #updateRemoteBtn{width:100%;margin-top:9px;border-color:var(--terra);font-size:13px}
+.save-area .save-recovery:empty{display:none}
+.save-area .save-recovery{margin-bottom:0;gap:6px}
+.save-area .save-recovery button{width:100%;white-space:normal}
+.import-panel{min-width:0}
+.import-toolbar{display:grid;grid-template-columns:minmax(200px,1fr) auto auto;align-items:end;gap:10px;margin:20px 0 8px}
+.import-toolbar input[type="file"]{width:100%;max-width:none;min-height:44px}
+.import-toolbar>button{white-space:nowrap}
+.import-status{font-size:14px;color:var(--deep);margin:12px 0}
+.import-results{border-top:1px solid var(--line);padding-top:18px;margin-top:24px;min-width:0}
+.import-summary{font-size:14px;line-height:1.6;font-weight:700;color:var(--deep)}
+.import-warnings{border-left:3px solid var(--yellow);padding:4px 12px;margin:12px 0}
+.import-warnings .sub{margin:5px 0}
+.import-filters{display:flex;flex-wrap:wrap;gap:12px;padding:14px 0;align-items:end}
+.import-filters>label{flex:1 1 190px}
+.import-table{width:100%;max-width:100%;scroll-margin-top:16px}
+.import-table table{min-width:590px}
+.import-table td{vertical-align:top;overflow-wrap:anywhere}
+.import-table td:first-child{width:70px;text-align:center}
+.import-review-required{background:#fff5df}
+.import-pager{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:14px 0}
+.import-pager .sub{text-align:center;flex:1 1 170px}
+.import-apply-footer{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;border-top:2px solid var(--leaf);background:#edf3e9;padding:16px;margin-top:18px}
+.import-apply-footer p{flex:1 1 260px;font-size:14px;font-weight:700;line-height:1.45;margin:0;color:var(--deep)}
+.import-apply-footer button{min-height:48px}
+@media(max-width:640px){
+ .workspace-head{grid-template-columns:minmax(0,1fr) 144px;gap:12px;align-items:start!important}
+ .workspace-head #spaceTitle{overflow-wrap:anywhere}
+ .save-area{width:144px}
+ .save-tile{grid-template-columns:22px minmax(0,1fr);gap:7px;padding:14px 10px;min-height:88px}
+ .save-symbol{font-size:23px}.save-label{font-size:18px}.save-destination{font-size:10px;white-space:normal}
+ .drive-product-icon{position:absolute;width:15px;height:15px;right:10px;bottom:8px}
+ .save-time{font-size:10px;padding-right:17px}
+ .save-detail{font-size:11px}
+ .save-area .save-recovery button,.save-area #updateRemoteBtn{font-size:12px;padding:9px 6px}
+ .import-toolbar{grid-template-columns:1fr 1fr}
+ .import-file-label{grid-column:1/-1}
+ .import-toolbar>button{padding:10px 8px}
+ .import-apply-footer{padding:13px}.import-apply-footer button{width:100%}
+ .import-pager{gap:6px}.import-pager .sub{flex-basis:100%;order:-1}
+}
+@media(max-width:350px){.workspace-head{grid-template-columns:minmax(0,1fr) 132px;gap:8px}.save-area{width:132px}.save-label{font-size:16px}}
+@media(prefers-reduced-motion:reduce){.save-symbol{animation:none!important}}
+@media print{.save-area,.import-toolbar,.import-results{display:none!important}}
