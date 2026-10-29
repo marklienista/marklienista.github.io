@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "scope": "LOCAL-OIDC-PROTOCOL-FIXTURE-NOT-AUTH0",
-  "generatedAt": "2026-10-29T12:59:25.765Z",
+  "generatedAt": "2026-10-29T13:24:58.940Z",
   "node": "v24.19.0",
   "realAuth0Issuance": "BLOCKED",
   "deployedBackends": 0,

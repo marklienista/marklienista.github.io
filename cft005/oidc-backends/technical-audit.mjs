@@ -28,13 +28,16 @@ export async function auditDatabase(client,product,label,previous){
     const policy=(await query('POLICY',`SELECT NOT r.rolsuper AND NOT r.rolcreatedb AND NOT r.rolcreaterole AND NOT r.rolreplication AND NOT r.rolbypassrls AND NOT r.rolinherit
       AND NOT EXISTS(SELECT 1 FROM pg_auth_members WHERE member=r.oid) AS restricted_role,
       c.relrowsecurity AND c.relforcerowsecurity AND pg_get_userbyid(c.relowner)='cft005_hml_owner' AS forced_rls,
+      has_table_privilege(current_user,c.oid,'UPDATE') AND has_column_privilege(current_user,c.oid,'record_id','UPDATE')
+      AND has_column_privilege(current_user,c.oid,'owner_label','UPDATE') AND has_column_privilege(current_user,c.oid,'product','UPDATE') AS with_check_columns_writable,
       NOT EXISTS(SELECT 1 FROM pg_trigger WHERE tgrelid=c.oid AND NOT tgisinternal) AS no_custom_triggers,
       (SELECT ssl FROM pg_stat_ssl WHERE pid=pg_backend_pid()) AS tls
       FROM pg_roles r CROSS JOIN pg_class c WHERE r.rolname=current_user AND c.oid=$1::regclass`,[table])).rows[0];
     checks.restrictedRole=policy?.restricted_role===true;checks.forcedRls=policy?.forced_rls===true;
     checks.noCustomTriggers=policy?.no_custom_triggers===true;checks.tls=policy?.tls===true;
+    checks.withCheckColumnsWritable=policy?.with_check_columns_writable===true;
     // Unknown triggers could have effects outside a rollback: do not run mutation probes.
-    if(!checks.restrictedRole||!checks.forcedRls||!checks.noCustomTriggers||!checks.tls)return {checks,next:null};
+    if(!checks.restrictedRole||!checks.forcedRls||!checks.noCustomTriggers||!checks.tls||!checks.withCheckColumnsWritable)return {checks,next:null};
     const constraints=(await query('CONSTRAINTS',`SELECT contype,convalidated,pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conrelid=$1::regclass`,[table])).rows;
     const has=definition=>constraints.some(c=>c.convalidated&&normalize(c.definition)===definition);
     checks.identityConstraint=has(`CHECKrecord_id='HML-${product}-'||owner_label`);

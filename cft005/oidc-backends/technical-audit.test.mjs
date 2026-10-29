@@ -7,7 +7,7 @@ import {runTechnicalProof} from './technical-proof.mjs';
 import {PROOF_ORIGINS} from './config.mjs';
 
 const cfg={product:'A',subjects:{'fixture-u1':'U1','fixture-u2':'U2'}};
-function databaseFixture({allowedProbe,failTag,unsafePolicy=false}={}){
+function databaseFixture({allowedProbe,failTag,unsafePolicy=false,restrictedColumns=false}={}){
   let owner=null,readOnly=false;const calls=[];const releases=[];
   const client={async query(sql,args=[]){
     const tag=/CFT005_AUDIT:([A-Z_]+)/.exec(sql)?.[1];calls.push({tag,sql,args});
@@ -16,7 +16,7 @@ function databaseFixture({allowedProbe,failTag,unsafePolicy=false}={}){
     if(['OWNER','READ_OWNER'].includes(tag))owner=args[0];
     if(['BEGIN','READ_BEGIN'].includes(tag))readOnly=tag==='READ_BEGIN';
     if(['ROLLBACK','ABORT','COMMIT'].includes(tag)){if(tag==='COMMIT')assert.equal(readOnly,true);owner=null;}
-    if(tag==='POLICY')return{rows:[{restricted_role:!unsafePolicy,forced_rls:true,no_custom_triggers:true,tls:true}]};
+    if(tag==='POLICY')return{rows:[{restricted_role:!unsafePolicy,forced_rls:true,no_custom_triggers:true,tls:true,with_check_columns_writable:!restrictedColumns}]};
     if(tag==='CONSTRAINTS')return{rows:[
       {contype:'c',convalidated:true,definition:"CHECK ((record_id = ('HML-A-'::text || owner_label)))"},
       {contype:'c',convalidated:true,definition:"CHECK ((product = 'A'::text))"},
@@ -48,6 +48,11 @@ test('unsafe role policy skips every mutation and ends the transaction',async()=
   const f=databaseFixture({unsafePolicy:true});const r=await auditDatabase(f.client,'A','U1');
   assert.equal(r.checks.restrictedRole,false);assert.equal(r.next,null);
   assert.equal(f.calls.at(-1).tag,'ABORT');assert.equal(f.calls.some(c=>c.tag==='OWN_NOOP'),false);
+});
+test('missing column UPDATE privileges cannot produce a false PASS for RLS WITH CHECK',async()=>{
+  const f=databaseFixture({restrictedColumns:true}),r=await auditDatabase(f.client,'A','U1');
+  assert.equal(r.checks.withCheckColumnsWritable,false);assert.equal(r.checks.withCheckOwnerDenied,undefined);
+  assert.equal(f.calls.some(c=>c.tag==='OWN_NOOP'),false);assert.equal(f.calls.at(-1).tag,'ABORT');
 });
 test('unexpected database error rolls back and destroys the pooled connection without raw error output',async()=>{
   const f=databaseFixture({failTag:'FINAL_ROW'}),store=createPostgresStore(cfg,'postgresql://cft005_hml_a:synthetic-only-password@dpg-dbh8tghsrm7s73f4tc9g-a/cft005_hml_db_teste',{Pool:f.Pool});

@@ -1,6 +1,6 @@
 import {PROOF_ORIGINS} from './config.mjs';
 
-const DB_CHECKS=Object.freeze(['initialContextEmpty','exactRuntimeRole','restrictedRole','forcedRls','noCustomTriggers','tls',
+const DB_CHECKS=Object.freeze(['initialContextEmpty','exactRuntimeRole','restrictedRole','forcedRls','noCustomTriggers','tls','withCheckColumnsWritable',
   'identityConstraint','productConstraint','ownerDomainConstraint','idPrimaryKey','exactOwnRow','noExtraVisibleRows','noExtraRowsProvenForContext',
   'otherReadFiltered','ownUpdateReached','otherUpdateFiltered','withCheckOwnerDenied','withCheckProductDenied',
   'otherSchemaDenied','otherRoleDenied','ownerRoleDenied','bypassDenied','noViewsOrForeignTables','noSecurityDefiner',
@@ -10,7 +10,7 @@ const DB_CHECKS=Object.freeze(['initialContextEmpty','exactRuntimeRole','restric
 
 // Session and token stay server-side, with fixed destinations and no caller-selected SQL.
 export async function runTechnicalProof({cfg,principal,session,sid,store,proofFetch}){
-  const receipt={version:1,startedAt:new Date().toISOString(),product:cfg.product,user:session.label,storage:store.kind,cases:[]};
+  const receipt={version:2,startedAt:new Date().toISOString(),product:cfg.product,user:session.label,storage:store.kind,cases:[]};
   const observe=(id,expected,actual)=>receipt.cases.push({id,expected,actual,result:expected===actual?'PASS':'FAIL'});
   try{
     if(store.kind!=='postgres'||typeof store.audit!=='function')throw Error('E_AUDIT_NOT_AVAILABLE');
