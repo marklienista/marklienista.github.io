@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "scope": "LOCAL-OIDC-PROTOCOL-FIXTURE-NOT-AUTH0",
-  "generatedAt": "2026-10-29T13:24:58.940Z",
+  "generatedAt": "2026-10-29T14:03:23.477Z",
   "node": "v24.19.0",
   "realAuth0Issuance": "BLOCKED",
   "deployedBackends": 0,
@@ -16,7 +16,7 @@
     "start.mjs": "d0fbdca5949864c1dc8a3dc054eafa658e93f67fc28e12e9facea49536bb5f14",
     "protocol-fixture.mjs": "a5ca7111abb2611d8d92726540b4627c5818e29fc1a8e415968e3d151a7c41fc",
     "integration.test.mjs": "23016e1b53293ab68eaaeef244ea9479d48f564d32c17a25fe12267856dd7f1c",
-    "package.json": "33f7d97960507f1314c9358d2cb01eb4db08de4c73670292e2af42b7ee6d9da2",
+    "package.json": "ff3fec25cbe379a99c036730d02e68fa830e726f0108e53665a680a93e768ba2",
     "pnpm-lock.yaml": "655e06782cfd65af01223e2beb09b1eb18182c40d74264e20d45f2e445b504e3"
   },
   "total": 51,

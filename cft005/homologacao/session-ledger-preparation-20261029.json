@@ -1,0 +1,87 @@
+{
+  "schema": "CFT005-SESSION-LEDGER-PREPARATION-1",
+  "recordedAt": "2026-10-29T15:13:53.325Z",
+  "scope": "synthetic-only",
+  "mode": "local-preparation",
+  "baseCommit": "8be5d05e050a9ca202a16b99880c1901781ad80f",
+  "localTests": {
+    "newTests": 24,
+    "aggregatePass": 94,
+    "aggregateFail": 0,
+    "aggregateSkipped": 0,
+    "crypto": "native Ed25519; ephemeral keys only in process memory",
+    "transactions": "deterministic SQL/locking model; not PostgreSQL"
+  },
+  "remoteExecution": {
+    "migrationApplied": false,
+    "newRolesCreated": false,
+    "newServiceCreated": false,
+    "deployed": false,
+    "sqlQueriesExecuted": false,
+    "credentialsRead": false,
+    "browserRead": false,
+    "ipAllowListConfirmed": [],
+    "networkChanged": false
+  },
+  "candidate": {
+    "wiredIntoRuntime": false,
+    "proposedCoordinator": "https://cft005-session-ledger-teste.onrender.com",
+    "coordinatorServiceId": null,
+    "freeCapacityConfirmed": false,
+    "coordinatorHttpImplemented": false,
+    "realPostgresValidated": false,
+    "nonces": "transactional unique key; no automatic purge",
+    "sessions": "hash and logical metadata only",
+    "tokens": "memory-only BFF; restart requires new login",
+    "epochs": "monotonic; no automatic reset",
+    "keysGeneratedForRealUse": false
+  },
+  "sourceIntegrity": {
+    "encoding": "UTF-8 LF",
+    "sha256": {
+      "cft005/oidc-backends/session-ledger/protocol.mjs": "926a7db09ff84b70b156a7a9bd5fd20fb07aa39ef0a2533912e1d5467f737fa8",
+      "cft005/oidc-backends/session-ledger/transactions.mjs": "034d4e8866fabc0fcd13777ab99a84b4ae05a3f629c820faccb9a3c3a1250a6d",
+      "cft005/oidc-backends/session-ledger/ledger.test.mjs": "d925006d9b5295230d69a8e6a127a7a5aef4c8f7788bc2bdb81e06e97ed41745",
+      "cft005/oidc-backends/session-ledger/001-ledger.DRAFT.sql": "0894fdf25946eee43964c7cc67898e784e55ab2dd50695ca42296319c3d0c50f",
+      "cft005/oidc-backends/session-ledger/002-rollback.DRAFT.sql": "92849aaea292ab787c9dc8f588fcc399322a6e5bef128807d636d3671b2da8b1",
+      "cft005/oidc-backends/package.json": "ff3fec25cbe379a99c036730d02e68fa830e726f0108e53665a680a93e768ba2",
+      "cft005/oidc-backends/pnpm-lock.yaml": "655e06782cfd65af01223e2beb09b1eb18182c40d74264e20d45f2e445b504e3"
+    },
+    "runtimeUnchanged": {
+      "cft005/oidc-backends/backend.mjs": true,
+      "cft005/oidc-backends/record-store.mjs": true,
+      "cft005/oidc-backends/provider.mjs": true,
+      "cft005/oidc-backends/config.mjs": true,
+      "cft005/oidc-backends/start.mjs": true,
+      "cft005/oidc-backends/technical-audit.mjs": true,
+      "cft005/oidc-backends/technical-proof.mjs": true
+    }
+  },
+  "contract": {
+    "counts": {
+      "PASS": 12,
+      "FAIL": 0,
+      "BLOCKED": 12
+    },
+    "publishedHomologation": "NOT_GRANTED",
+    "newRealGatePasses": 0,
+    "sessionLedgerPrerequisite": false,
+    "isolatedSsoPrerequisite": false
+  },
+  "safeguards": {
+    "publishedAppsUnchanged": true,
+    "apertaquemUnchanged": true,
+    "realDataUntouched": true,
+    "globalTtlUnchanged": true,
+    "auth0Unchanged": true,
+    "secretsExported": false
+  },
+  "nextStep": "Validate candidate migration and restricted privileges on isolated PostgreSQL 17 before integration; keep hosted database network closed",
+  "limits": [
+    "Local lock model is not a real race/restart/commit/RLS test",
+    "No HTTPS coordinator or BFF session integration yet",
+    "H18 requires isolated SSO and is not solved by the ledger",
+    "H10 genuine isolated Supabase JWT remains unavailable",
+    "Free database expiration and provider retention remain separate limits"
+  ]
+}

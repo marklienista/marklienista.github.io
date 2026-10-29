@@ -1,5 +1,7 @@
 # CFT-005 — Matriz consolidada, 28/10/2026
 
+**Preparação de sessões — 29/10/2026:** [registro durável candidato](../homologacao/REGISTRO-SESSOES-PREPARACAO-20261029.md), protocolo Ed25519 A/B, migração/retirada protegidas e transação com locks até o commit. **24 novos testes locais PASS; suíte BFF 94 PASS.** Sem integração no runtime, migração, novo serviço, deploy, leitura de credenciais ou abertura de rede; API confirmou ipAllowList=[]. Concorrência modelada localmente, ainda sem prova PostgreSQL real. Contrato preservado **12 PASS / 0 FAIL / 12 BLOCKED** e SPA **9 PASS / 2 FAIL / 3 BLOCKED**. Único próximo passo: validar SQL/grants candidatos em PostgreSQL 17 isolado antes da integração. CFT-005 ABERTO; adendos abaixo históricos.
+
 ## Atualização técnica de 29/10/2026
 
 | Matriz | PASS | FAIL | BLOCKED | Escopo |
