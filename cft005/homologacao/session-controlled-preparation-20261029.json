@@ -1,0 +1,89 @@
+{
+  "schema": "CFT005-HML-CONTROLLED-SESSION-PREPARATION-1",
+  "preparedAt": "2026-10-30T01:58:02.731Z",
+  "timeZone": "America/Sao_Paulo",
+  "scope": "offline synthetic-only preparation",
+  "runtimeBaseCommit": "a00203719ee2e8035c87bc75fc0d65c309e2a4f9",
+  "hostedExecutionPerformed": false,
+  "localValidation": {
+    "command": "node --test cft005/homologacao/evaluate.test.mjs cft005/homologacao/session-race-receipt.test.mjs",
+    "PASS": 46,
+    "FAIL": 0,
+    "newTests": 24,
+    "existingEvaluatorTests": 22,
+    "fixtureOnly": true
+  },
+  "sourceIntegrityLf": {
+    "cft005/homologacao/session-race-receipt.mjs": "c7f20920f2cc02cf9862f4a73394ba8c25974ef81070ed5b7fd69b7f6644c66d",
+    "cft005/homologacao/session-race-receipt.test.mjs": "6525e4dec6e679527ca85d2210ee3764a2a99e0620594d1e5d862ce7c5f695ef",
+    "cft005/homologacao/SESSOES-PROTOCOLO-CONTROLADO-20261029.md": "ed9a3bfad6b49cfdd4157918e7cf7247dd5dfee5959dc4d12c465780711e76e2",
+    "cft005/homologacao/ROTEIRO-TESTES.md": "93256ba7a351e1750930b2a8b8357f21e70de26005850c78343ba1d3147a2857"
+  },
+  "preparedRaces": {
+    "schema": "CFT005-HML-SESSION-RACE-1",
+    "state": "BLOCKED",
+    "products": [
+      {
+        "schema": "CFT005-HML-SESSION-RACE-1",
+        "runId": "HML-SESSION-RACE-PREP-A",
+        "sourceCommit": "a00203719ee2e8035c87bc75fc0d65c309e2a4f9",
+        "product": "A",
+        "state": "BLOCKED",
+        "reason": "FIXTURE_ONLY",
+        "observedOrder": "INCOMPLETE",
+        "publishedHomologation": "NOT_GRANTED",
+        "limit": "Sanitized executor observations only. One product race is not H15/H24 completion; no independent attestation."
+      },
+      {
+        "schema": "CFT005-HML-SESSION-RACE-1",
+        "runId": "HML-SESSION-RACE-PREP-B",
+        "sourceCommit": "a00203719ee2e8035c87bc75fc0d65c309e2a4f9",
+        "product": "B",
+        "state": "BLOCKED",
+        "reason": "FIXTURE_ONLY",
+        "observedOrder": "INCOMPLETE",
+        "publishedHomologation": "NOT_GRANTED",
+        "limit": "Sanitized executor observations only. One product race is not H15/H24 completion; no independent attestation."
+      }
+    ],
+    "gatePromotion": "NONE",
+    "publishedHomologation": "NOT_GRANTED",
+    "limit": "Two ordered races are only part of H15/H24. H14, replay, outage, old-credential and restart criteria remain separate."
+  },
+  "hostedMatrixPreserved": {
+    "PASS": 12,
+    "FAIL": 0,
+    "BLOCKED": 12
+  },
+  "newHostedGatePasses": 0,
+  "operatorAdapter": {
+    "implemented": false,
+    "startupIntegrated": false,
+    "hostedControlChannelAvailable": false,
+    "requiredBeforeNextNetworkWindow": true
+  },
+  "observedRenderMetadata": {
+    "databaseIpAllowList": [],
+    "coordinator": "suspended",
+    "readOnlyChecks": true,
+    "networkChanged": false
+  },
+  "safeguards": {
+    "publishedAppsUnchanged": true,
+    "apertaquemUnchanged": true,
+    "realDataUntouched": true,
+    "globalTtlUnchanged": true,
+    "noCredentialAccess": true,
+    "noBrowserSessionRead": true,
+    "noNewServiceOrMigration": true,
+    "noDeployOrPublication": true
+  },
+  "cft005": "OPEN",
+  "uniqueNextStep": "Implement and validate the bounded server-only operator adapter before proposing publication, deployment or a new network window.",
+  "limits": [
+    "No real login, PostgreSQL operation, network outage or race executed by this preparation.",
+    "The trace reviewer checks declared observations; it does not attest their origin.",
+    "Two race results do not automatically satisfy H15/H24 or grant published homologation.",
+    "H10/H18/H20-H23 retain previous blockers."
+  ]
+}

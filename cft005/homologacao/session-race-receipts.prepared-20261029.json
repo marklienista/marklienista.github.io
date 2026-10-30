@@ -1,0 +1,54 @@
+[
+  {
+    "schema": "CFT005-HML-SESSION-RACE-1",
+    "runId": "HML-SESSION-RACE-PREP-A",
+    "mode": "fixture",
+    "scope": "synthetic-only",
+    "sourceCommit": "a00203719ee2e8035c87bc75fc0d65c309e2a4f9",
+    "product": "A",
+    "requirements": {
+      "fourOwnerBaselinesVerified": false,
+      "separateProfilesVerified": false,
+      "bindingsVerified": false,
+      "samePhysicalConnectionVerified": false,
+      "writeUsesNormalDataFence": false
+    },
+    "events": [],
+    "postconditions": {
+      "oldSessionAStatus": null,
+      "oldSessionBStatus": null,
+      "u2AStatus": null,
+      "u2BStatus": null,
+      "oldBindingDenied": null,
+      "epochAdvancedExactlyOnce": null,
+      "ownWriteCommittedExactlyOnce": null,
+      "otherRowsPreserved": null
+    }
+  },
+  {
+    "schema": "CFT005-HML-SESSION-RACE-1",
+    "runId": "HML-SESSION-RACE-PREP-B",
+    "mode": "fixture",
+    "scope": "synthetic-only",
+    "sourceCommit": "a00203719ee2e8035c87bc75fc0d65c309e2a4f9",
+    "product": "B",
+    "requirements": {
+      "fourOwnerBaselinesVerified": false,
+      "separateProfilesVerified": false,
+      "bindingsVerified": false,
+      "samePhysicalConnectionVerified": false,
+      "writeUsesNormalDataFence": false
+    },
+    "events": [],
+    "postconditions": {
+      "oldSessionAStatus": null,
+      "oldSessionBStatus": null,
+      "u2AStatus": null,
+      "u2BStatus": null,
+      "oldBindingDenied": null,
+      "epochAdvancedExactlyOnce": null,
+      "ownWriteCommittedExactlyOnce": null,
+      "otherRowsPreserved": null
+    }
+  }
+]
