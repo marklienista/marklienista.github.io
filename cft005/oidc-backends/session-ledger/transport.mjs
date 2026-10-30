@@ -47,7 +47,7 @@ async function ready(pool){
     (SELECT count(*)=3 AND bool_and(c.relrowsecurity AND c.relforcerowsecurity AND pg_get_userbyid(c.relowner)='cft005_hml_session_owner') FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='cft005_hml_auth' AND c.relkind='r') AS ok FROM pg_roles r WHERE rolname=current_user`);
   if(r.rows[0]?.ok!==true)throw unavailable();
 }
-export async function startCoordinator({pool,publicKeys},{host='127.0.0.1',port=0,tlsForTest,closePool=true}={}){
+export async function startCoordinator({pool,publicKeys},{host='127.0.0.1',port=0,tlsForTest,closePool=true,operatorEnabled=false}={}){
   // Reject malformed/shared key configuration before accepting traffic.
   if(!['A','B'].every(p=>publicKeys?.[p]?.type==='public'&&publicKeys[p].asymmetricKeyType==='ed25519')||publicKeys.A.export({type:'spki',format:'der'}).equals(publicKeys.B.export({type:'spki',format:'der'})))throw unavailable();
   if(tlsForTest&&host!=='127.0.0.1')throw unavailable();
@@ -57,6 +57,7 @@ export async function startCoordinator({pool,publicKeys},{host='127.0.0.1',port=
     let e;
     try{
       if(req.headers.host!==target.host)return send(400,{error:'invalid_host'});
+      if(operatorEnabled&&req.url==='/v1/operator/keys'&&req.method==='GET')return send(200,{version:1,A:publicKeys.A.export({type:'spki',format:'der'}).toString('base64'),B:publicKeys.B.export({type:'spki',format:'der'}).toString('base64')});
       if(req.url==='/health'&&req.method==='GET'){await ready(pool);return send(200,{ready:true,ledgerVersion:version});}
       if(req.url!==target.pathname||req.method!=='POST')return send(404,{error:'not_found'});
       if(req.headers['content-type']!=='application/json'||req.headers.authorization||req.headers.cookie)return send(401,{error:'invalid_command'});

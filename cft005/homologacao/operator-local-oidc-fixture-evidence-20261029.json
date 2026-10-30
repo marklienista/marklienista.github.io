@@ -1,0 +1,282 @@
+{
+  "schema": 1,
+  "scope": "LOCAL-OIDC-PROTOCOL-FIXTURE-NOT-AUTH0",
+  "generatedAt": "2026-10-30T02:21:53.278Z",
+  "node": "v24.19.0",
+  "realAuth0Issuance": "BLOCKED",
+  "deployedBackends": 0,
+  "realAccountsUsed": 0,
+  "realDataAccessed": false,
+  "serversClosed": true,
+  "sourceHashEncoding": "UTF-8 LF",
+  "sourceSha256": {
+    "backend.mjs": "964a394b7d95b041761b63a0c692527d8278b2257620389c09a9d430736393f4",
+    "provider.mjs": "161a9d2b3abffa3dce9b464fb0552d25c316d1bf410ac3741c96372e871e5ed2",
+    "config.mjs": "d5dbfa9edd8864d4bb72d0d0a7277408f7f8fdf085b2abf7ff51b376d9f2d4a5",
+    "start.mjs": "d549c5f022ce17cfc5d457951be40f1399321783024fb1e9edd3e8ced28fd39c",
+    "protocol-fixture.mjs": "d6f5c66bc0a52424e15b9028e560cfa765e7ec4904b4e75dbba320066f3d2c03",
+    "integration.test.mjs": "23016e1b53293ab68eaaeef244ea9479d48f564d32c17a25fe12267856dd7f1c",
+    "package.json": "566e49518a0a7aab0db1eb289522cfa34293dfe2605a6e8a800982ba181cc391",
+    "pnpm-lock.yaml": "655e06782cfd65af01223e2beb09b1eb18182c40d74264e20d45f2e445b504e3"
+  },
+  "total": 51,
+  "passed": 51,
+  "failed": 0,
+  "cases": [
+    {
+      "id": "AU1-LOGIN",
+      "label": "confidential code exchange with S256, state and nonce",
+      "result": "PASS"
+    },
+    {
+      "id": "AU1-SESSION",
+      "label": "server session exposes only synthetic label and CSRF",
+      "result": "PASS"
+    },
+    {
+      "id": "AU1-READ",
+      "label": "read own private synthetic record",
+      "result": "PASS"
+    },
+    {
+      "id": "AU1-WRITE",
+      "label": "write own private record with session and CSRF",
+      "result": "PASS"
+    },
+    {
+      "id": "AU1-CROSS-USER",
+      "label": "cannot read or write other synthetic user",
+      "result": "PASS"
+    },
+    {
+      "id": "AU2-LOGIN",
+      "label": "confidential code exchange with S256, state and nonce",
+      "result": "PASS"
+    },
+    {
+      "id": "AU2-SESSION",
+      "label": "server session exposes only synthetic label and CSRF",
+      "result": "PASS"
+    },
+    {
+      "id": "AU2-READ",
+      "label": "read own private synthetic record",
+      "result": "PASS"
+    },
+    {
+      "id": "AU2-WRITE",
+      "label": "write own private record with session and CSRF",
+      "result": "PASS"
+    },
+    {
+      "id": "AU2-CROSS-USER",
+      "label": "cannot read or write other synthetic user",
+      "result": "PASS"
+    },
+    {
+      "id": "BU1-LOGIN",
+      "label": "confidential code exchange with S256, state and nonce",
+      "result": "PASS"
+    },
+    {
+      "id": "BU1-SESSION",
+      "label": "server session exposes only synthetic label and CSRF",
+      "result": "PASS"
+    },
+    {
+      "id": "BU1-READ",
+      "label": "read own private synthetic record",
+      "result": "PASS"
+    },
+    {
+      "id": "BU1-WRITE",
+      "label": "write own private record with session and CSRF",
+      "result": "PASS"
+    },
+    {
+      "id": "BU1-CROSS-USER",
+      "label": "cannot read or write other synthetic user",
+      "result": "PASS"
+    },
+    {
+      "id": "BU2-LOGIN",
+      "label": "confidential code exchange with S256, state and nonce",
+      "result": "PASS"
+    },
+    {
+      "id": "BU2-SESSION",
+      "label": "server session exposes only synthetic label and CSRF",
+      "result": "PASS"
+    },
+    {
+      "id": "BU2-READ",
+      "label": "read own private synthetic record",
+      "result": "PASS"
+    },
+    {
+      "id": "BU2-WRITE",
+      "label": "write own private record with session and CSRF",
+      "result": "PASS"
+    },
+    {
+      "id": "BU2-CROSS-USER",
+      "label": "cannot read or write other synthetic user",
+      "result": "PASS"
+    },
+    {
+      "id": "OIDC-PARAMS",
+      "label": "login uses confidential code flow and form_post",
+      "result": "PASS"
+    },
+    {
+      "id": "STATE",
+      "label": "wrong state rejected before token exchange",
+      "result": "PASS"
+    },
+    {
+      "id": "NONCE",
+      "label": "wrong signed ID Token nonce rejected",
+      "result": "PASS"
+    },
+    {
+      "id": "UNKNOWN-USER",
+      "label": "unapproved signed subject cannot create session",
+      "result": "PASS"
+    },
+    {
+      "id": "WRONG-CLIENT",
+      "label": "access token signed for client B rejected by A",
+      "result": "PASS"
+    },
+    {
+      "id": "WRONG-AUDIENCE",
+      "label": "access token for another API rejected",
+      "result": "PASS"
+    },
+    {
+      "id": "ID-SIGNATURE",
+      "label": "invalid signature or claims cannot establish a session",
+      "result": "PASS"
+    },
+    {
+      "id": "ACCESS-SIGNATURE",
+      "label": "invalid signature or claims cannot establish a session",
+      "result": "PASS"
+    },
+    {
+      "id": "EXPIRED-ACCESS",
+      "label": "invalid signature or claims cannot establish a session",
+      "result": "PASS"
+    },
+    {
+      "id": "WRONG-ISSUER",
+      "label": "invalid signature or claims cannot establish a session",
+      "result": "PASS"
+    },
+    {
+      "id": "NO-READ-SCOPE",
+      "label": "invalid signature or claims cannot establish a session",
+      "result": "PASS"
+    },
+    {
+      "id": "PKCE",
+      "label": "wrong verifier fails at the confidential token endpoint",
+      "result": "PASS"
+    },
+    {
+      "id": "CALLBACK-REPLAY",
+      "label": "callback transaction consumed once",
+      "result": "PASS"
+    },
+    {
+      "id": "CODE-TRANSPLANT",
+      "label": "A code cannot be exchanged by client B",
+      "result": "PASS"
+    },
+    {
+      "id": "COOKIE-TRANSPLANT",
+      "label": "A session cookie cannot select session on B",
+      "result": "PASS"
+    },
+    {
+      "id": "TX-TRANSPLANT",
+      "label": "A transaction cookie cannot select transaction on B",
+      "result": "PASS"
+    },
+    {
+      "id": "BEARER-INJECTION",
+      "label": "browser bearer cannot bootstrap backend authorization",
+      "result": "PASS"
+    },
+    {
+      "id": "CROSS-PRODUCT",
+      "label": "same user cannot select another product by URL or headers",
+      "result": "PASS"
+    },
+    {
+      "id": "CSRF",
+      "label": "write requires own session CSRF and own Origin",
+      "result": "PASS"
+    },
+    {
+      "id": "BODY-OWNERSHIP",
+      "label": "body cannot change product or owner",
+      "result": "PASS"
+    },
+    {
+      "id": "CALLBACK-QUERY",
+      "label": "code-bearing GET callback rejected; no URL-based flow",
+      "result": "PASS"
+    },
+    {
+      "id": "DIRECT-DATA",
+      "label": "no direct database-style route exists",
+      "result": "PASS"
+    },
+    {
+      "id": "PRESERVATION",
+      "label": "negative writes preserve all four synthetic records",
+      "result": "PASS"
+    },
+    {
+      "id": "PROOF-A",
+      "label": "real HTTP runner, signed foreign-client refusal and sanitized receipt (LOCAL issuer)",
+      "result": "PASS"
+    },
+    {
+      "id": "PROOF-B",
+      "label": "real HTTP runner, signed foreign-client refusal and sanitized receipt (LOCAL issuer)",
+      "result": "PASS"
+    },
+    {
+      "id": "PROOF-BOUNDARIES",
+      "label": "anonymous or forged requests cannot run proof or obtain data from token probe",
+      "result": "PASS"
+    },
+    {
+      "id": "LOGIN-DIAGNOSTICS",
+      "label": "fixed categories reveal failure stage without raw errors, codes or identities",
+      "result": "PASS"
+    },
+    {
+      "id": "DENIAL-PHASES",
+      "label": "authorization denial and token-endpoint refusal have separate sanitized categories",
+      "result": "PASS"
+    },
+    {
+      "id": "LOCAL-LOGOUT",
+      "label": "logout A leaves B authenticated",
+      "result": "PASS"
+    },
+    {
+      "id": "LOGOUT-OFFLINE",
+      "label": "local cleanup survives provider verification outage",
+      "result": "PASS"
+    },
+    {
+      "id": "CONFIG",
+      "label": "missing secrets and shared client IDs fail closed",
+      "result": "PASS"
+    }
+  ]
+}

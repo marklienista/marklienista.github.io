@@ -4,6 +4,8 @@ import {PROOF_ORIGINS} from './config.mjs';
 import {createMemoryFixtureStore} from './record-store.mjs';
 import {runTechnicalProof} from './technical-proof.mjs';
 import {sessionHash} from './session-ledger/protocol.mjs';
+import {createSessionOperator} from './session-operator/controller.mjs';
+import {operatorPath} from './session-operator/protocol.mjs';
 
 const SESSION='__Host-cft005-session',TRANSACTION='__Host-cft005-transaction';
 const LOGIN_STAGES=new Set(['client_authentication','code_exchange','provider_denied','provider_connection','oidc_response_validation',
@@ -38,7 +40,7 @@ const PAGE='<!doctype html><html lang="pt-BR"><meta charset="utf-8"><title>CFT-0
 const SCRIPT=`let session,logoutCsrf;const status=document.getElementById('status');const messages={transaction_cookie_missing:'O navegador não devolveu o cookie temporário de entrada.',transaction_missing:'A tentativa expirou ou o serviço reiniciou; entre novamente.',callback_format:'O retorno de entrada veio em formato inesperado.',client_authentication:'O provedor recusou a credencial deste serviço.',code_exchange:'O provedor recusou a troca do código de entrada.',provider_denied:'A entrada foi cancelada ou recusada no provedor.',provider_connection:'Não foi possível contatar o provedor.',oidc_response_validation:'O retorno do provedor não passou na validação OIDC.',id_token_validation:'A identidade recebida não passou na validação.',subject_allowlist:'A conta recebida não corresponde às contas de teste autorizadas.',access_token_profile:'O perfil do token recebido não corresponde ao previsto.',access_token_scope:'A permissão de leitura não veio no token.',access_token_client:'O token pertence ao outro cliente de teste.',access_token_validation:'O token de acesso não passou na validação.',subject_binding:'A identidade não corresponde ao token de acesso.',session_creation:'Não foi possível criar a sessão local.',session_ledger_denied:'As sessões foram encerradas durante esta entrada; entre novamente.',session_ledger_unavailable:'O serviço de sessões está temporariamente indisponível.'};async function check(){const r=await fetch('/session');if(r.status===503){const cleanup=await fetch('/logout/context');logoutCsrf=cleanup.ok?(await cleanup.json()).csrf:null;session=null;status.textContent='Serviço de sessões temporariamente indisponível. A saída local continua disponível.';return;}session=r.ok?await r.json():null;logoutCsrf=session?.csrf;status.textContent=session?'Produto '+session.product+' · '+session.user:'Sem sessão local';if(!session){const d=await(await fetch('/auth/status')).json();if(d.last?.result==='FAIL'){status.textContent+=' — '+(messages[d.last.stage]||'A entrada não foi confirmada.');if(d.last.phase==='token_endpoint')status.textContent+=' Etapa: troca do código no servidor.';if(d.last.phase==='authorization_response')status.textContent+=' Etapa: autorização no provedor.';}}}document.getElementById('read').onclick=async()=>{if(!session)return;const r=await fetch('/api/products/'+session.product+'/records/'+session.user);status.textContent=JSON.stringify(await r.json());};document.getElementById('proof').onclick=async()=>{if(!session)return;status.textContent='Executando prova entre os servidores…';try{const r=await fetch('/proof/run',{method:'POST',headers:{'X-CFT005-CSRF':session.csrf}});status.textContent=JSON.stringify(await r.json(),null,2);}catch{status.textContent='Falha na prova; tente novamente';}};document.getElementById('technical').onclick=async()=>{if(!session)return;status.textContent='Executando verificação técnica…';try{const r=await fetch('/proof/technical/run',{method:'POST',headers:{'X-CFT005-CSRF':session.csrf}});status.textContent=JSON.stringify(await r.json(),null,2);}catch{status.textContent='Falha na verificação técnica; informe ao executor antes de repetir';}};document.getElementById('leave').onclick=async()=>{const csrf=session?.csrf||logoutCsrf;if(!csrf)return;const r=await fetch('/logout',{method:'POST',headers:{'X-CFT005-CSRF':csrf}});const result=await r.json();await check();if(result.durableLocalLogout===false)status.textContent+=' — limpeza local feita; confirmação durável indisponível.';};document.getElementById('revoke').onclick=async()=>{if(!session)return;const r=await fetch('/sessions/revoke',{method:'POST',headers:{'X-CFT005-CSRF':session.csrf}});if(r.ok){await check();status.textContent='Sessões de homologação encerradas para esta conta.';}else{status.textContent='Não foi possível confirmar o encerramento. Atualize a página antes de tentar novamente.';}};check().catch(()=>{status.textContent='Falha na verificação';});`;
 
 /** Single-instance test BFF. Resource data and credential-bearing sessions stay private. */
-export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchProofForTest,recordStore,sessionLedger}={}) {
+export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchProofForTest,recordStore,sessionLedger,controlledSessions}={}) {
   if(!recordStore&&host!=='127.0.0.1')throw new Error('E_DATABASE_REQUIRED');
   if(host!=='127.0.0.1'&&!sessionLedger)throw new Error('E_LEDGER_REQUIRED');
   const store=recordStore??createMemoryFixtureStore(cfg);
@@ -55,6 +57,10 @@ export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchPr
     }
   };
   const proofFetch=fetchProofForTest??fetch;
+  if(controlledSessions&&(!sessionLedger||store.controlledWriteProof!==controlledSessions.writeControl||host!=='127.0.0.1'&&cfg.origin!==PROOF_ORIGINS[cfg.product]))throw Error('E_OPERATOR_UNAVAILABLE');
+  const operator=controlledSessions?createSessionOperator({...controlledSessions,cfg,ledger:sessionLedger,proofFetch,mode:host==='127.0.0.1'?'fixture':'real'}):null;
+  const controlButtons='<button id="prepareSession">Preparar sessão para ensaio</button><button id="localSessionProof">Provar saída local</button><button id="raceSessionProof">Provar revogação concorrente</button><button id="finishSessionProof">Conferir ensaio após reentrada</button><button id="abortSessionProof">Encerrar ensaio interrompido</button>';
+  const controlScript=`for(const [id,path]of [['prepareSession','enroll'],['localSessionProof','logout'],['raceSessionProof','race'],['finishSessionProof','finalize'],['abortSessionProof','abort']])document.getElementById(id).onclick=async()=>{if(!session){status.textContent='Entre novamente antes de continuar o ensaio.';return;}status.textContent='Executando ensaio controlado…';try{const r=await fetch('/proof/sessions/'+path,{method:'POST',headers:{'X-CFT005-CSRF':session.csrf}});status.textContent=JSON.stringify(await r.json(),null,2);}catch{status.textContent='Ensaio interrompido; informe ao executor antes de repetir.';}};`;
   let proofRunning=false;
   const server=createServer({requestTimeout:10000,headersTimeout:10000,maxHeaderSize:16384},async(req,res)=>{
     const fail=(status,error)=>send(res,status,{error});
@@ -62,6 +68,11 @@ export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchPr
       if(req.headers.host!==new URL(cfg.origin).host)return fail(400,'invalid_host');
       const url=new URL(req.url,cfg.origin);
       if(url.origin!==cfg.origin||url.search||url.hash)return fail(400,'invalid_url');
+      if(url.pathname===operatorPath){
+        if(!operator)return fail(404,'not_found');
+        if(req.method!=='POST'||req.headers['content-type']!=='application/json'||req.headers.authorization||req.headers.cookie)return fail(401,'operator_command_denied');
+        try{return send(res,200,await operator.peer(JSON.parse(await read(req,4096))));}catch{return fail(401,'operator_command_denied');}
+      }
       // Data-free probe: validates the same JWT policy, never creates a session or accesses records.
       if(url.pathname==='/proof/token-policy'){
         if(req.method!=='POST'||req.headers['content-type']!=='application/json')return fail(405,'method_forbidden');
@@ -82,8 +93,9 @@ export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchPr
       const jar=cookies(req);
       const sid=jar.get(SESSION),session=sessions.get(sid);
       if(req.method==='GET'&&url.pathname==='/health'){await store.ready();return send(res,200,{ready:true,product:cfg.product,storage:store.kind});}
-      if(req.method==='GET'&&url.pathname==='/')return send(res,200,PAGE,{'Content-Type':'text/html; charset=utf-8'});
-      if(req.method==='GET'&&url.pathname==='/client.js')return send(res,200,SCRIPT,{'Content-Type':'text/javascript; charset=utf-8'});
+      if(req.method==='GET'&&url.pathname==='/')return send(res,200,operator?PAGE.replace('<pre id="status"',controlButtons+'<pre id="status"'):PAGE,{'Content-Type':'text/html; charset=utf-8'});
+      if(req.method==='GET'&&url.pathname==='/client.js')return send(res,200,SCRIPT+(operator?controlScript:''),{'Content-Type':'text/javascript; charset=utf-8'});
+      if(req.method==='GET'&&url.pathname==='/proof/sessions/results')return operator?send(res,200,operator.results()):fail(404,'not_found');
       // Fixed diagnostic categories only, shared by this synthetic test instance. No raw errors or identifiers.
       if(req.method==='GET'&&url.pathname==='/auth/status')return send(res,200,{product:cfg.product,...loginStatus});
       // Public audit summaries contain only synthetic labels, timestamps and verdicts; no records or credentials.
@@ -145,14 +157,27 @@ export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchPr
       }
       if(sessionLedger)await store.authorize(principal);
       if(req.method==='GET'&&url.pathname==='/session')return send(res,200,{product:cfg.product,user:session.label,csrf:session.csrf});
+      if(req.method==='POST'&&['/proof/sessions/enroll','/proof/sessions/logout','/proof/sessions/race','/proof/sessions/finalize','/proof/sessions/abort'].includes(url.pathname)){
+        if(!operator)return fail(404,'not_found');
+        try{if(await read(req,1))return fail(400,'invalid_body');}catch{return fail(400,'invalid_body');}
+        const caller={sid,session,principal};
+        if(url.pathname.endsWith('/enroll'))return send(res,200,operator.enroll(caller));
+        if(session.label!=='U1')return fail(403,'operator_user_required');
+        if(proofRunning)return fail(429,'proof_busy');proofRunning=true;
+        try{return send(res,200,url.pathname.endsWith('/abort')?await operator.abort(caller):url.pathname.endsWith('/finalize')?await operator.finalize(caller):await operator.run(url.pathname.endsWith('/race')?'race':'logout',caller));}
+        catch(error){if(error?.message==='E_OPERATOR_UNAVAILABLE')return fail(409,'operator_not_ready_or_interrupted_no_retry');throw error;}
+        finally{proofRunning=false;}
+      }
       if(req.method==='POST'&&url.pathname==='/sessions/revoke'){
         if(!sessionLedger)return fail(503,'ledger_required');
+        if(operator&&!operator.allowRevoke(req.headers['x-cft005-operator'],principal))return fail(409,'operator_window_active');
         try{if(await read(req,1))return fail(400,'invalid_body');}catch{return fail(400,'invalid_body');}
         await sessionLedger.revoke(session.binding);
         sessions.delete(sid);
         return send(res,200,{revoked:true,scope:'hml-user',durable:true},{'Set-Cookie':cookie(SESSION,'',0)});
       }
       if(req.method==='POST'&&url.pathname==='/proof/technical/run'){
+        if(operator?.busy())return fail(409,'operator_window_active');
         if(sessionLedger&&store.ledgerAuditVersion!==1)return fail(503,'technical_requires_ledger_review');
         if(proofRunning||now-(session.lastTechnical??0)<15)return fail(429,'proof_busy');
         proofRunning=true;session.lastTechnical=now;
@@ -163,6 +188,7 @@ export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchPr
         return send(res,200,receipt);
       }
       if(req.method==='POST'&&url.pathname==='/proof/run'){
+        if(operator?.busy())return fail(409,'operator_window_active');
         if(proofRunning||now-(session.lastProof??0)<15)return fail(429,'proof_busy');
         proofRunning=true;session.lastProof=now;
         const receipt={startedAt:new Date().toISOString(),product:cfg.product,user:session.label,storage:store.kind,cases:[],otherOwnerPreservation:'Requires independent recheck by the other authenticated owner'};
@@ -220,7 +246,11 @@ export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchPr
         if(req.headers['content-type']!=='application/json')return invalid(415,'json_required');
         let input;try{input=JSON.parse(await read(req,4096));}catch{return invalid(400,'invalid_body');}
         if(!input||Array.isArray(input)||Object.keys(input).length!==1||typeof input.value!=='string'||input.value.length>128)return invalid(400,'invalid_body');
-        const updated=await store.write(principal,route[2],input.value);
+        const marker=req.headers['x-cft005-operator'];
+        if(marker&&!operator)return fail(400,'operator_disabled');
+        const permit=marker?operator.claimWrite(marker,principal):undefined;
+        if(operator&&!operator.allowWrite(permit))return fail(409,'operator_window_active');
+        const updated=await store.write(principal,route[2],input.value,permit);
         if(!updated)return send(res,404,{error:'not_found'},storageHeaders);
         return send(res,200,{record:updated},storageHeaders);
       }else if(req.method!=='GET')return fail(405,'method_forbidden');
@@ -236,6 +266,7 @@ export async function startBackend(cfg,provider,{host='127.0.0.1',port=0,fetchPr
   });
   await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(port,host,resolve);});
   return Object.freeze({port:server.address().port,close:()=>new Promise((resolve,reject)=>{
+    operator?.close();
     server.close(error=>error?reject(error):store.close().then(resolve,reject));server.closeAllConnections();
   })});
 }

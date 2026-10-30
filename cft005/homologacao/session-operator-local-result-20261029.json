@@ -1,0 +1,74 @@
+{
+  "schema": "CFT005-SESSION-OPERATOR-LOCAL-RESULT-1",
+  "recordedAt": "2026-10-30T02:25:47.629Z",
+  "scope": "local-synthetic-only",
+  "baseLocalCommit": "135845db24d26fd4f2ea25a19703906e08e54e3c",
+  "runtimeLastHostedCommit": "a00203719ee2e8035c87bc75fc0d65c309e2a4f9",
+  "backendTests": {
+    "PASS": 127,
+    "FAIL": 0,
+    "operatorTests": 20
+  },
+  "evaluatorTests": {
+    "PASS": 46,
+    "FAIL": 0
+  },
+  "nativePostgres": {
+    "version": 170011,
+    "PASS": 98,
+    "FAIL": 0,
+    "operatorChecks": 20,
+    "baselineRegressionChecks": 78,
+    "testedSourceHashesVerified": 24
+  },
+  "intermediateAttempt": {
+    "PASS": 94,
+    "FAIL": 0,
+    "file": "session-operator-postgres17-attempt1-20261029.json",
+    "limit": "Intermediate version before final key-loading, UI, timeout and abort checks; not the final tested-source proof."
+  },
+  "implemented": [
+    "fixed signed peer channel with distinct protocol audience, source/target binding, nonces and private short-lived leases",
+    "explicit authenticated U1/U2 enrollment per product",
+    "local logout with peer/U2 preservation",
+    "normal HTTP PUT fenced against peer-product revocation in both directions",
+    "bounded monitor timeout closes client, rolls back and prevents pool reuse",
+    "fresh owner recheck before completed receipt",
+    "abort/expiry without authority reset or automatic write retry"
+  ],
+  "notImplementedInThisIncrement": [
+    "controlled hosted outage orchestration H16",
+    "exact ledger revocation replay and wrong-target suite H17",
+    "pending real OIDC callback hook H19",
+    "controlled hosted restart protocol H24"
+  ],
+  "defaultMode": "off",
+  "activationFlag": "HML_CONTROLLED_SESSION_PROOF=enabled-v1",
+  "newCredentials": false,
+  "newDatabaseObjects": false,
+  "newDependency": false,
+  "privacy": {
+    "realOidc": false,
+    "realBrowser": false,
+    "hostedDatabaseAccessed": false,
+    "realRecordsAccessed": false,
+    "peerSessionCredentialsTransferred": false,
+    "privateEvidenceFieldsExported": false
+  },
+  "localPeerTransportLimit": "BFF peers use mapped HTTP loopback in the OIDC fixture; coordinator and key loading use real local HTTPS with a validated temporary certificate. Hosted fixed peer destinations require normal HTTPS certificate validation; no live hosted operator assertion.",
+  "profilesLimit": "The server does not infer browser profile separation. Race receipts retain separateProfilesVerified=false and fixture mode; no gate promotion from these receipts.",
+  "hostedMatrixPreserved": {
+    "PASS": 12,
+    "FAIL": 0,
+    "BLOCKED": 12
+  },
+  "newHostedGatePasses": 0,
+  "publishedHomologation": "NOT_GRANTED",
+  "cleanup": {
+    "clustersStopped": 2,
+    "temporaryPasswordAndPrivateTlsKeyAbsent": true,
+    "listener57517Absent": true
+  },
+  "nextStep": "Publish the reviewed sanitized candidate, then activate and exercise the operator only on existing synthetic A/B/coordinator in a separately authorized temporary network window.",
+  "cft005": "OPEN"
+}

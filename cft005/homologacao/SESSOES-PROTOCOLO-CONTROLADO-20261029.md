@@ -1,5 +1,7 @@
 # Prova controlada de sessões — preparação de 29/10/2026
 
+**Adendo posterior:** o [operador de logout/corrida foi implementado e validado localmente](./OPERADOR-SESSOES-RESULTADO-20261029.md), desligado por padrão. Os itens abaixo registram a preparação anterior; pane, replay exato da revogação, callback pendente e reinício hospedado ainda exigem seus complementos. Não há novo PASS real nem janela aberta por esse adendo.
+
 **Preparação local; nenhuma rodada hospedada nesta etapa.** Matriz incremental preservada: **12 PASS / 0 FAIL / 12 BLOCKED**. CFT-005 ABERTO. O auditor hospedado continua a002037; os arquivos desta preparação não são importados pelo startup A/B/coordenador.
 
 A API foi consultada: banco cft005-hml-db-teste com ipAllowList=[]; coordenador cft005-session-ledger-teste suspenso. Não abrir rede nem pedir novas entradas enquanto a instrumentação protegida abaixo não estiver implementada e revisada.

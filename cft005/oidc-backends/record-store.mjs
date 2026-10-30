@@ -25,7 +25,7 @@ export function databaseOptions(product,connectionString){
     statement_timeout:5000,idle_in_transaction_session_timeout:5000,idleTimeoutMillis:120000,application_name:'cft005-bff-'+product};
 }
 
-export function createPostgresStore(cfg,connectionString,{Pool=pg.Pool,ledger}={}){
+export function createPostgresStore(cfg,connectionString,{Pool=pg.Pool,ledger,writeControl}={}){
   const pool=new Pool(databaseOptions(cfg.product,connectionString));
   pool.on('error',()=>{}); // No raw database errors or credentials in application logs.
   const schema='cft005_hml_'+cfg.product.toLowerCase(),table=schema+'.records';
@@ -34,9 +34,11 @@ export function createPostgresStore(cfg,connectionString,{Pool=pg.Pool,ledger}={
     if(!principal||!Object.hasOwn(cfg.subjects,principal.subject)||cfg.subjects[principal.subject]!==principal.label)throw unavailable();
     return principal.label;
   }
-  async function execute(principal,sql,values){
+  async function execute(principal,sql,values,permit){
     const label=principalLabel(principal);let client,destroy=false;
-    if(ledger)return protectedTransaction({pool,coordinator:ledger,cfg,principal,binding:principal.ledgerBinding,operation:c=>c.query(sql,values)});
+    if(ledger)return protectedTransaction({pool,coordinator:ledger,cfg,principal,binding:principal.ledgerBinding,operation:async c=>{
+      const r=await c.query(sql,values);if(permit)await writeControl.afterQuery(c,permit,r.rowCount);return r;
+    }});
     try{
       client=await pool.connect();await client.query('BEGIN');
       await client.query("SELECT set_config('cft005.owner',$1,true)",[label]);
@@ -47,7 +49,7 @@ export function createPostgresStore(cfg,connectionString,{Pool=pg.Pool,ledger}={
     }finally{client?.release(destroy);}
   }
   function view(row){return row?{id:row.record_id,value:row.value,revision:row.revision}:null;}
-  return Object.freeze({kind:'postgres',ledgerRequired:Boolean(ledger),ledgerAuditVersion:ledger?1:undefined,
+  return Object.freeze({kind:'postgres',ledgerRequired:Boolean(ledger),ledgerAuditVersion:ledger?1:undefined,controlledWriteProof:writeControl,
     async ready(){
       try{
         const r=await pool.query(`SELECT current_user=$1 AND session_user=$1 AND NOT rolsuper AND NOT rolcreatedb AND NOT rolcreaterole AND NOT rolbypassrls AS login_ok,
@@ -69,9 +71,11 @@ export function createPostgresStore(cfg,connectionString,{Pool=pg.Pool,ledger}={
       if(!['U1','U2'].includes(requested))return null;
       const r=await execute(principal,`SELECT record_id,value,revision FROM ${table} WHERE record_id=$1`,[`HML-${cfg.product}-${requested}`]);return view(r.rows[0]);
     },
-    async write(principal,requested,value){
+    async write(principal,requested,value,permit){
       if(!['U1','U2'].includes(requested)||typeof value!=='string'||value.length>128)throw unavailable();
-      const r=await execute(principal,`UPDATE ${table} SET value=$1,revision=revision+1 WHERE record_id=$2 RETURNING record_id,value,revision`,[value,`HML-${cfg.product}-${requested}`]);return view(r.rows[0]);
+      if(permit&&(!ledger||!writeControl||principal.label!=='U1'||requested!=='U1'))throw unavailable();
+      const r=await execute(principal,`UPDATE ${table} SET value=$1,revision=revision+1 WHERE record_id=$2 RETURNING record_id,value,revision`,[value,`HML-${cfg.product}-${requested}`],permit);
+      if(permit)writeControl.committed(permit);return view(r.rows[0]);
     },
     async audit(principal){
       const label=principalLabel(principal);let client,reuse=false;

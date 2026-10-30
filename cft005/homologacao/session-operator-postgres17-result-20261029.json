@@ -1,0 +1,847 @@
+{
+  "schema": "CFT005-LOCAL-HTTPS-LEDGER-INTEGRATION-1",
+  "recordedAt": "2026-10-30T02:23:41.722Z",
+  "scope": "local-synthetic-only",
+  "mode": "native-postgresql",
+  "serverVersionNum": 170011,
+  "realOidc": false,
+  "realBrowserSessions": false,
+  "hostedDatabaseAccessed": false,
+  "hostedNetworkChanged": false,
+  "runtimeIntegrated": true,
+  "coordinatorHttps": true,
+  "counts": {
+    "PASS": 98,
+    "FAIL": 0
+  },
+  "cases": [
+    {
+      "id": "PG17-TLS-LOCAL-BOUNDARY",
+      "result": "PASS"
+    },
+    {
+      "id": "MIGRATION-UNREVIEWED-REFUSED",
+      "result": "PASS"
+    },
+    {
+      "id": "MIGRATION-EXACT-SQL-APPLIED-LOCAL",
+      "result": "PASS"
+    },
+    {
+      "id": "MIGRATION-SECOND-APPLICATION-REFUSED",
+      "result": "PASS"
+    },
+    {
+      "id": "SCHEMA-OWNER-FORCE-RLS-NO-PUBLIC",
+      "result": "PASS"
+    },
+    {
+      "id": "A-REAL-LOGIN-RESTRICTED-TLS",
+      "result": "PASS"
+    },
+    {
+      "id": "A-CROSS-PRODUCT-RECORDS-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "A-NO-EPOCH-SESSION-MUTATION-OR-NONCES",
+      "result": "PASS"
+    },
+    {
+      "id": "A-NO-ROLE-ESCALATION-OR-DDL",
+      "result": "PASS"
+    },
+    {
+      "id": "A-NO-CONTEXT-NO-METADATA",
+      "result": "PASS"
+    },
+    {
+      "id": "A-U1-REGISTER-LOCK-AND-POSITIVE-READ",
+      "result": "PASS"
+    },
+    {
+      "id": "A-U2-REGISTER-LOCK-AND-POSITIVE-READ",
+      "result": "PASS"
+    },
+    {
+      "id": "A-METADATA-RLS-OWNER-PRODUCT-AND-LOCK-PAD",
+      "result": "PASS"
+    },
+    {
+      "id": "A-OTHER-USER-RECORD-FILTERED",
+      "result": "PASS"
+    },
+    {
+      "id": "B-REAL-LOGIN-RESTRICTED-TLS",
+      "result": "PASS"
+    },
+    {
+      "id": "B-CROSS-PRODUCT-RECORDS-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "B-NO-EPOCH-SESSION-MUTATION-OR-NONCES",
+      "result": "PASS"
+    },
+    {
+      "id": "B-NO-ROLE-ESCALATION-OR-DDL",
+      "result": "PASS"
+    },
+    {
+      "id": "B-NO-CONTEXT-NO-METADATA",
+      "result": "PASS"
+    },
+    {
+      "id": "B-U1-REGISTER-LOCK-AND-POSITIVE-READ",
+      "result": "PASS"
+    },
+    {
+      "id": "B-U2-REGISTER-LOCK-AND-POSITIVE-READ",
+      "result": "PASS"
+    },
+    {
+      "id": "B-METADATA-RLS-OWNER-PRODUCT-AND-LOCK-PAD",
+      "result": "PASS"
+    },
+    {
+      "id": "B-OTHER-USER-RECORD-FILTERED",
+      "result": "PASS"
+    },
+    {
+      "id": "COORDINATOR-NO-PRODUCT-DATA-OR-DDL",
+      "result": "PASS"
+    },
+    {
+      "id": "REPLAY-UNIQUE-NONCE-DURABLE",
+      "result": "PASS"
+    },
+    {
+      "id": "WRONG-PRODUCT-SIGNED-COMMAND-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "LOCAL-LOGOUT-LEAVES-PEER-AND-U2",
+      "result": "PASS"
+    },
+    {
+      "id": "A-REAL-CONCURRENT-WRITE-THEN-REVOCATION",
+      "result": "PASS"
+    },
+    {
+      "id": "B-REAL-CONCURRENT-WRITE-THEN-REVOCATION",
+      "result": "PASS"
+    },
+    {
+      "id": "CHECK-THEN-WRITE-RACE-FENCED",
+      "result": "PASS"
+    },
+    {
+      "id": "OLD-LOGIN-SNAPSHOT-AND-REACTIVATION-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "COORDINATOR-OUTAGE-FAILS-CLOSED",
+      "result": "PASS"
+    },
+    {
+      "id": "REAL-RESTART-PRESERVES-EPOCH-NONCE-AND-ROWS",
+      "result": "PASS"
+    },
+    {
+      "id": "A-U1-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "A-U2-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "B-U1-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "B-U2-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "AUDIT-A-U1-RLS-ROLLBACK-CLEANUP-AND-REUSE",
+      "result": "PASS"
+    },
+    {
+      "id": "AUDIT-A-U2-RLS-ROLLBACK-CLEANUP-AND-REUSE",
+      "result": "PASS"
+    },
+    {
+      "id": "AUDIT-B-U1-RLS-ROLLBACK-CLEANUP-AND-REUSE",
+      "result": "PASS"
+    },
+    {
+      "id": "AUDIT-B-U2-RLS-ROLLBACK-CLEANUP-AND-REUSE",
+      "result": "PASS"
+    },
+    {
+      "id": "AUDIT-A-PROBE-FENCE-ORDERS-REAL-REVOCATION",
+      "result": "PASS"
+    },
+    {
+      "id": "AUDIT-A-VERIFY-FENCE-ORDERS-REAL-REVOCATION",
+      "result": "PASS"
+    },
+    {
+      "id": "AUDIT-B-PROBE-FENCE-ORDERS-REAL-REVOCATION",
+      "result": "PASS"
+    },
+    {
+      "id": "AUDIT-B-VERIFY-FENCE-ORDERS-REAL-REVOCATION",
+      "result": "PASS"
+    },
+    {
+      "id": "AUDIT-SECOND-PHASE-ONLINE-OUTAGE-NEVER-RETURNS-PASS",
+      "result": "PASS"
+    },
+    {
+      "id": "AUDIT-FORGED-PRINCIPAL-AND-BINDING-DENIED-BEFORE-PROBES",
+      "result": "PASS"
+    },
+    {
+      "id": "AUDIT-RECOVERY-AFTER-DENIALS-PRESERVES-ALL-FOUR-ROWS",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-HTTPS-UNSIGNED-COMMAND-REFUSED",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-TLS-HOSTNAME-VALIDATION",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U1-OIDC-SNAPSHOT-REGISTER-SESSION",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U1-POSITIVE-READ-WRITE-RLS",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U1-CROSS-USER-PRODUCT-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U2-OIDC-SNAPSHOT-REGISTER-SESSION",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U2-POSITIVE-READ-WRITE-RLS",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U2-CROSS-USER-PRODUCT-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U1-OIDC-SNAPSHOT-REGISTER-SESSION",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U1-POSITIVE-READ-WRITE-RLS",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U1-CROSS-USER-PRODUCT-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U2-OIDC-SNAPSHOT-REGISTER-SESSION",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U2-POSITIVE-READ-WRITE-RLS",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U2-CROSS-USER-PRODUCT-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-REVOKE-CSRF-AND-BROWSER-OWNER-BODY-REFUSED",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U1-GUARDED-TECHNICAL-AUDIT",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U2-GUARDED-TECHNICAL-AUDIT",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U1-GUARDED-TECHNICAL-AUDIT",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U2-GUARDED-TECHNICAL-AUDIT",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-LOCAL-LOGOUT-PRESERVES-PEER-AND-U2",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-HTTP-WRITE-REVOCATION-ACK-ORDERED",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-PRE-REVOCATION-OIDC-CALLBACK-CANNOT-REACTIVATE",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-NEW-LOGIN-SURVIVES-UNEXPIRED-REPLAY",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-REAL-HTTPS-OUTAGE-FAILS-CLOSED-LOCAL-CLEANUP-WORKS",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-BFF-RESTART-DENIES-OLD-COOKIES-AND-RECOVERS-FRESH-LOGIN",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U1-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-A-U2-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U1-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "INT-B-U2-FINAL-PRESERVATION",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-PUBLIC-KEYS-HTTPS-PIN-OWN-EXISTING-KEY",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-UNSIGNED-COOKIE-BEARER-PEER-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-ENABLED-UI-COMPILES-WITHOUT-INLINE-SCRIPT",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-A-U1-AUTHENTICATED-ENROLLMENT",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-A-U2-AUTHENTICATED-ENROLLMENT",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-B-U1-AUTHENTICATED-ENROLLMENT",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-B-U2-AUTHENTICATED-ENROLLMENT",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-U2-CSRF-BODY-AND-FORGED-MARKER-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-LOCAL-LOGOUT-PRESERVES-PEER-AND-U2",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-A-REAL-HTTP-PUT-BLOCKS-REVOKE-UNTIL-COMMIT",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-REPLAY-SOURCE-AND-LEASE-SUBSTITUTION-DENIED",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-A-FRESH-OWNER-RECHECK-REQUIRED-AND-SANITIZED",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-B-REAL-HTTP-PUT-BLOCKS-REVOKE-UNTIL-COMMIT",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-B-FRESH-OWNER-RECHECK-REQUIRED-AND-SANITIZED",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-BOUNDED-TIMEOUT-ROLLS-BACK-AND-DESTROYS-CLIENT",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-ABORT-CLEARS-CONTROLS-WITHOUT-RESETTING-AUTHORITY",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-A-U1-FINAL-EXACT-REVISION-ACCOUNTING",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-A-U2-FINAL-EXACT-REVISION-ACCOUNTING",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-B-U1-FINAL-EXACT-REVISION-ACCOUNTING",
+      "result": "PASS"
+    },
+    {
+      "id": "OP-NATIVE-B-U2-FINAL-EXACT-REVISION-ACCOUNTING",
+      "result": "PASS"
+    },
+    {
+      "id": "RETIREMENT-EXACT-SQL-PRESERVES-LEDGER-DENIES-NEW-LOGIN",
+      "result": "PASS"
+    }
+  ],
+  "diagnostics": [
+    {
+      "phase": "A-METADATA-RLS-OWNER-PRODUCT-AND-LOCK-PAD",
+      "sqlState": "23514",
+      "kind": "UPDATE"
+    },
+    {
+      "phase": "B-METADATA-RLS-OWNER-PRODUCT-AND-LOCK-PAD",
+      "sqlState": "23514",
+      "kind": "UPDATE"
+    },
+    {
+      "phase": "REPLAY-UNIQUE-NONCE-DURABLE",
+      "sqlState": "23505",
+      "kind": "INSERT"
+    },
+    {
+      "phase": "restart-reconnect",
+      "sqlState": "23505",
+      "kind": "INSERT"
+    },
+    {
+      "phase": "INT-NEW-LOGIN-SURVIVES-UNEXPIRED-REPLAY",
+      "sqlState": "23505",
+      "kind": "INSERT"
+    }
+  ],
+  "sourceSha256": {
+    "001-ledger.DRAFT.sql": "81584f9b5c280ea29680c4aabd62362daeee7c488e864342564e91026f6b00aa",
+    "002-rollback.DRAFT.sql": "92849aaea292ab787c9dc8f588fcc399322a6e5bef128807d636d3671b2da8b1",
+    "transactions.mjs": "1e6e145bd357ed50b786840daf256f5d22c8cdfcb64bc2edc720631c16f4873c",
+    "protocol.mjs": "3d7a187e6d6c564a4fdbb1492fcf0f39c328aa1301a505227e161a1ae3d925bb",
+    "local-baseline.sql": "59188642d386ca1a88706320e084fffdfb905e5fe5f20a155d0d2f69cb57987b",
+    "postgres-validation.mjs": "759ce183b2c696762826dab90e86a8a8a0aef866cabe724d9857517d4fd15423",
+    "run-local-postgres.ps1": "421877a7dfbbf7af35392cce6bbafd85a6b1d1694c6cb3ef833cb1bf47c369fe",
+    "control-local-postgres.ps1": "117cf8b5f4dded7721010c0b2ffebe71053d8288a58af789d91386538188f2d5",
+    "transport.mjs": "d036956cc30aba13bee152aca9b5ab8e0ae331df4c1df84a8b03f427043e74f6",
+    "settings.mjs": "2d741fa51809f77b7a949abc3e90db487e28826ff22d1c93c51c43e72961f40a",
+    "integrated-postgres-proof.mjs": "1c550b9f55f11d7bff341249b1b7fdb8c77f04636da2827716c525f4ed81ab5f",
+    "../backend.mjs": "964a394b7d95b041761b63a0c692527d8278b2257620389c09a9d430736393f4",
+    "../record-store.mjs": "9e66158cb4b2754e2a79e592aa633eb0ca564ab418be149721b03ed4bcfab794",
+    "../protocol-fixture.mjs": "d6f5c66bc0a52424e15b9028e560cfa765e7ec4904b4e75dbba320066f3d2c03",
+    "audit-postgres-proof.mjs": "76dd6e12e287675b1dc34a1c468888f7d98a8cc625186c1019cf4ef491a07839",
+    "../technical-audit.mjs": "a08f84fb9b5fdfb5fc978636668fe2e9231a8f898060caa6128c600fac7d1263",
+    "../technical-proof.mjs": "8d46460d7f93a463714bd29c2692abbe1620b3a0e0cb58356f9794bdfa7ab87c",
+    "../session-operator/protocol.mjs": "c37f45683be9e4738175ab93ab8f9e4b04e5bff2e5ade0ae7139175cf5456170",
+    "../session-operator/write-control.mjs": "710dd492b2d360592af982da9c72ccfe70a14a4da78ab8afe8bf89e2bc99d7f4",
+    "../session-operator/controller.mjs": "bcf8f6cf7eba15f15ec48884dabb1329c2cbf71963d0d8f877620ea3d5ef5ad6",
+    "../session-operator/postgres-proof.mjs": "455e72bce7019ba08a797c35a89600476a0ae412f93f48ba40ca952576a39328",
+    "../start.mjs": "d549c5f022ce17cfc5d457951be40f1399321783024fb1e9edd3e8ced28fd39c",
+    "start.mjs": "6de16b9cfd56724336ba5639cdf12ddd1a062d1c257b4ee7152d15b59f25aa3d",
+    "../../homologacao/session-race-receipt.mjs": "c7f20920f2cc02cf9862f4a73394ba8c25974ef81070ed5b7fd69b7f6644c66d"
+  },
+  "publishedHomologation": "NOT_GRANTED",
+  "newHmlGatePasses": 0,
+  "firstFailure": null,
+  "auditIntegrated": true,
+  "auditEvidence": {
+    "schema": "CFT005-NATIVE-GUARDED-AUDIT-1",
+    "contexts": [
+      {
+        "product": "A",
+        "user": "U1",
+        "checks": {
+          "exactRuntimeRole": true,
+          "restrictedRole": true,
+          "forcedRls": true,
+          "noCustomTriggers": true,
+          "tls": true,
+          "withCheckColumnsWritable": true,
+          "identityConstraint": true,
+          "productConstraint": true,
+          "ownerDomainConstraint": true,
+          "idPrimaryKey": true,
+          "exactOwnRow": true,
+          "noExtraVisibleRows": true,
+          "noExtraRowsProvenForContext": true,
+          "otherReadFiltered": true,
+          "ownUpdateReached": true,
+          "otherUpdateFiltered": true,
+          "withCheckOwnerDenied": true,
+          "withCheckProductDenied": true,
+          "otherSchemaDenied": true,
+          "otherRoleDenied": true,
+          "ownerRoleDenied": true,
+          "bypassDenied": true,
+          "noViewsOrForeignTables": true,
+          "noSecurityDefiner": true,
+          "noPublicFunctionExecute": true,
+          "publicCreateDenied": true,
+          "peerSchemaUsageDenied": true,
+          "noPublicRelations": true,
+          "fixedPrivateTables": true,
+          "ownerDefaultExecuteRevoked": true,
+          "noPublications": true,
+          "ownRowPreservedInsideTransaction": true,
+          "initialContextEmpty": true,
+          "afterRollbackContextEmpty": true,
+          "sameConnectionThroughRollback": true,
+          "ownRowPreservedAfterRollback": true,
+          "afterCommitContextEmpty": true,
+          "sameConnectionThroughCommit": true,
+          "previousVerifiedOwnerDifferent": false,
+          "sameConnectionAsPreviousAudit": false,
+          "ledgerGuardedProbeRollback": true,
+          "ledgerGuardedVerificationCommit": true,
+          "ledgerFreshAuthorizationEachPhase": true
+        }
+      },
+      {
+        "product": "A",
+        "user": "U2",
+        "checks": {
+          "exactRuntimeRole": true,
+          "restrictedRole": true,
+          "forcedRls": true,
+          "noCustomTriggers": true,
+          "tls": true,
+          "withCheckColumnsWritable": true,
+          "identityConstraint": true,
+          "productConstraint": true,
+          "ownerDomainConstraint": true,
+          "idPrimaryKey": true,
+          "exactOwnRow": true,
+          "noExtraVisibleRows": true,
+          "noExtraRowsProvenForContext": true,
+          "otherReadFiltered": true,
+          "ownUpdateReached": true,
+          "otherUpdateFiltered": true,
+          "withCheckOwnerDenied": true,
+          "withCheckProductDenied": true,
+          "otherSchemaDenied": true,
+          "otherRoleDenied": true,
+          "ownerRoleDenied": true,
+          "bypassDenied": true,
+          "noViewsOrForeignTables": true,
+          "noSecurityDefiner": true,
+          "noPublicFunctionExecute": true,
+          "publicCreateDenied": true,
+          "peerSchemaUsageDenied": true,
+          "noPublicRelations": true,
+          "fixedPrivateTables": true,
+          "ownerDefaultExecuteRevoked": true,
+          "noPublications": true,
+          "ownRowPreservedInsideTransaction": true,
+          "initialContextEmpty": true,
+          "afterRollbackContextEmpty": true,
+          "sameConnectionThroughRollback": true,
+          "ownRowPreservedAfterRollback": true,
+          "afterCommitContextEmpty": true,
+          "sameConnectionThroughCommit": true,
+          "previousVerifiedOwnerDifferent": true,
+          "sameConnectionAsPreviousAudit": true,
+          "ledgerGuardedProbeRollback": true,
+          "ledgerGuardedVerificationCommit": true,
+          "ledgerFreshAuthorizationEachPhase": true
+        }
+      },
+      {
+        "product": "B",
+        "user": "U1",
+        "checks": {
+          "exactRuntimeRole": true,
+          "restrictedRole": true,
+          "forcedRls": true,
+          "noCustomTriggers": true,
+          "tls": true,
+          "withCheckColumnsWritable": true,
+          "identityConstraint": true,
+          "productConstraint": true,
+          "ownerDomainConstraint": true,
+          "idPrimaryKey": true,
+          "exactOwnRow": true,
+          "noExtraVisibleRows": true,
+          "noExtraRowsProvenForContext": true,
+          "otherReadFiltered": true,
+          "ownUpdateReached": true,
+          "otherUpdateFiltered": true,
+          "withCheckOwnerDenied": true,
+          "withCheckProductDenied": true,
+          "otherSchemaDenied": true,
+          "otherRoleDenied": true,
+          "ownerRoleDenied": true,
+          "bypassDenied": true,
+          "noViewsOrForeignTables": true,
+          "noSecurityDefiner": true,
+          "noPublicFunctionExecute": true,
+          "publicCreateDenied": true,
+          "peerSchemaUsageDenied": true,
+          "noPublicRelations": true,
+          "fixedPrivateTables": true,
+          "ownerDefaultExecuteRevoked": true,
+          "noPublications": true,
+          "ownRowPreservedInsideTransaction": true,
+          "initialContextEmpty": true,
+          "afterRollbackContextEmpty": true,
+          "sameConnectionThroughRollback": true,
+          "ownRowPreservedAfterRollback": true,
+          "afterCommitContextEmpty": true,
+          "sameConnectionThroughCommit": true,
+          "previousVerifiedOwnerDifferent": false,
+          "sameConnectionAsPreviousAudit": false,
+          "ledgerGuardedProbeRollback": true,
+          "ledgerGuardedVerificationCommit": true,
+          "ledgerFreshAuthorizationEachPhase": true
+        }
+      },
+      {
+        "product": "B",
+        "user": "U2",
+        "checks": {
+          "exactRuntimeRole": true,
+          "restrictedRole": true,
+          "forcedRls": true,
+          "noCustomTriggers": true,
+          "tls": true,
+          "withCheckColumnsWritable": true,
+          "identityConstraint": true,
+          "productConstraint": true,
+          "ownerDomainConstraint": true,
+          "idPrimaryKey": true,
+          "exactOwnRow": true,
+          "noExtraVisibleRows": true,
+          "noExtraRowsProvenForContext": true,
+          "otherReadFiltered": true,
+          "ownUpdateReached": true,
+          "otherUpdateFiltered": true,
+          "withCheckOwnerDenied": true,
+          "withCheckProductDenied": true,
+          "otherSchemaDenied": true,
+          "otherRoleDenied": true,
+          "ownerRoleDenied": true,
+          "bypassDenied": true,
+          "noViewsOrForeignTables": true,
+          "noSecurityDefiner": true,
+          "noPublicFunctionExecute": true,
+          "publicCreateDenied": true,
+          "peerSchemaUsageDenied": true,
+          "noPublicRelations": true,
+          "fixedPrivateTables": true,
+          "ownerDefaultExecuteRevoked": true,
+          "noPublications": true,
+          "ownRowPreservedInsideTransaction": true,
+          "initialContextEmpty": true,
+          "afterRollbackContextEmpty": true,
+          "sameConnectionThroughRollback": true,
+          "ownRowPreservedAfterRollback": true,
+          "afterCommitContextEmpty": true,
+          "sameConnectionThroughCommit": true,
+          "previousVerifiedOwnerDifferent": true,
+          "sameConnectionAsPreviousAudit": true,
+          "ledgerGuardedProbeRollback": true,
+          "ledgerGuardedVerificationCommit": true,
+          "ledgerFreshAuthorizationEachPhase": true
+        }
+      }
+    ],
+    "allFourRowsUnchanged": true,
+    "realOidc": false,
+    "hostedEvidence": false
+  },
+  "operatorIntegrated": true,
+  "operatorEvidence": {
+    "scope": "local-synthetic-only",
+    "realOidc": false,
+    "realBrowser": false,
+    "sharedDatabaseAdminUsedByRuntime": false,
+    "receipts": [
+      {
+        "version": 1,
+        "kind": "logout",
+        "mode": "fixture",
+        "product": "A",
+        "state": "BLOCKED",
+        "phase": "complete",
+        "checks": {
+          "localLogoutDurable": true,
+          "ownOldSession401": true,
+          "peerSession200": true,
+          "u2Sessions200": true,
+          "u2RowsPreserved": true,
+          "noCentralLogoutClaim": true,
+          "rowsPreserved": true
+        },
+        "limit": "Local product logout only; no Auth0/Google central logout."
+      },
+      {
+        "version": 1,
+        "kind": "race",
+        "product": "A",
+        "state": "BLOCKED",
+        "phase": "complete",
+        "trace": {
+          "schema": "CFT005-HML-SESSION-RACE-1",
+          "runId": "HML-SESSION-RACE-A-1793326987289",
+          "mode": "fixture",
+          "scope": "synthetic-only",
+          "sourceCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "product": "A",
+          "requirements": {
+            "fourOwnerBaselinesVerified": true,
+            "separateProfilesVerified": false,
+            "bindingsVerified": true,
+            "samePhysicalConnectionVerified": true,
+            "writeUsesNormalDataFence": true
+          },
+          "events": [
+            {
+              "seq": 1,
+              "event": "write_fence_acquired"
+            },
+            {
+              "seq": 2,
+              "event": "write_issued"
+            },
+            {
+              "seq": 3,
+              "event": "revoke_requested"
+            },
+            {
+              "seq": 4,
+              "event": "revoke_waiting_on_write_lock"
+            },
+            {
+              "seq": 5,
+              "event": "no_ack_while_lock_held"
+            },
+            {
+              "seq": 6,
+              "event": "write_commit_confirmed"
+            },
+            {
+              "seq": 7,
+              "event": "revocation_commit_confirmed"
+            },
+            {
+              "seq": 8,
+              "event": "revocation_ack_received"
+            },
+            {
+              "seq": 9,
+              "event": "postconditions_checked"
+            }
+          ],
+          "postconditions": {
+            "oldSessionAStatus": 401,
+            "oldSessionBStatus": 401,
+            "u2AStatus": 200,
+            "u2BStatus": 200,
+            "oldBindingDenied": true,
+            "epochAdvancedExactlyOnce": true,
+            "ownWriteCommittedExactlyOnce": true,
+            "otherRowsPreserved": true
+          }
+        },
+        "limit": "Synthetic session proof only; fixture is not hosted evidence. Other gates remain separate."
+      },
+      {
+        "version": 1,
+        "kind": "race",
+        "product": "B",
+        "state": "BLOCKED",
+        "phase": "complete",
+        "trace": {
+          "schema": "CFT005-HML-SESSION-RACE-1",
+          "runId": "HML-SESSION-RACE-B-1793327003592",
+          "mode": "fixture",
+          "scope": "synthetic-only",
+          "sourceCommit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "product": "B",
+          "requirements": {
+            "fourOwnerBaselinesVerified": true,
+            "separateProfilesVerified": false,
+            "bindingsVerified": true,
+            "samePhysicalConnectionVerified": true,
+            "writeUsesNormalDataFence": true
+          },
+          "events": [
+            {
+              "seq": 1,
+              "event": "write_fence_acquired"
+            },
+            {
+              "seq": 2,
+              "event": "write_issued"
+            },
+            {
+              "seq": 3,
+              "event": "revoke_requested"
+            },
+            {
+              "seq": 4,
+              "event": "revoke_waiting_on_write_lock"
+            },
+            {
+              "seq": 5,
+              "event": "no_ack_while_lock_held"
+            },
+            {
+              "seq": 6,
+              "event": "write_commit_confirmed"
+            },
+            {
+              "seq": 7,
+              "event": "revocation_commit_confirmed"
+            },
+            {
+              "seq": 8,
+              "event": "revocation_ack_received"
+            },
+            {
+              "seq": 9,
+              "event": "postconditions_checked"
+            }
+          ],
+          "postconditions": {
+            "oldSessionAStatus": 401,
+            "oldSessionBStatus": 401,
+            "u2AStatus": 200,
+            "u2BStatus": 200,
+            "oldBindingDenied": true,
+            "epochAdvancedExactlyOnce": true,
+            "ownWriteCommittedExactlyOnce": true,
+            "otherRowsPreserved": true
+          }
+        },
+        "limit": "Synthetic session proof only; fixture is not hosted evidence. Other gates remain separate."
+      }
+    ],
+    "newHostedGatePasses": 0,
+    "limits": [
+      "Only local logout and two ordered races implemented in this operator increment.",
+      "Separate browser profiles are not inferred by the server.",
+      "H16/H17/H19/H24 require their remaining hosted operations; operator replay test is not ledger revocation replay homologation."
+    ]
+  }
+}
